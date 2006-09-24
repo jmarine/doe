@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence">
+  <persistence-unit name="doe4ejb3" transaction-type="JTA">
+    <jta-data-source>jdbc/doe4ejb3</jta-data-source>
+    <class>org.doe4ejb3.test.Category</class>
+    <class>org.doe4ejb3.test.Ingredient</class>
+    <class>org.doe4ejb3.test.Recipe</class>
+    <properties>
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="toplink.create-ddl-jdbc-file-name" value="doe4ejb3_test_create_javadb.jdbc"/>
+      <property name="toplink.drop-ddl-jdbc-file-name" value="doe4ejb3_test_drop_javadb.jdbc"/>
+    </properties>
+  </persistence-unit>
+</persistence>
