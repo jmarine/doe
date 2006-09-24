@@ -1,0 +1,85 @@
+/*
+ * DataBinder.java
+ *
+ * Created on 24 July 2006, 20:01
+ * @author Jordi Marine Fort
+ */
+
+package org.doe4ejb3.gui;
+
+import java.beans.PropertyEditor;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.InvocationTargetException;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.swing.JComponent;
+import org.doe4ejb3.util.ReflectionUtils;
+
+
+/**
+ *
+ * @author Jordi Marine Fort
+ */
+public class JComponentDataBinder 
+{
+    private Object comp;
+    private Method compGetter;
+    private PropertyEditor editor;
+    private Property entityProperty;
+    
+    /** Creates a new instance of DataBinder */
+    public JComponentDataBinder(Object comp, Method compGetter, PropertyEditor editor, Property entityProperty) 
+    {
+        this.comp = comp;
+        this.compGetter = compGetter;
+        this.editor = editor;
+        this.entityProperty = entityProperty;
+
+    }
+    
+    public void executeObjSetterWithValueFromCompGetter() throws IllegalAccessException, InvocationTargetException
+    {
+        try {
+        
+            Object value = ReflectionUtils.getMemberValue(comp, compGetter); 
+            
+            Class memberClass = entityProperty.getType();
+            boolean convertToCollection = java.util.Collection.class.isAssignableFrom(memberClass);
+            if( (convertToCollection) && (value.getClass().isArray()) ) {
+                Class collectionClass = memberClass;
+
+                // ParameterizedType paramType = (ParameterizedType)memberType;
+                // memberClass = (Class)(paramType.getActualTypeArguments()[0]);            
+
+                // FIXME: Create generic collection for "collectionClass"?
+                java.util.Collection list = (java.util.Set.class.isAssignableFrom(memberClass))? new HashSet() : new java.util.ArrayList();
+                for(int index = 0; index < Array.getLength(value); index++) {
+                    list.add(Array.get(value, index));
+                }
+
+                // FIXME: Is this cast really needed?
+                value = collectionClass.cast(list);
+
+            } else if(editor != null) {
+                editor.setAsText(value.toString());  // string representation
+                value = editor.getValue();           // convert to editor's real type
+            }
+
+            entityProperty.setValue(value);
+
+        } catch(Exception ex) {
+            System.out.println("JComponentDataBinder.executeObjSetterWithValueFromCompGetter: ERROR: " + ex.getMessage());
+            ex.printStackTrace();
+            // throw ex;  // FIXME: SHOULD REALLY FAIL
+        }
+    }
+    
+}
