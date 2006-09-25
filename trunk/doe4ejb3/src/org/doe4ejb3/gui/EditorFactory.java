@@ -158,24 +158,23 @@ public class EditorFactory {
                 editor = java.beans.PropertyEditorManager.findEditor(memberClass);
                 System.out.println("EditorFactory: property editor for " + memberClass.getName() + "=" + editor);
                 
-                if( (editor != null) && (editor.supportsCustomEditor()) ) {
-                    System.out.println("EditorFactory: searching for custom editor: " + editor.getClass());
-                    Component awtComponent = editor.getCustomEditor();
-                    if(awtComponent instanceof JComponent) {
-                        comp = (JComponent)awtComponent;
+                Component customComponent = null;
+                if( (editor != null) && (editor.supportsCustomEditor()) && ((customComponent = editor.getCustomEditor()) != null) ) {
+                    if(customComponent instanceof JComponent) {
+                        comp = (JComponent)customComponent;
                     } else {
-                        JPanel panel = new JPanel();
+                        JPanel panel = new JPanel();  // A JComponent is needed to putClientProperty("dataBinder", binder)
                         panel.setLayout(new FlowLayout());
-                        panel.add(awtComponent);
+                        panel.add(customComponent);
                         comp = panel;
                     }
-                    System.out.println("EditorFactory: custom editor: " + comp);
 
                     Method editorGetter = editor.getClass().getMethod("getValue");
                     Object value = property.getValue();
                     if(value != null) editor.setValue(value);
 
                     binder = new JComponentDataBinder(editor, editorGetter, editor, property);
+                    
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
                     JCheckBox checkBox = new JCheckBox();
                     comp = checkBox;
@@ -189,10 +188,27 @@ public class EditorFactory {
                         checkBox.setSelected(value.booleanValue());
                     }
                     
-                } else {
-                    JTextComponent textField = (defaultLength < 100)? new JTextField(defaultLength) : new JTextArea(6, 100);
-                    comp = textField;
-                    compGetter = textField.getClass().getMethod("getText");
+                } else { // using JTextField or JTextArea depending on Column's length attribute
+                    int length = defaultLength;
+                    if(property instanceof ObjectProperty) {
+                        ObjectProperty objectProperty = (ObjectProperty)property;
+                        javax.persistence.Column column = (javax.persistence.Column)objectProperty.getAnnotation(javax.persistence.Column.class);
+                        if( (column != null) && (column.length() > 0) ) length = column.length();
+                    }
+                    
+                    JTextComponent textField = null;
+                    if(length < 100) {
+                        textField = new JTextField(length);
+                        compGetter = textField.getClass().getMethod("getText");
+                        comp = textField;
+                    } else {
+                        textField = new javax.swing.JTextPane();
+                        // textField.setMinimumSize(new java.awt.Dimension(defaultLength * 10, 80));
+                        textField.setPreferredSize(new java.awt.Dimension(defaultLength * 10, 80));
+                        compGetter = textField.getClass().getMethod("getText");
+                        binder = new JComponentDataBinder(textField, compGetter, editor, property);                        
+                        comp = new JScrollPane(textField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                    }
 
                     Object value = property.getValue();
                     if(value != null) {
