@@ -107,7 +107,7 @@ public class ObjectProperty implements Property
                 if(propertyDescriptor.getReadMethod() != null) {
                     annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
                 }
-                if( (annotation == null) && (propertyDescriptor.getWriteMethod() != null) ) {
+                if( (annotation != null) && (propertyDescriptor.getWriteMethod() != null) ) {
                     annotation = propertyDescriptor.getWriteMethod().getAnnotation(annotationClass);
                 }
         } 
