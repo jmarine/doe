@@ -96,7 +96,7 @@ The "Domain Object Explorer" is a desktop application that can be included withi
       </ul>
       <li>Cons:</li>
       <ul>
-	<li>Only runs on <a href="https://glassfish.dev.java.net/public/downloadsindex.html">GlassFish v2</a> (build 12)</li>
+	<li>Only runs on <a href="https://glassfish.dev.java.net/public/downloadsindex.html">GlassFish v2</a> build 19 (M2)</li>
 	<li>Deployed aplications are really big (about 40Mb)</li>
 	<li>No stable version, yet</li>
 	<li>...</li>
@@ -129,7 +129,7 @@ The "Domain Object Explorer" is a desktop application that can be included withi
     <blockquote>
 
 	<ol>
-        <li>Download, install and start <a href="https://glassfish.dev.java.net/public/downloadsindex.html">GlassFish v2</a> application server (important note: "doe" has only been tested with GlassFish v2 build 12, and newer versions may not work because of "issue 1173").
+        <li>Download, install and start <a href="https://glassfish.dev.java.net/public/downloadsindex.html">GlassFish v2</a> application server (important note: "doe" has only been tested with GlassFish v2 build 19, prior versions may not work because of "issue 1173").
         </li>
         <li>Include the "doe4ejb3-app-client" into your enterprise application, and deploy the new EAR to the application server.<br> Note: if you want to try with the sample application, you have to create a database for the EJB3 entities, and configure the connection parameters in GlassFish administration console (the JDBC datasource name should be "jdbc/doe4ejb3"), then open the projects in NetBeans 5.5 beta 2, and deploy the "doe4ejb3-test-app" project into the application server.</li>
 	<li>Launch the new Java Web Start application client (note: you can use GlassFish administration console to browse the deployed application, and launch the new "doe4ejb3-app-client" module).</li>
