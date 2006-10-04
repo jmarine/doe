@@ -9,6 +9,9 @@ package org.doe4ejb3.gui;
 
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.InvocationTargetException;
@@ -21,6 +24,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -32,6 +36,7 @@ import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
+import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerDateModel;
 import javax.swing.DefaultListModel;
@@ -99,7 +104,7 @@ public class EditorFactory {
                     final DefaultListModel listModel = new DefaultListModel();
                     Method modelGetter = listModel.getClass().getMethod("toArray");
                     binder = new JComponentDataBinder(listModel, modelGetter, editor, property);
-                    comp = getEditorForEntityCollection(memberClass, property, listModel);
+                    comp = getEditorForMultivaluedProperty(memberClass, property, listModel);
 
                 } catch(Exception ex) {
                     System.out.println("Error loading property: " + ex.getMessage());
@@ -238,46 +243,47 @@ public class EditorFactory {
         }
         return comp;
     }
+    
 
-    private static JComponent getEditorForEntityCollection(final Class memberClass, final Property property, final DefaultListModel listModel) throws InvocationTargetException, IllegalAccessException {
-        JComponent comp;
+    /** setup an editor for a multi-valued property */
+    private static JComponent getEditorForMultivaluedProperty(final Class memberClass, final Property property, final DefaultListModel listModel) throws InvocationTargetException, IllegalAccessException {
+        final JPanel panel = new JPanel();
+        final List allValues = JPAUtils.findAllEntities(memberClass);
 
-        List allValues = JPAUtils.findAllEntities(memberClass);
-        final JList list = new JList();
-        list.setVisibleRowCount(6);
-        list.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        list.setModel(listModel);
+        // populate listmodel with property's values
+        Collection values = (Collection)property.getValue();
+        System.out.println("Property " + property.getName() + " collection size = " + values.size());
+        Iterator iter = values.iterator();
+        while(iter.hasNext()) {
+            Object valueToSelect = iter.next();
+            listModel.addElement(valueToSelect);
+        }
+
+        // configure JList component
+        final JList jList = new JList();
+        jList.setVisibleRowCount(6);
+        jList.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        jList.setModel(listModel);
+        // TODO: allow drag and drop operations
         
-        
-        // TODO: refactor to method & better layout
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout());
-        panel.add(new JScrollPane(list));
-        
-        final JComboBox newItemComboBox = new JComboBox(allValues.toArray());
-        newItemComboBox.insertItemAt("(select new value)", 0);
-        newItemComboBox.setSelectedIndex(0);
-        panel.add(newItemComboBox);
-        
+        // configure "add" button
         JButton btnAddItem = new JButton("Add");
         btnAddItem.addActionListener(new ActionListener() {
            public void actionPerformed(ActionEvent evt)  {
-             System.out.println("EditorFactory: adding selected index: " + newItemComboBox.getSelectedIndex());
-             if(newItemComboBox.getSelectedIndex() > 0) {
-                 Object newItem = newItemComboBox.getSelectedItem();
-                 if(!listModel.contains(newItem)) {
-                     System.out.println("EditorFactory: adding selected item: " + newItemComboBox.getSelectedIndex());                             
+               Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new item", JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
+               if(newItem != null) {
+                  if(!listModel.contains(newItem)) {
                      listModel.addElement(newItem);
-                 }
-             }
+                  }
+               }
            }
         });
-        panel.add(btnAddItem);
-        
+
+        // configure "delete" button
         JButton btnDeleteItem = new JButton("Delete");
         btnDeleteItem.addActionListener(new ActionListener() {
            public void actionPerformed(ActionEvent evt)  {
-               int indexesToRemove[] = list.getSelectedIndices();
+               int indexesToRemove[] = jList.getSelectedIndices();
                System.out.println("EditorFactory: removing selected items: " + indexesToRemove);
                if(indexesToRemove != null) {
                    for(int i = 0; i < indexesToRemove.length; i++) {
@@ -287,25 +293,22 @@ public class EditorFactory {
                }
            }
         });
-        panel.add(btnDeleteItem);
         
-        comp = panel;                        
-
         
-
-        ListSelectionModel selectionModel = list.getSelectionModel();
-        Collection values = (Collection)property.getValue();
-        System.out.println("Property " + property.getName() + " collection size = " + values.size());
-        Iterator iter = values.iterator();
-        while(iter.hasNext()) {
-            Object valueToSelect = iter.next();
-            listModel.addElement(valueToSelect);
-            /* before
-            int pos = allValues.indexOf(valueToSelect);
-            selectionModel.addSelectionInterval(pos,pos);
-             */
-        }
-        return comp;
+        // configure panel layout
+        panel.setLayout(new GridBagLayout());
+        panel.add(new JScrollPane(jList), gbcList);
+        panel.add(btnAddItem, gbcButton);
+        panel.add(btnDeleteItem, gbcButton);
+        
+        return panel;
     }
+
+    
+    /** Private constants to layout item list */
+    private final static GridBagConstraints gbcList = new GridBagConstraints(0,0, 2, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,0,2,0), 0,0);
+    
+    /** Private constants to layout buttons */
+    private final static GridBagConstraints gbcButton = new GridBagConstraints(GridBagConstraints.RELATIVE,1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,0,5,3), 0,0);
     
 }
