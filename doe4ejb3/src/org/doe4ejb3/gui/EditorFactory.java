@@ -245,7 +245,10 @@ public class EditorFactory {
     }
     
 
-    /** setup an editor for a multi-valued property */
+    /** 
+     * Setup an editor for a multi-valued property 
+     * TODO: allow drag and drop operations
+     */
     private static JComponent getEditorForMultivaluedProperty(final Class memberClass, final Property property, final DefaultListModel listModel) throws InvocationTargetException, IllegalAccessException {
         final JPanel panel = new JPanel();
         final List allValues = JPAUtils.findAllEntities(memberClass);
@@ -264,7 +267,6 @@ public class EditorFactory {
         jList.setVisibleRowCount(6);
         jList.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jList.setModel(listModel);
-        // TODO: allow drag and drop operations
         
         // configure "add" button
         JButton btnAddItem = new JButton("Add");
