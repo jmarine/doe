@@ -6,6 +6,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.doe4ejb3.annotation.PropertyDescriptor;
+
 
 @Entity
 public class Ingredient
@@ -18,6 +20,7 @@ public class Ingredient
     private String name;
 
     @Column(name="AMOUNT", length=20)
+    @PropertyDescriptor(index=1, showInLists=true)    
     public String getAmount()
     {
         return amount;
@@ -28,7 +31,6 @@ public class Ingredient
         this.amount = amount;
     }
 
-    //@PropertyDescriptor(index=0)
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     public Integer getId()
@@ -42,6 +44,7 @@ public class Ingredient
     }
 
     @Column(name="NAME", length=50)
+    @PropertyDescriptor(index=2, showInLists=true)
     public String getName()
     {
         return name;
