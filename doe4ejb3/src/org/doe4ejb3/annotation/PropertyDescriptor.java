@@ -23,4 +23,5 @@ public @interface PropertyDescriptor {
     String displayName() default "";
     String resourceBundle() default "";
     String format() default "";
+    boolean showInLists() default false;
 }
