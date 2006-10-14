@@ -42,6 +42,7 @@ public class JPAUtils
 {
 
     private static JAXBContext jc = null;
+    private static Hashtable<String, ArrayList<Class>> entityListByPU = new Hashtable<String, ArrayList<Class>>();
     private static Hashtable puNameByEntity = new Hashtable();
     private static Hashtable<String, Class> classesByPUNameAndEntityName = new Hashtable<String, Class>();
     private static Hashtable entityManagerFactoryByPUName = new Hashtable();
@@ -58,7 +59,20 @@ public class JPAUtils
         return classesByPUNameAndEntityName.get(key);
     }
     
-    public static Collection<Class> getPersistentEntities() throws Exception
+    
+    public static Collection<String> getPersistenceUnits() throws Exception
+    {
+        getPersistentEntities();
+        return entityListByPU.keySet();
+    }
+    
+    public static Collection<Class> getPersistentEntities(String puName) throws Exception
+    {
+        return entityListByPU.get(puName);
+    }
+
+    
+    private static Collection<Class> getPersistentEntities() throws Exception
     {
         try {
             System.out.println("Searching persistence providers");
@@ -121,11 +135,18 @@ public class JPAUtils
                         Class clazz = loader.loadClass(className);
                         Entity entity = (Entity)clazz.getAnnotation(javax.persistence.Entity.class);
                         if(entity != null) {
-                            puNameByEntity.put(className, pu.getName());
+                            String puName = pu.getName();
+                            if(puName == null) puName = "";
+                            puNameByEntity.put(className, puName);
                             
                             String entityName = entity.name();
                             if( (entityName == null) || (entityName.length() == 0) ) entityName = clazz.getSimpleName();
-                            classesByPUNameAndEntityName.put(pu.getName() + "/" + entityName, clazz);
+                            classesByPUNameAndEntityName.put(puName + "/" + entityName, clazz);
+                            
+                            ArrayList<Class> entityList = entityListByPU.get(puName);
+                            if(entityList == null) entityList = new ArrayList<Class>();
+                            entityList.add(clazz);
+                            entityListByPU.put(puName, entityList);
                         }
                     }
                 }
@@ -161,6 +182,11 @@ public class JPAUtils
                     String entityName = entity.name();
                     if( (entityName == null) || (entityName.length() == 0) ) entityName = clazz.getSimpleName();
                     classesByPUNameAndEntityName.put(defaultPUName + "/" + entityName, clazz);
+                    
+                    ArrayList<Class> entityList = entityListByPU.get(defaultPUName);
+                    if(entityList == null) entityList = new ArrayList<Class>();
+                    entityList.add(clazz);
+                    entityListByPU.put(defaultPUName, entityList);
                 }
             }
         }
