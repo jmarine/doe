@@ -10,7 +10,7 @@ import org.doe4ejb3.annotation.PropertyDescriptor;
 
 
 @Entity
-public class Ingredient
+public class Ingredient implements java.io.Serializable
 {
 
     private Integer id;

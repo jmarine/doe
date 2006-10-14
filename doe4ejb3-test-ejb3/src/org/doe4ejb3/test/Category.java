@@ -22,7 +22,7 @@ import javax.persistence.ManyToOne;
 
 
 @Entity
-public class Category
+public class Category implements java.io.Serializable
 {
     private Integer id;
     

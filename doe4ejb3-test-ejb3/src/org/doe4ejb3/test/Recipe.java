@@ -15,6 +15,8 @@ package org.doe4ejb3.test;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -24,6 +26,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -35,7 +38,7 @@ import org.doe4ejb3.annotation.PropertyDescriptor;
 
 @Entity
 @NamedQuery(name="searchByCategory",query="SELECT OBJECT(r) FROM Recipe r WHERE r.category = :category")
-public class Recipe
+public class Recipe implements java.io.Serializable
 {
     private Integer id;
 
