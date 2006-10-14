@@ -58,7 +58,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         }
         
         // TODO: advice user when no persistence entities were found.
-        if(jComboBoxEntityClass.getItemCount() == 0) error = new ApplicationException("No persistent entities found.");
+        // if(jComboBoxEntityClass.getItemCount() == 0) error = new ApplicationException("No persistent entities found.");
         
         // replace JDesktopPane with a better  MDI container
         mdiDesktopPane = new MDIDesktopPane();
@@ -83,24 +83,14 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
         jPopupMenuContextual = new javax.swing.JPopupMenu();
-        jMenuItemContextualNew = new javax.swing.JMenuItem();
-        jMenuItemContextualEdit = new javax.swing.JMenuItem();
-        jMenuItemContextualSeparator1 = new javax.swing.JSeparator();
-        jMenuItemContextualDelete = new javax.swing.JMenuItem();
+        jMenuItemNew = new javax.swing.JMenuItem();
+        jMenuItemManager = new javax.swing.JMenuItem();
         jToolBar = new javax.swing.JToolBar();
         jButtonExit = new javax.swing.JButton();
         jStatusPanel = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
         jSplitPaneCentral = new javax.swing.JSplitPane();
-        jPanelEntidad = new javax.swing.JPanel();
-        jLabelEntity = new javax.swing.JLabel();
-        jComboBoxEntityClass = new javax.swing.JComboBox();
-        jLabelQuery = new javax.swing.JLabel();
-        jComboBoxNamedQuery = new javax.swing.JComboBox();
-        jPanelQueryParams = new javax.swing.JPanel();
-        jScrollPaneQueryResults = new javax.swing.JScrollPane();
-        jListQueryResults = new javax.swing.JList();
-        jButtonSearch = new javax.swing.JButton();
+        jOutlinePanePersistenceUnits = new org.doe4ejb3.gui.JOutlinePane();
         jScrollDesktopPane = new javax.swing.JScrollPane();
         jMainMenuBar = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
@@ -111,37 +101,25 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuHelp = new javax.swing.JMenu();
         jMenuItemAbout = new javax.swing.JMenuItem();
 
-        jMenuItemContextualNew.setMnemonic('n');
-        jMenuItemContextualNew.setText("New");
-        jMenuItemContextualNew.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemNew.setMnemonic('n');
+        jMenuItemNew.setText("New");
+        jMenuItemNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemContextualNewActionPerformed(evt);
+                jMenuItemNewActionPerformed(evt);
             }
         });
 
-        jPopupMenuContextual.add(jMenuItemContextualNew);
+        jPopupMenuContextual.add(jMenuItemNew);
 
-        jMenuItemContextualEdit.setMnemonic('e');
-        jMenuItemContextualEdit.setText("Edit");
-        jMenuItemContextualEdit.addActionListener(new java.awt.event.ActionListener() {
+        jMenuItemManager.setMnemonic('m');
+        jMenuItemManager.setText("Manage");
+        jMenuItemManager.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemContextualEditActionPerformed(evt);
+                jMenuItemManagerActionPerformed(evt);
             }
         });
 
-        jPopupMenuContextual.add(jMenuItemContextualEdit);
-
-        jPopupMenuContextual.add(jMenuItemContextualSeparator1);
-
-        jMenuItemContextualDelete.setMnemonic('d');
-        jMenuItemContextualDelete.setText("Delete");
-        jMenuItemContextualDelete.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemContextualDeleteActionPerformed(evt);
-            }
-        });
-
-        jPopupMenuContextual.add(jMenuItemContextualDelete);
+        jPopupMenuContextual.add(jMenuItemManager);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Domain Object Explorer for EJB3");
@@ -174,79 +152,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         getContentPane().add(jStatusPanel, java.awt.BorderLayout.SOUTH);
 
         jSplitPaneCentral.setDividerLocation(300);
-        jPanelEntidad.setMinimumSize(new java.awt.Dimension(300, 200));
-        jLabelEntity.setText("Entity:");
-
-        jComboBoxEntityClass.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jComboBoxEntityClassItemStateChanged(evt);
-            }
-        });
-
-        jLabelQuery.setText("Query:");
-
-        jComboBoxNamedQuery.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All" }));
-        jComboBoxNamedQuery.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jComboBoxNamedQueryItemStateChanged(evt);
-            }
-        });
-
-        jPanelQueryParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parameters:"));
-
-        jScrollPaneQueryResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Results:"));
-        jScrollPaneQueryResults.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jListQueryResults.setComponentPopupMenu(jPopupMenuContextual);
-        jScrollPaneQueryResults.setViewportView(jListQueryResults);
-
-        jButtonSearch.setMnemonic('s');
-        jButtonSearch.setText("Search");
-        jButtonSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonSearchActionPerformed(evt);
-            }
-        });
-
-        org.jdesktop.layout.GroupLayout jPanelEntidadLayout = new org.jdesktop.layout.GroupLayout(jPanelEntidad);
-        jPanelEntidad.setLayout(jPanelEntidadLayout);
-        jPanelEntidadLayout.setHorizontalGroup(
-            jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanelEntidadLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPaneQueryResults, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanelEntidadLayout.createSequentialGroup()
-                        .add(jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabelEntity)
-                            .add(jLabelQuery))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(jComboBoxEntityClass, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .add(jComboBoxNamedQuery, 0, 120, Short.MAX_VALUE))
-                        .add(15, 15, 15)
-                        .add(jButtonSearch))
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanelQueryParams, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 275, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanelEntidadLayout.setVerticalGroup(
-            jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(jPanelEntidadLayout.createSequentialGroup()
-                .addContainerGap()
-                .add(jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabelEntity)
-                    .add(jComboBoxEntityClass, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabelQuery)
-                    .add(jComboBoxNamedQuery, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButtonSearch))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanelQueryParams, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 92, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPaneQueryResults, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
-                .addContainerGap())
-        );
-        jSplitPaneCentral.setLeftComponent(jPanelEntidad);
+        jSplitPaneCentral.setLeftComponent(jOutlinePanePersistenceUnits);
 
         jScrollDesktopPane.setMinimumSize(new java.awt.Dimension(400, 200));
         jScrollDesktopPane.setPreferredSize(new java.awt.Dimension(400, 200));
@@ -297,46 +203,61 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jComboBoxNamedQueryItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxNamedQueryItemStateChanged
-        ListItem selectedEntityClassItem = (ListItem)jComboBoxEntityClass.getSelectedItem();
-        Class entityClass = (Class)selectedEntityClassItem.getValue();
-        String persistenceUnitName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
-
-        showStatus("Searching parameter types...");
-        if(jComboBoxNamedQuery.getSelectedIndex() <= 0) {
-            jPanelQueryParams.removeAll();
-            jPanelQueryParams.setVisible(false);
-        } else  {
-            ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
-            NamedQuery namedQuery = (NamedQuery)listItem.getValue();
-            String ejbql = namedQuery.query();
+    private void jMenuItemManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemManagerActionPerformed
+        try {
+            DomainObjectExplorer.getInstance().showStatus("");
             
-            try {
-                jPanelQueryParams.removeAll();
-                
-                HashMap ejbqlParameterTypes = EJBQLUtils.parseEJBQLParameterTypes(persistenceUnitName, ejbql);
-                // TODO: create controls for query parameters (depending on its type)
-
-                if(ejbqlParameterTypes.size() == 0) {
-                    jPanelQueryParams.removeAll();
-                    jPanelQueryParams.setVisible(false);
-                } else {
-                    queryParametersPanel = new QueryParametersEditorImpl(ejbqlParameterTypes);
-                    jPanelQueryParams.setLayout(new java.awt.BorderLayout());
-                    jPanelQueryParams.add(queryParametersPanel, java.awt.BorderLayout.CENTER);
-                    jPanelQueryParams.setVisible(true);
-                }
-                
-            } catch(Exception ex) {
-                jPanelQueryParams.removeAll();
-                jPanelQueryParams.setLayout(new FlowLayout());
-                jPanelQueryParams.add(new JLabel("Unknown parameter types"));
-                jPanelQueryParams.setVisible(true);
+            Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
+            JComponent sourceControl = (JComponent)invoker;
+            
+            if(sourceControl instanceof JList) {
+                // Nueva entidad:
+                JList list = (JList)sourceControl; 
+                Class entityClass = (Class)list.getSelectedValue();
+                if(entityClass != null) DomainObjectExplorer.getInstance().openInternalFrameEntityManager(entityClass);
+                else throw new ApplicationException("A class must be selected");
             }
             
+        } catch(ApplicationException ex) {
+            
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            
+        } catch(Exception ex) {
+            
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+            
         }
-        showStatus("done.");
-    }//GEN-LAST:event_jComboBoxNamedQueryItemStateChanged
+        
+    }//GEN-LAST:event_jMenuItemManagerActionPerformed
+
+    private void jMenuItemNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemNewActionPerformed
+        try {
+            DomainObjectExplorer.getInstance().showStatus("");
+            
+            Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
+            JComponent sourceControl = (JComponent)invoker;
+            
+            if(sourceControl instanceof JList) {
+                // Nueva entidad:
+                JList list = (JList)sourceControl; 
+                Class entityClass = (Class)list.getSelectedValue();
+                if(entityClass != null) DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(entityClass, null);
+                else throw new ApplicationException("A class must be selected");
+            }
+            
+        } catch(ApplicationException ex) {
+            
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            
+        } catch(Exception ex) {
+            
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+            
+        }
+
+    }//GEN-LAST:event_jMenuItemNewActionPerformed
 
 
     // <editor-fold defaultstate="collapsed" desc=" Window events ">
@@ -361,136 +282,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.1\nDevelopers: Jordi Marine Fort <jmarine@tinet.org>", "About", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItemAboutActionPerformed
 
-    private void jMenuItemNewActionPerformed(java.awt.event.ActionEvent evt) {                                                       
-
-        try {
-            showStatus("");
-
-            JMenuItem invoker = (javax.swing.JMenuItem)evt.getSource();
-            Class entityClass = (Class)invoker.getClientProperty("org.doe4ejb3.entityClass");
-
-            if(entityClass != null) {
-                showInternalFrame(entityClass, null);
-            }
-            
-        } catch(ApplicationException ex) {
-
-            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-        } catch(Exception ex) {
-
-            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            
-        }
-    }                                                      
+                                                 
 
     // </editor-fold>
  
     
     // <editor-fold defaultstate="collapsed" desc=" Contextual menu events ">
-    private void jMenuItemContextualNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualNewActionPerformed
-
-        try {
-            showStatus("");
-
-            Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
-            JComponent sourceControl = (JComponent)invoker;
-            Class entityClass = (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-            
-            if(sourceControl instanceof JList) {
-                // Nueva entidad:
-                showInternalFrame(entityClass, null);
-            } 
-            
-        } catch(ApplicationException ex) {
-
-            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-        } catch(Exception ex) {
-
-            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            
-        }
-        
-    }//GEN-LAST:event_jMenuItemContextualNewActionPerformed
-
     
-    private void jMenuItemContextualEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualEditActionPerformed
-        try {
-            showStatus("");
-            
-            Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
-            JComponent sourceControl = (JComponent)invoker;
-            Class entityClass = (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-            
-            if(sourceControl instanceof JList) {
-                // Editar entidad:
-                Object entity = ((JList)sourceControl).getSelectedValue();
-                
-                if(entity == null) {
-                    throw new ApplicationException("No se ha seleccionado ningun valor.");
-                } else {
-                    showInternalFrame(entityClass, entity);
-                }
-            } 
-            
-        } catch(ApplicationException ex) {
-
-            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-        } catch(Exception ex) {
-
-            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            
-        }
-    }//GEN-LAST:event_jMenuItemContextualEditActionPerformed
-
-    private void jMenuItemContextualDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualDeleteActionPerformed
-
-        try {
-            showStatus("");
-            
-            Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
-            JComponent sourceControl = (JComponent)invoker;
-            Class entityClass = (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-            
-            // TODO? generalize for other component types (i.e. JTree, ComboBox, ...)
-            if(sourceControl instanceof JList) {
-                JList jList = (JList)sourceControl;
-                Object entity = jList.getSelectedValue();
-                if(entity == null) {
-                    throw new ApplicationException("No se ha seleccionado ningun valor.");
-                } else {
-                    int confirm = JOptionPane.showInternalConfirmDialog(mdiDesktopPane, "¿Seguro que desea eliminar " + entity.toString() + "?", "Confirme operacion", JOptionPane.OK_CANCEL_OPTION);
-                    if(confirm == JOptionPane.OK_OPTION) {
-                        JPAUtils.removeEntity(entity);
-                        
-                        DefaultListModel model = (DefaultListModel)jList.getModel();
-                        model.removeElementAt(jList.getSelectedIndex());
-                        
-                        showStatus("Selected item has been deleted.");
-                    }
-                }
-            }
-            
-            
-        } catch(ApplicationException ex) {
-
-            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
-        } catch(Exception ex) {
-
-            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-        }
-
-        
-        
-    }//GEN-LAST:event_jMenuItemContextualDeleteActionPerformed
-
     // </editor-fold>
 
     
@@ -504,66 +302,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     
     // <editor-fold defaultstate="collapsed" desc=" Other application events ">
-    private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
-      try {
-        List entities = null;
-        ListItem selectedListItem = (ListItem)jComboBoxEntityClass.getSelectedItem();
-        Class entityClass = (Class)selectedListItem.getValue();
 
-        showStatus("Searching...");
-        if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
-            entities = JPAUtils.findAllEntities(entityClass);
-            
-        } else if(jComboBoxNamedQuery.getSelectedIndex() > 0) {
-            ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
-            NamedQuery namedQuery = (NamedQuery)listItem.getValue();
-            HashMap parameterValues = queryParametersPanel.getParameterValues();
-            entities = JPAUtils.executeNamedQuery(entityClass, namedQuery.name(), parameterValues);
-        }
-
-        DefaultListModel model = new DefaultListModel();
-        if(entities.size() > 0) {
-            for(Object obj : entities) model.addElement(obj);
-        }
-
-        jListQueryResults.setModel(model);
-
-        showStatus(MessageFormat.format("Search done: {0} entities found", entities.size()));
-
-     } catch(Exception ex) {
-        showStatus("Error: " + ex.getMessage());
-     }
-
-        
-    }//GEN-LAST:event_jButtonSearchActionPerformed
-
-
-
-    private void jComboBoxEntityClassItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxEntityClassItemStateChanged
-        ListItem selectedListItem = (ListItem)jComboBoxEntityClass.getSelectedItem();
-        Class entityClass = (Class)selectedListItem.getValue();
-
-        jListQueryResults.setModel(new DefaultListModel());
-        jListQueryResults.putClientProperty("org.doe4ejb3.entityClass", entityClass);        
-
-        jComboBoxNamedQuery.removeAllItems();
-        jComboBoxNamedQuery.addItem("All");
-        
-        if(entityClass.getAnnotations() != null) {
-            for(Annotation annotation : entityClass.getAnnotations()) {
-                if(annotation instanceof NamedQuery) {
-                    NamedQuery namedQuery = (NamedQuery)annotation;
-                    String ejbql = namedQuery.query();
-                    if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {
-                        ListItem item = new ListItem(namedQuery, namedQuery.name());
-                        jComboBoxNamedQuery.addItem(item);
-                    }
-                }
-            }
-        }
-
-        jPanelQueryParams.setVisible(false);
-    }//GEN-LAST:event_jComboBoxEntityClassItemStateChanged
 
     // </editor-fold>
 
@@ -615,9 +354,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         String entityName = I18n.getEntityName(entityClass);
         String puName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
         
-        ListItem item = new ListItem(entityClass, puName + "/" + entityName);
-        jComboBoxEntityClass.addItem(item);
-                
         JMenuItem menuItem = new JMenuItem(entityName);
         menuItem.putClientProperty("org.doe4ejb3.entityClass", entityClass);
         menuItem.addActionListener(new ActionListener() {
@@ -634,10 +370,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     
     public void removeEntityClass(Class entityClass)
     {
-        String entityName = I18n.getEntityName(entityClass);
-        ListItem item = new ListItem(entityClass, entityName);
-        jComboBoxEntityClass.removeItem(item);
-        
         JMenuItem menuItem = newMenuItemsForEntityClasses.get(entityClass);
         if(menuItem != null) {
             jMenuNew.remove(menuItem);
@@ -684,17 +416,70 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     protected void initPersistenceEntities() throws Exception
     {
         System.out.println("EntityContainer: initPersistentEntities...");
-        Collection<Class> entityClasses =  org.doe4ejb3.util.JPAUtils.getPersistentEntities();
-        for(Class entityClass : entityClasses) 
+        Collection<String> persistenceUnits = org.doe4ejb3.util.JPAUtils.getPersistenceUnits();
+        for(String persistenceUnit : persistenceUnits) 
         {
-            addEntityClass(entityClass);
+            Collection<Class> persistenceEntities = org.doe4ejb3.util.JPAUtils.getPersistentEntities(persistenceUnit);
+            JList entityList = new JList(persistenceEntities.toArray());
+            entityList.setCellRenderer(EntityClassListCellRenderer.getInstance());
+            entityList.setComponentPopupMenu(jPopupMenuContextual);
+            entityList.addMouseListener(new MouseAdapter() {
+                public void mouseClicked(MouseEvent evt) {
+                    try {
+                        JList list = (JList)evt.getSource();
+                        Class entityClass = (Class)list.getSelectedValue();
+                        if( (evt.getClickCount() > 1) && (entityClass != null) ) {
+                            openInternalFrameEntityManager(entityClass);
+                        }
+                    } catch(Exception ex) {
+                        showStatus("Error: " + ex.getMessage());
+                    }
+                }
+            });
+            
+            String title = "PU: " + persistenceUnit;
+            if(persistenceUnit.length() == 0) title = "Default PU";
+            jOutlinePanePersistenceUnits.addTab(title, new JScrollPane(entityList));
+            
+            for(Class entityClass : persistenceEntities) addEntityClass(entityClass);
         }
+    }
 
+    public void openInternalFrameEntityManager(Class entityClass) throws Exception
+    {
+        final Object key = entityClass.getName() + "Manager";
+        JInternalFrame oldFrame = openedInternalFrames.get(key);
+        if(oldFrame != null) {
+
+            if(oldFrame.isIcon()) oldFrame.setIcon(false);
+            oldFrame.setSelected(true);
+            
+        } else {
+
+            String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass) + " manager";
+            JInternalFrame iFrame = new JInternalFrame(title, true, true, true, false );
+            iFrame.getContentPane().setLayout(new BorderLayout());
+            iFrame.getContentPane().add(new EntityManagerPane(entityClass), BorderLayout.CENTER);
+            
+            iFrame.addInternalFrameListener(new InternalFrameAdapter() {
+                public void internalFrameClosed(InternalFrameEvent evt) {
+                    openedInternalFrames.remove(key);
+                }
+              });
+
+
+            openedInternalFrames.put(key, iFrame);
+            mdiDesktopPane.add(iFrame);
+            iFrame.setVisible(true);
+            iFrame.setSelected(true);
+
+        }
     }
     
-    private void showInternalFrame(Class entityClass, Object entity) throws Exception
+    
+    public void openInternalFrameEntityEditor(Class entityClass, Object entity) throws Exception
     {
-        final Object key = (entity != null) ? entity : entityClass;
+        final Object key = (entity != null) ? entity : entityClass.getName() + "Editor";
         JInternalFrame oldFrame = openedInternalFrames.get(key);
         if(oldFrame != null) {
 
@@ -703,7 +488,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             
         } else {
             
-            JInternalFrame iFrame = createInternalFrame(entityClass, entity);
+            JInternalFrame iFrame = createInternalFrameEntityEditor(entityClass, entity);
             iFrame.addInternalFrameListener(new InternalFrameAdapter() {
                 public void internalFrameClosed(InternalFrameEvent evt) {
                     openedInternalFrames.remove(key);
@@ -720,7 +505,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }
 
 
-    private JInternalFrame createInternalFrame(final Class entityClass, Object entity) throws Exception 
+    private JInternalFrame createInternalFrameEntityEditor(final Class entityClass, Object entity) throws Exception 
     {
 
         // TODO: encapsulate as "EntityInternalFrame":
@@ -786,29 +571,19 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     // <editor-fold defaultstate="collapsed" desc=" Attributes ">
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonExit;
-    private javax.swing.JButton jButtonSearch;
-    private javax.swing.JComboBox jComboBoxEntityClass;
-    private javax.swing.JComboBox jComboBoxNamedQuery;
-    private javax.swing.JLabel jLabelEntity;
-    private javax.swing.JLabel jLabelQuery;
     private javax.swing.JLabel jLabelStatus;
-    private javax.swing.JList jListQueryResults;
     private javax.swing.JMenuBar jMainMenuBar;
     private javax.swing.JMenu jMenuEdit;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
     private javax.swing.JMenuItem jMenuItemAbout;
-    private javax.swing.JMenuItem jMenuItemContextualDelete;
-    private javax.swing.JMenuItem jMenuItemContextualEdit;
-    private javax.swing.JMenuItem jMenuItemContextualNew;
-    private javax.swing.JSeparator jMenuItemContextualSeparator1;
     private javax.swing.JMenuItem jMenuItemExit;
+    private javax.swing.JMenuItem jMenuItemManager;
+    private javax.swing.JMenuItem jMenuItemNew;
     private javax.swing.JMenu jMenuNew;
-    private javax.swing.JPanel jPanelEntidad;
-    private javax.swing.JPanel jPanelQueryParams;
+    private org.doe4ejb3.gui.JOutlinePane jOutlinePanePersistenceUnits;
     private javax.swing.JPopupMenu jPopupMenuContextual;
     private javax.swing.JScrollPane jScrollDesktopPane;
-    private javax.swing.JScrollPane jScrollPaneQueryResults;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSplitPane jSplitPaneCentral;
     private javax.swing.JPanel jStatusPanel;
@@ -818,7 +593,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     /** Other UI components */
     private static DomainObjectExplorer DOE = null;
     private MDIDesktopPane mdiDesktopPane = null;
-    private QueryParametersEditorImpl queryParametersPanel = null;
 
     /** Caches */ 
     private HashMap<Object,JInternalFrame> openedInternalFrames = new HashMap<Object,JInternalFrame>();
