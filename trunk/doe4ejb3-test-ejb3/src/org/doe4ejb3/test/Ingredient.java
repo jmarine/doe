@@ -6,10 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.annotation.PropertyDescriptor;
 
 
 @Entity
+@EntityDescriptor(hidden=true)
 public class Ingredient implements java.io.Serializable
 {
 
