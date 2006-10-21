@@ -84,7 +84,7 @@ public class QueryParametersEditorImpl extends JPanel
     private void handleParameterProperty(Property property)
     {
         int defaultLength = 20;
-        JComponent comp = EditorFactory.getEditor(property, defaultLength, TemporalType.TIMESTAMP);
+        JComponent comp = EditorFactory.getPropertyEditor(property, defaultLength, TemporalType.TIMESTAMP);
         if(comp != null) {
             JComponentDataBinder binder = (JComponentDataBinder)comp.getClientProperty("dataBinder");
             if(binder != null) binders.add(binder);
