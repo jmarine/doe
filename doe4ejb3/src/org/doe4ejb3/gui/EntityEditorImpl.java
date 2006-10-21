@@ -61,6 +61,11 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
     {
         binders.clear();
     }
+    
+    public boolean isNew()
+    {
+        return this.objIsNew;
+    }
 
     public Object getEntity() throws IllegalAccessException, InvocationTargetException
     {
@@ -256,7 +261,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
                 // Other editors:
                 javax.persistence.TemporalType defaultTemporalType = javax.persistence.TemporalType.TIMESTAMP;
                 if( (temporal != null) && (temporal.value() != null) ) defaultTemporalType = temporal.value();
-                comp = EditorFactory.getEditor(entityProperty, defaultLength, defaultTemporalType);
+                comp = EditorFactory.getPropertyEditor(entityProperty, defaultLength, defaultTemporalType);
                 binder = (JComponentDataBinder)((JComponent)comp).getClientProperty("dataBinder");
                 
             }

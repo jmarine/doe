@@ -8,6 +8,7 @@
 package org.doe4ejb3.gui;
 
 import com.sun.imageio.plugins.common.I18N;
+import com.sun.org.apache.bcel.internal.classfile.JavaClass;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -23,6 +24,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -34,6 +36,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
+import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -51,10 +54,12 @@ import javax.swing.event.TableModelListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.text.JTextComponent;
 
-
 import javax.persistence.TemporalType;
 
-import org.doe4ejb3.annotation.Editor;
+import org.doe4ejb3.event.EntityEvent;
+import org.doe4ejb3.event.EntityListener;
+import org.doe4ejb3.exception.ApplicationException;
+import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.util.JPAUtils;
 
 
@@ -69,18 +74,18 @@ public class EditorFactory {
      */
     public static EntityEditorInterface getEntityEditor(Class entityClass) throws ClassNotFoundException, IllegalAccessException, InstantiationException
     {
-        // search for @Editor annotation in @Entity/@Embedded class.
+        // search for @EntityDescriptor annotation in @Entity/@Embedded class.
         EntityEditorInterface entityEditor = null;
-        Editor editorAnnotation = (Editor)entityClass.getAnnotation(Editor.class);
-        if( (editorAnnotation != null) && (editorAnnotation.className() != null) && (editorAnnotation.className().length() > 0) ) {
-            entityEditor = (EntityEditorInterface)Class.forName(editorAnnotation.className()).newInstance();
+        EntityDescriptor editorAnnotation = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
+        if( (editorAnnotation != null) && (editorAnnotation.editorClassName() != null) && (editorAnnotation.editorClassName().length() > 0) ) {
+            entityEditor = (EntityEditorInterface)Class.forName(editorAnnotation.editorClassName()).newInstance();
         } else {
             entityEditor = new EntityEditorImpl();
         }
         return entityEditor;
     }
     
-    public static JComponent getEditor(Property property, int defaultLength, TemporalType defaultTemporalType)
+    public static JComponent getPropertyEditor(Property property, int defaultLength, TemporalType defaultTemporalType)
     {
         JComponent comp = null;
         Method compGetter = null;
@@ -110,7 +115,7 @@ public class EditorFactory {
                 try {
                     System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
                     JComponentDataBinder binderOutParam[] = new JComponentDataBinder[1];
-                    comp = getEditorForMultivaluedProperty(memberClass, property, editor, defaultLength, binderOutParam);
+                    comp = getCollectionEditor(property, memberClass, false, defaultLength, binderOutParam);
                     binder = binderOutParam[0];
 
                 } catch(Exception ex) {
@@ -255,82 +260,189 @@ public class EditorFactory {
      * Setup an editor for a multi-valued property 
      * TODO: allow drag and drop operations
      */
-    private static JComponent getEditorForMultivaluedProperty(final Class memberClass, final Property property, final java.beans.PropertyEditor editor, int defaultLength, JComponentDataBinder binderOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean managerControls, int defaultLength, JComponentDataBinder binderOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
         final JPanel panel = new JPanel();
+        final JTable jTable = new JTable();
         final DefaultListModel listModel = new DefaultListModel();
+        final ListSelectionModel listSelectionModel = jTable.getSelectionModel();
+        final ObjectPropertyTableModel objectPropertyTableModel = new ObjectPropertyTableModel(memberClass, listModel);
         
-        // configure data binder
-        Method modelGetter = listModel.getClass().getMethod("toArray");
-        binderOutParam[0] = new JComponentDataBinder(listModel, modelGetter, editor, property);
+        panel.putClientProperty("listModel", listModel);
+        panel.putClientProperty("listSelectionModel", listSelectionModel);
+        
+        if(property != null) {
+            // configure data binder
+            Method modelGetter = listModel.getClass().getMethod("toArray");
+            binderOutParam[0] = new JComponentDataBinder(listModel, modelGetter, null, property);
 
-        // populate listmodel with property's values
-        Collection values = (Collection)property.getValue();
-        System.out.println("Property " + property.getName() + " collection size = " + values.size());
-        Iterator iter = values.iterator();
-        while(iter.hasNext()) {
-            Object valueToSelect = iter.next();
-            listModel.addElement(valueToSelect);
+            // populate listmodel with property's values
+            Collection values = (Collection)property.getValue();
+            System.out.println("Property " + property.getName() + " collection size = " + values.size());
+            Iterator iter = values.iterator();
+            while(iter.hasNext()) {
+                Object valueToSelect = iter.next();
+                listModel.addElement(valueToSelect);
+            }
         }
 
-        // choose best UI control to display item list
-        JScrollPane scrollableItems = null;
-        ListSelectionModel listSelectionModel = null;
-        ObjectPropertyTableModel objectPropertyTableModel = new ObjectPropertyTableModel(memberClass, listModel);
-        if(objectPropertyTableModel.getColumnCount() > 0) {
-            JTable jTable = new JTable(objectPropertyTableModel);
-            jTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            jTable.setRowSelectionAllowed(true);
-            listSelectionModel = jTable.getSelectionModel();
-            scrollableItems = new JScrollPane(jTable);
-        } else {
-            JList jList = new JList();
-            jList.setVisibleRowCount(6);
-            jList.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-            jList.setModel(listModel);
-            listSelectionModel = jList.getSelectionModel();
-            scrollableItems = new JScrollPane(jList);
-        }
-      
-        
-        // configure "add" button
-        JButton btnAddItem = new JButton("Add");
-        btnAddItem.addActionListener(new ActionListener() {
-           public void actionPerformed(ActionEvent evt)  {
-               List allValues = JPAUtils.findAllEntities(memberClass);
-               Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
-               if(newItem != null) {
-                  // FIXME: caution with duplicated relations and "Set" collection types.
-                  if(!listModel.contains(newItem)) {  
-                      listModel.addElement(newItem);
-                  } else {
-                      JOptionPane.showInternalMessageDialog(panel, "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
-                  }
-               }
-           }
-        });
-
-        // configure "delete" button
-        final ListSelectionModel listSelectionModelFinal = listSelectionModel;
-        JButton btnDeleteItem = new JButton("Delete");
-        btnDeleteItem.addActionListener(new ActionListener() {
-           public void actionPerformed(ActionEvent evt)  {
-               if(!listSelectionModelFinal.isSelectionEmpty()) {
-                   for(int index = listSelectionModelFinal.getMaxSelectionIndex(); index >= listSelectionModelFinal.getMinSelectionIndex(); index--) {
-                       if(listSelectionModelFinal.isSelectedIndex(index)) {
-                           System.out.println("EditorFactory: removing selected index: " + index);
-                           listModel.removeElementAt(index);
-                       }
+        // configure "add" button?
+        JButton btnAddExistingItem = null;
+        if(!managerControls) {  /* Only when editing OneToMany or ManyToMany relationships) */
+            btnAddExistingItem = new JButton("Add");
+            btnAddExistingItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt)  {
+                   List allValues = JPAUtils.findAllEntities(memberClass);
+                   Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
+                   if(newItem != null) {
+                      // FIXME: caution with duplicated relations and "Set" collection types.
+                      if(!listModel.contains(newItem)) {  
+                          listModel.addElement(newItem);
+                      } else {
+                          JOptionPane.showInternalMessageDialog(panel, "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
+                      }
                    }
                }
+            });
+        }
+
+
+        // configure "new" button
+        JButton btnNewItem = new JButton("New");
+        if(managerControls) btnNewItem.setMnemonic('n');
+        btnNewItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt)  {
+                try { 
+                    JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, null); 
+                    final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                    listenerList.add(EntityListener.class, new EntityListener() {
+                        public void entityChanged(EntityEvent event) {
+                            if(event.getEventType() == EntityEvent.ENTITY_INSERT) {
+                                listModel.addElement(event.getEntity());
+                            }
+                        }
+                    });
+                } catch(Exception ex) { 
+                    System.out.println("Error: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
            }
         });
+
+        // configure "edit" button
+        JButton btnEditItem = new JButton("Edit");
+        if(managerControls) btnEditItem.setMnemonic('e');
+        btnEditItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt)  {
+                try { 
+                    int index = listSelectionModel.getMinSelectionIndex(); 
+                    if( (index == -1) || (!listSelectionModel.isSelectedIndex(index)) ) {
+                        throw new ApplicationException("No item selected");
+                    } else {
+                        JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, listModel.getElementAt(index)); 
+                        EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                        listenerList.add(EntityListener.class, new EntityListener() {
+                            public void entityChanged(EntityEvent event) {
+                                if(event.getEventType() == EntityEvent.ENTITY_UPDATE) {
+                                    // update JTable
+                                    int index = listModel.indexOf(event.getEntity());
+                                    if(index != -1) listModel.setElementAt(event.getEntity(), index);
+                                    else listModel.setElementAt(listModel.getElementAt(0), 0);
+                                }
+                            }
+                        });
+                    }
+                } catch(Exception ex) { 
+                    JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Printing...", JOptionPane.ERROR_MESSAGE);                
+                }
+           }
+        });
+        
+        
+        // configure "delete" button
+        JButton btnDeleteItem = new JButton("Delete");
+        if(managerControls) btnDeleteItem.setMnemonic('d');
+        btnDeleteItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt)  {
+                int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+                if(confirm == JOptionPane.OK_OPTION) 
+                {
+                    if(!listSelectionModel.isSelectionEmpty()) {
+                        for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
+                            if(listSelectionModel.isSelectedIndex(index)) {
+                                System.out.println("EditorFactory: removing selected index: " + index);
+                                if(managerControls) {  // delete command from "EntityManagerPane"
+                                    Object entity = listModel.getElementAt(index);
+                                    JPAUtils.removeEntity(entity);                                
+                                }
+                                listModel.removeElementAt(index);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // configure "print" button?
+        JButton btnPrint = null;
+        if(managerControls) {
+            btnPrint = new JButton("Print");
+            btnPrint.setMnemonic('p');
+            btnPrint.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt)  {
+                    try {
+                        if(objectPropertyTableModel.getRowCount() == 0) {
+                            throw new ApplicationException("There aren't rows to print.");
+                        } else {
+                            MessageFormat headerFormat = new MessageFormat(I18n.getEntityName(memberClass) + " list:");
+                            MessageFormat footerFormat = new MessageFormat("Page {0}");
+                            jTable.print(JTable.PrintMode.FIT_WIDTH, headerFormat, footerFormat);
+                        }
+                    } catch(Exception ex) {
+                        JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Printing...", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            });
+        }
+        
+        // configure "close" button?
+        JButton btnClose = null;
+        if(managerControls) {
+            // Close command from "EntityManagerPane"
+            btnClose = new JButton("Close");
+            btnClose.setMnemonic('c');
+            btnClose.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent evt)  
+                {        
+                    Component parent = (Component)evt.getSource();
+                    while( (parent != null) && (!(parent instanceof JInternalFrame)) ) {
+                        parent = parent.getParent();
+                    }
+                
+                    if(parent != null) {
+                        JInternalFrame iFrame = (JInternalFrame)parent;
+                        iFrame.dispose();
+                    }
+                }
+            });
+        }
         
         
         // configure panel layout
+        JScrollPane scrollableItems = new JScrollPane(jTable);
+        scrollableItems.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        
+        jTable.setModel(objectPropertyTableModel);
+        jTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        jTable.setRowSelectionAllowed(true);
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
-        buttonPanel.add(btnAddItem, gbcButton);
-        buttonPanel.add(btnDeleteItem, gbcButton);
+        if(btnAddExistingItem != null)  buttonPanel.add(btnAddExistingItem, gbcButton);
+        if(btnNewItem != null)          buttonPanel.add(btnNewItem, gbcButton);
+        if(btnEditItem != null)         buttonPanel.add(btnEditItem, gbcButton);
+        if(btnDeleteItem != null)       buttonPanel.add(btnDeleteItem, gbcButton);
+        if(btnPrint != null)            buttonPanel.add(btnPrint, gbcButton);
+        if(btnClose != null)            buttonPanel.add(btnClose, gbcButton);
         
         panel.setPreferredSize(new java.awt.Dimension(450, 180));        
         panel.setLayout(new BorderLayout());
@@ -350,175 +462,3 @@ public class EditorFactory {
 }
 
 
-class ObjectPropertyTableModel implements javax.swing.table.TableModel, javax.swing.event.ListDataListener
-{
-    private Class itemClass;
-    private DefaultListModel listModel;
-    private ArrayList<Member> columnMembers;
-    private ArrayList<org.doe4ejb3.annotation.PropertyDescriptor> columnPropertyDescriptors;
-    private EventListenerList listenerList;
-    
-    public ObjectPropertyTableModel(Class itemClass, DefaultListModel listModel) throws Exception
-    {
-        this.itemClass = itemClass;
-        this.listModel = listModel;
-        this.listModel.addListDataListener(this);
-        
-        this.columnMembers = new ArrayList<Member>();
-        this.columnPropertyDescriptors = new ArrayList<org.doe4ejb3.annotation.PropertyDescriptor>();
-        this.listenerList = new EventListenerList();
-
-        // TODO: order by index
-        System.out.println("ObjectPropertyDescriptorTableModel: Scan columns...");
-        for(Field field : itemClass.getFields()) {
-            org.doe4ejb3.annotation.PropertyDescriptor pd = field.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
-            if( (pd != null) && (pd.showInLists()) ) {
-                columnMembers.add(field);
-                columnPropertyDescriptors.add(pd);
-                System.out.println("ObjectPropertyDescriptorTableModel: found column: " + field.getName());
-            }
-        }
-
-        java.beans.BeanInfo bi = java.beans.Introspector.getBeanInfo(itemClass);
-        for(java.beans.PropertyDescriptor bpd : bi.getPropertyDescriptors()) {
-            Method method = bpd.getReadMethod();
-            if(method != null) {
-                org.doe4ejb3.annotation.PropertyDescriptor pd = method.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
-                if( (pd != null) && (pd.showInLists()) ) {
-                    columnMembers.add(method);
-                    columnPropertyDescriptors.add(pd);
-                    System.out.println("ObjectPropertyDescriptorTableModel: found column: " + method.getName());
-                }
-            }
-        }
-        System.out.println("ObjectPropertyDescriptorTableModel: Scan done.");        
-
-    }
-
-    public int getRowCount() {
-        int rows = listModel.getSize();
-        System.out.println("ObjectPropertyDescriptorTableModel: RowCount =" + rows);
-        return rows;
-    }
-
-    public int getColumnCount() {
-        int cols = columnMembers.size();
-        System.out.println("ObjectPropertyDescriptorTableModel: Num columns =" + cols);
-        return cols;
-    }
-
-    public String getColumnName(int columnIndex) {
-        String columnName = "";
-        try {
-            if( (columnIndex >= 0) && (columnIndex < columnPropertyDescriptors.size()) ) {
-                org.doe4ejb3.annotation.PropertyDescriptor pd = columnPropertyDescriptors.get(columnIndex);
-                if((pd != null) && (pd.displayName() != null) && (pd.displayName().length() > 0) ) {
-                    columnName = pd.displayName();
-                } else {
-                    Member member = columnMembers.get(columnIndex);
-                    if(member != null) {
-                        columnName = member.getName();
-                        if(columnName.startsWith("set")) columnName = columnName.substring(3);
-                        else if(columnName.startsWith("get")) columnName = columnName.substring(3);
-                        else if(columnName.startsWith("is")) columnName = columnName.substring(2);
-                    }
-                }
-            }
-        } catch(Exception ex) {
-            columnName = "N/A";
-        }
-        return columnName;
-    }
-
-    public Class getColumnClass(int columnIndex) {
-        if( (columnIndex >= 0) && (columnIndex < columnMembers.size()) ) {
-            Member member = columnMembers.get(columnIndex);
-            if(member != null) {
-                if(member instanceof Field) return ((Field)member).getType();
-                else if(member instanceof Method) return ((Method)member).getReturnType();
-            }
-        }
-        return String.class;
-    }
-
-    public boolean isCellEditable(int rowIndex, int columnIndex) {
-        return false;
-    }
-
-    public Object getValueAt(int rowIndex, int columnIndex) {
-        Object obj = listModel.getElementAt(rowIndex);
-        try {
-            Object retval = obj.toString();
-            if( (columnIndex >= 0) && (columnIndex < columnMembers.size()) ) {
-                Member member = columnMembers.get(columnIndex);
-                if(member != null) {
-                    if(member instanceof Field) retval = ((Field)member).get(obj);
-                    else if(member instanceof Method) retval = ((Method)member).invoke(obj);
-                }
-            }        
-            System.out.println("Object " + rowIndex + ", property " + columnIndex + " = " + retval);
-            return retval;
-        } catch(Exception ex) {
-            return "N/A";
-        }
-    }
-
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        // not needed
-    }
-
-    /**
-     * Adds a listener to the list that's notified each time a change
-     * to the data model occurs.
-     *
-     * @param   l               the TableModelListener
-     */
-    public void addTableModelListener(TableModelListener l) {
-        System.out.println("EditorFactory: addTableModelListener.");
-        listenerList.add(TableModelListener.class, l);
-    }
-
-    /**
-     * Removes a listener from the list that's notified each time a
-     * change to the data model occurs.
-     *
-     * @param   l               the TableModelListener
-     */
-    public void removeTableModelListener(TableModelListener l) {
-        listenerList.remove(TableModelListener.class, l);
-    }
-
-    public void intervalAdded(ListDataEvent e) {
-        fireChangeEvents(e);
-    }
-
-    public void intervalRemoved(ListDataEvent e) {
-        System.out.println("EditorFactory: intervalRemoved: " + e);
-        fireChangeEvents(e);
-    }
-
-    public void contentsChanged(ListDataEvent e) {
-        fireChangeEvents(e);
-    }
-    
-    private void fireChangeEvents(ListDataEvent e)
-    {
-        int tableModelEventType = TableModelEvent.UPDATE;
-        switch(e.getType()) {
-            case ListDataEvent.INTERVAL_ADDED: tableModelEventType = TableModelEvent.INSERT; break;
-            case ListDataEvent.INTERVAL_REMOVED: tableModelEventType = TableModelEvent.DELETE; break;
-            case ListDataEvent.CONTENTS_CHANGED: tableModelEventType = TableModelEvent.UPDATE; break;
-        }
-        
-        TableModelEvent event = new TableModelEvent(this, e.getIndex0(), e.getIndex1(), javax.swing.event.TableModelEvent.ALL_COLUMNS, tableModelEventType);
-        // Process the listeners last to first, notifying
-        // those that are interested in this event
-        Object[] listeners = listenerList.getListenerList();
-        for (int i = listeners.length-2; i>=0; i-=2) {
-            if (listeners[i]==TableModelListener.class) {
-                System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
-                ((TableModelListener)listeners[i+1]).tableChanged(event);
-            }
-        }
-    }
-}

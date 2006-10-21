@@ -16,11 +16,14 @@ import java.lang.reflect.InvocationTargetException;
  * @author Jordi Marine Fort
  */
 public interface EntityEditorInterface {
-    
+
+    boolean isNew();
+
     Object getEntity() throws IllegalAccessException, InvocationTargetException;
     
     void setEntity(Object obj);
     
     void newEntity(Class entityClass) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
+    
     
 }

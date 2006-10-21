@@ -18,6 +18,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD}) 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Editor {
-    String className() default "org.doe4ejb3.gui.EntityEditorImpl";
+public @interface EntityDescriptor {
+    String editorClassName() default "org.doe4ejb3.gui.EntityEditorImpl";
+    String iconPath() default "";
 }

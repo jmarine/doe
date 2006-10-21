@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Vector;
 
 import javax.swing.*;
+import javax.swing.event.EventListenerList;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
@@ -30,6 +31,8 @@ import javax.persistence.Query;
 
 // import javax.jnlp.*;
 
+import org.doe4ejb3.event.EntityEvent;
+import org.doe4ejb3.event.EntityListener;
 import org.doe4ejb3.exception.ApplicationException;
 import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.EJBQLUtils;
@@ -279,7 +282,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
 
     private void jMenuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemAboutActionPerformed
-        JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.1\nDevelopers: Jordi Marine Fort <jmarine@tinet.org>", "About", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@tinet.org>", "About", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItemAboutActionPerformed
 
                                                  
@@ -463,6 +466,8 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             
             iFrame.addInternalFrameListener(new InternalFrameAdapter() {
                 public void internalFrameClosed(InternalFrameEvent evt) {
+                    JInternalFrame iFrame = evt.getInternalFrame();
+                    iFrame.putClientProperty("acceptListeners", null);
                     openedInternalFrames.remove(key);
                 }
               });
@@ -477,31 +482,28 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }
     
     
-    public void openInternalFrameEntityEditor(Class entityClass, Object entity) throws Exception
+    public JInternalFrame openInternalFrameEntityEditor(Class entityClass, Object entity) throws Exception
     {
         final Object key = (entity != null) ? entity : entityClass.getName() + "Editor";
-        JInternalFrame oldFrame = openedInternalFrames.get(key);
-        if(oldFrame != null) {
+        JInternalFrame iFrame = openedInternalFrames.get(key);
 
-            if(oldFrame.isIcon()) oldFrame.setIcon(false);
-            oldFrame.setSelected(true);
-            
-        } else {
-            
-            JInternalFrame iFrame = createInternalFrameEntityEditor(entityClass, entity);
+        if(iFrame == null) {
+            iFrame = createInternalFrameEntityEditor(entityClass, entity);
             iFrame.addInternalFrameListener(new InternalFrameAdapter() {
                 public void internalFrameClosed(InternalFrameEvent evt) {
                     openedInternalFrames.remove(key);
                 }
               });
 
-
             openedInternalFrames.put(key, iFrame);
             mdiDesktopPane.add(iFrame);
-            iFrame.setVisible(true);
-            iFrame.setSelected(true);
-
         }
+
+        if(iFrame.isIcon()) iFrame.setIcon(false);
+        iFrame.setVisible(true);
+        iFrame.setSelected(true);
+        
+        return iFrame;
     }
 
 
@@ -516,6 +518,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         
         System.out.println("Creating internal frame");
         final JInternalFrame iFrame = new JInternalFrame(title, true, true, true, false );
+        iFrame.putClientProperty("entityListeners", new EventListenerList());
         
         System.out.println("Preparing editor ");
         final EntityEditorInterface editor = EditorFactory.getEntityEditor(entityClass);
@@ -525,6 +528,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         System.out.println("Preparing buttons...");
         JButton btnAccept = new JButton("Accept");
         btnAccept.setMnemonic('a');
+        btnAccept.setActionCommand("accept");
         btnAccept.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 Object modifiedEntity = null;
@@ -532,6 +536,17 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                     modifiedEntity = editor.getEntity();
                     JPAUtils.saveEntity(modifiedEntity);
                     showStatus(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
+                    
+                    EntityEvent entityEvent = new EntityEvent(evt.getSource(), editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, modifiedEntity );
+                    EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                    Object[] listeners = listenerList.getListenerList();
+                    for (int i = listeners.length-2; i>=0; i-=2) {
+                        if (listeners[i]==EntityListener.class) {
+                            System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
+                            ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
+                        }
+                    }
+                    
                     iFrame.dispose();
                 } catch(Exception ex) {
                     showStatus(MessageFormat.format("Error saving {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
@@ -542,6 +557,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         
         JButton btnClose = new JButton("Close");
         btnClose.setMnemonic('c');
+        btnClose.setActionCommand("close");
         btnClose.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 iFrame.dispose();

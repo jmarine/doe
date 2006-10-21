@@ -47,46 +47,39 @@ public class EntityManagerPane extends javax.swing.JPanel {
     public EntityManagerPane(Class entityClass) {
         initComponents();
         this.entityClass = entityClass;
-        
-        jPanelQueryParams.setVisible(false);
-        jComboBoxNamedQuery.removeAllItems();                                           
-        jComboBoxNamedQuery.addItem("All");                                                                                                                             
-        if(entityClass.getAnnotations() != null) {                                          
-            for(Annotation annotation : entityClass.getAnnotations()) {                         
-                if(annotation instanceof NamedQuery) {                                              
-                    NamedQuery namedQuery = (NamedQuery)annotation;                                 
-                    String ejbql = namedQuery.query();                                              
-                    if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {                                                                                               
-                        ListItem item = new ListItem(namedQuery, namedQuery.name());                                                                                                    
-                        jComboBoxNamedQuery.addItem(item);
+
+        try {
+            // post initialization:
+            JComponentDataBinder outBinder[] = new JComponentDataBinder[1];
+            JComponent entityListEditor = EditorFactory.getCollectionEditor(null, entityClass, true, 0, outBinder);
+            listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");
+            listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");
+
+            jComboBoxNamedQuery.removeAllItems();                                           
+            jPanelQueryParams.setVisible(false);
+            jPanelResults.setLayout(new java.awt.BorderLayout());
+            jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(5,0,0,0));
+            jPanelResults.add("Center", entityListEditor);
+
+
+            // load queries in combobox:
+            jComboBoxNamedQuery.addItem("All");                                                                                                                             
+            if(entityClass.getAnnotations() != null) {                                          
+                for(Annotation annotation : entityClass.getAnnotations()) {                         
+                    if(annotation instanceof NamedQuery) {                                              
+                        NamedQuery namedQuery = (NamedQuery)annotation;                                 
+                        String ejbql = namedQuery.query();                                              
+                        if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {                                                                                               
+                            ListItem item = new ListItem(namedQuery, namedQuery.name());                                                                                                    
+                            jComboBoxNamedQuery.addItem(item);
+                        }
                     }
                 }
             }
-        }
-        
-        
-        // TODO: choose best UI control to display item list
-        listModel = new DefaultListModel();
-        ObjectPropertyTableModel objectPropertyTableModel = null;
-        try { objectPropertyTableModel = new ObjectPropertyTableModel(entityClass, listModel); }
-        catch(Exception ex) { DomainObjectExplorer.getInstance().showStatus("Error: " + ex.getMessage()); }
 
-        if( (objectPropertyTableModel != null) && (objectPropertyTableModel.getColumnCount() > 0) ) {
-                JTable jTable = new JTable(objectPropertyTableModel);
-                jTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-                jTable.setRowSelectionAllowed(true);
-                jTable.putClientProperty("org.doe4ejb3.entityClass", entityClass);                                                                                                                                                                   
-                jTable.setComponentPopupMenu(jPopupMenuContextual);
-                listSelectionModel = jTable.getSelectionModel();
-                jScrollPaneQueryResults.setViewportView(jTable);
-        } else {
-                jListQueryResults = new JList();
-                jListQueryResults.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-                jListQueryResults.setModel(listModel);
-                jListQueryResults.putClientProperty("org.doe4ejb3.entityClass", entityClass);
-                jListQueryResults.setComponentPopupMenu(jPopupMenuContextual);
-                listSelectionModel = jListQueryResults.getSelectionModel();
-                jScrollPaneQueryResults.setViewportView(jListQueryResults);
+            
+        } catch(Exception ex) {
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
         }
         
     }
@@ -107,9 +100,8 @@ public class EntityManagerPane extends javax.swing.JPanel {
         jLabelQuery = new javax.swing.JLabel();
         jComboBoxNamedQuery = new javax.swing.JComboBox();
         jPanelQueryParams = new javax.swing.JPanel();
-        jScrollPaneQueryResults = new javax.swing.JScrollPane();
-        jListQueryResults = new javax.swing.JList();
         jButtonSearch = new javax.swing.JButton();
+        jPanelResults = new javax.swing.JPanel();
 
         jMenuItemContextualNew.setMnemonic('n');
         jMenuItemContextualNew.setText("New");
@@ -157,10 +149,6 @@ public class EntityManagerPane extends javax.swing.JPanel {
 
         jPanelQueryParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parameters:"));
 
-        jScrollPaneQueryResults.setBorder(javax.swing.BorderFactory.createTitledBorder("Results:"));
-        jScrollPaneQueryResults.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jScrollPaneQueryResults.setViewportView(jListQueryResults);
-
         jButtonSearch.setMnemonic('s');
         jButtonSearch.setText("Search");
         jButtonSearch.addActionListener(new java.awt.event.ActionListener() {
@@ -169,6 +157,17 @@ public class EntityManagerPane extends javax.swing.JPanel {
             }
         });
 
+        org.jdesktop.layout.GroupLayout jPanelResultsLayout = new org.jdesktop.layout.GroupLayout(jPanelResults);
+        jPanelResults.setLayout(jPanelResultsLayout);
+        jPanelResultsLayout.setHorizontalGroup(
+            jPanelResultsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 492, Short.MAX_VALUE)
+        );
+        jPanelResultsLayout.setVerticalGroup(
+            jPanelResultsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+            .add(0, 269, Short.MAX_VALUE)
+        );
+
         org.jdesktop.layout.GroupLayout jPanelEntidadLayout = new org.jdesktop.layout.GroupLayout(jPanelEntidad);
         jPanelEntidad.setLayout(jPanelEntidadLayout);
         jPanelEntidadLayout.setHorizontalGroup(
@@ -176,12 +175,12 @@ public class EntityManagerPane extends javax.swing.JPanel {
             .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanelEntidadLayout.createSequentialGroup()
                 .addContainerGap()
                 .add(jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jScrollPaneQueryResults, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
-                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanelQueryParams, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 474, Short.MAX_VALUE)
+                    .add(org.jdesktop.layout.GroupLayout.LEADING, jPanelResults, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .add(jPanelQueryParams, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanelEntidadLayout.createSequentialGroup()
                         .add(jLabelQuery)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jComboBoxNamedQuery, 0, 342, Short.MAX_VALUE)
+                        .add(jComboBoxNamedQuery, 0, 360, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jButtonSearch)))
                 .addContainerGap())
@@ -197,7 +196,7 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanelQueryParams, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jScrollPaneQueryResults, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 249, Short.MAX_VALUE)
+                .add(jPanelResults, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         add(jPanelEntidad, java.awt.BorderLayout.CENTER);
@@ -320,11 +319,14 @@ public class EntityManagerPane extends javax.swing.JPanel {
     private void jComboBoxNamedQueryItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxNamedQueryItemStateChanged
         String persistenceUnitName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
         
-        DomainObjectExplorer.getInstance().showStatus("Searching parameter types...");
+        listModel.clear();
         if(jComboBoxNamedQuery.getSelectedIndex() <= 0) {
             jPanelQueryParams.removeAll();
             jPanelQueryParams.setVisible(false);
+            jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(5,0,0,0));
         } else  {
+            DomainObjectExplorer.getInstance().showStatus("Searching parameter types...");
+            
             ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
             NamedQuery namedQuery = (NamedQuery)listItem.getValue();
             String ejbql = namedQuery.query();
@@ -338,11 +340,13 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 if(ejbqlParameterTypes.size() == 0) {
                     jPanelQueryParams.removeAll();
                     jPanelQueryParams.setVisible(false);
+                    jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(5,0,0,0));                    
                 } else {
                     queryParametersPanel = new QueryParametersEditorImpl(ejbqlParameterTypes);
                     jPanelQueryParams.setLayout(new java.awt.BorderLayout());
                     jPanelQueryParams.add(queryParametersPanel, java.awt.BorderLayout.CENTER);
                     jPanelQueryParams.setVisible(true);
+                    jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(0,0,0,0));
                 }
                 
             } catch(Exception ex) {
@@ -350,10 +354,12 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 jPanelQueryParams.setLayout(new FlowLayout());
                 jPanelQueryParams.add(new JLabel("Unknown parameter types"));
                 jPanelQueryParams.setVisible(true);
+                jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(0,0,0,0));
             }
             
+            DomainObjectExplorer.getInstance().showStatus("done.");            
         }
-        DomainObjectExplorer.getInstance().showStatus("done.");
+
     }//GEN-LAST:event_jComboBoxNamedQueryItemStateChanged
     
     
@@ -361,15 +367,14 @@ public class EntityManagerPane extends javax.swing.JPanel {
     private javax.swing.JButton jButtonSearch;
     private javax.swing.JComboBox jComboBoxNamedQuery;
     private javax.swing.JLabel jLabelQuery;
-    private javax.swing.JList jListQueryResults;
     private javax.swing.JMenuItem jMenuItemContextualDelete;
     private javax.swing.JMenuItem jMenuItemContextualEdit;
     private javax.swing.JMenuItem jMenuItemContextualNew;
     private javax.swing.JSeparator jMenuItemContextualSeparator1;
     private javax.swing.JPanel jPanelEntidad;
     private javax.swing.JPanel jPanelQueryParams;
+    private javax.swing.JPanel jPanelResults;
     private javax.swing.JPopupMenu jPopupMenuContextual;
-    private javax.swing.JScrollPane jScrollPaneQueryResults;
     // End of variables declaration//GEN-END:variables
 
 
