@@ -126,6 +126,8 @@ public class EditorFactory {
             } else {
                 
                 // OneToOne || ManyToOne
+                // TODO: clear/remove relationship (with "empty" option)
+                
                 try {
                     JComboBox combo = new JComboBox(JPAUtils.findAllEntities(memberClass).toArray());
                     comp = combo;
