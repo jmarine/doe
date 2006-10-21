@@ -68,7 +68,7 @@ public class JPAUtils
     
     public static Collection<Class> getPersistentEntities(String puName) throws Exception
     {
-        return entityListByPU.get(puName);
+        return (Collection<Class>)entityListByPU.get(puName).clone();
     }
 
     
