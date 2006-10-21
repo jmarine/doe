@@ -321,9 +321,10 @@ public class EditorFactory {
                             }
                         }
                     });
+                } catch(ApplicationException ex) { 
+                    JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                 } catch(Exception ex) { 
-                    System.out.println("Error: " + ex.getMessage());
-                    ex.printStackTrace();
+                    JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                 }
            }
         });
@@ -351,8 +352,11 @@ public class EditorFactory {
                             }
                         });
                     }
+                } catch(ApplicationException ex) { 
+                    JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
+                    
                 } catch(Exception ex) { 
-                    JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Printing...", JOptionPane.ERROR_MESSAGE);                
+                    JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
                 }
            }
         });
@@ -397,8 +401,10 @@ public class EditorFactory {
                             MessageFormat footerFormat = new MessageFormat("Page {0}");
                             jTable.print(JTable.PrintMode.FIT_WIDTH, headerFormat, footerFormat);
                         }
+                    } catch(ApplicationException ex) { 
+                        JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);                
                     } catch(Exception ex) {
-                        JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Printing...", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             });

@@ -34,7 +34,8 @@ public class JAutoScrollPaneOnComponentFocus extends JScrollPane implements Cont
     /**
      * Creates a new instance of JAutoScrollPaneOnComponentFocus
      */
-    public JAutoScrollPaneOnComponentFocus(Container container, int vsbPolicy, int hsbPolicy) {
+    public JAutoScrollPaneOnComponentFocus(Container container, int vsbPolicy, int hsbPolicy) 
+    {
         super(container, vsbPolicy, hsbPolicy);
         container.addContainerListener(this);
         for(Component component : container.getComponents()) {
@@ -42,18 +43,20 @@ public class JAutoScrollPaneOnComponentFocus extends JScrollPane implements Cont
         }
     }
 
-    public void componentAdded(ContainerEvent event) {
+    public void componentAdded(ContainerEvent event) 
+    {
         Component component = event.getComponent();
         component.addFocusListener(this);
     }
 
-    public void componentRemoved(ContainerEvent event) {
+    public void componentRemoved(ContainerEvent event) 
+    {
         Component component = event.getComponent();
         component.removeFocusListener(this);
     }
 
-    public void focusGained(FocusEvent event) {
-       
+    public void focusGained(FocusEvent event) 
+    {
         Component c = (Component)event.getSource();
         JViewport vp = this.getViewport();
         Point vpp = vp.getViewPosition();
@@ -69,7 +72,7 @@ public class JAutoScrollPaneOnComponentFocus extends JScrollPane implements Cont
         this.getViewport().setViewPosition(vpp);
     }
 
-    public void focusLost(FocusEvent e) {
-    }
+    
+    public void focusLost(FocusEvent e) { }
     
 }

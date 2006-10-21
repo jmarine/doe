@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
@@ -31,6 +32,7 @@ import javax.persistence.Query;
 
 // import javax.jnlp.*;
 
+import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.event.EntityEvent;
 import org.doe4ejb3.event.EntityListener;
 import org.doe4ejb3.exception.ApplicationException;
@@ -282,7 +284,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
 
     private void jMenuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemAboutActionPerformed
-        JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@tinet.org>", "About", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItemAboutActionPerformed
 
                                                  
@@ -352,7 +354,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }
 
 
-    public void addEntityClass(Class entityClass)
+    public void addEntityClassActions(Class entityClass)
     {
         String entityName = I18n.getEntityName(entityClass);
         String puName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
@@ -422,7 +424,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         Collection<String> persistenceUnits = org.doe4ejb3.util.JPAUtils.getPersistenceUnits();
         for(String persistenceUnit : persistenceUnits) 
         {
-            Collection<Class> persistenceEntities = org.doe4ejb3.util.JPAUtils.getPersistentEntities(persistenceUnit);
+            Collection<Class> persistenceEntities = getVisiblePersistentEntities(persistenceUnit);
             JList entityList = new JList(persistenceEntities.toArray());
             entityList.setCellRenderer(EntityClassListCellRenderer.getInstance());
             entityList.setComponentPopupMenu(jPopupMenuContextual);
@@ -444,8 +446,23 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             if(persistenceUnit.length() == 0) title = "Default PU";
             jOutlinePanePersistenceUnits.addTab(title, new JScrollPane(entityList));
             
-            for(Class entityClass : persistenceEntities) addEntityClass(entityClass);
+            for(Class entityClass : persistenceEntities) addEntityClassActions(entityClass);
         }
+    }
+    
+    public Collection<Class> getVisiblePersistentEntities(String persistenceUnit) throws Exception
+    {
+        Collection<Class> persistenceEntities = org.doe4ejb3.util.JPAUtils.getPersistentEntities(persistenceUnit);
+        Iterator<Class> iter = persistenceEntities.iterator();
+        while(iter.hasNext()) {
+            Class entityClass = iter.next();
+            EntityDescriptor ed = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
+            if( (ed != null) && (ed.hidden()) ) {
+                iter.remove();
+            }
+        }
+
+        return persistenceEntities;
     }
 
     public void openInternalFrameEntityManager(Class entityClass) throws Exception
