@@ -345,13 +345,13 @@ public class EntityManagerPane extends javax.swing.JPanel {
             String ejbql = namedQuery.query();
             
             try {
+                queryParametersPanel = null;
                 jPanelQueryParams.removeAll();
                 
                 HashMap ejbqlParameterTypes = EJBQLUtils.parseEJBQLParameterTypes(persistenceUnitName, ejbql);
                 // TODO: create controls for query parameters (depending on its type)
                 
                 if(ejbqlParameterTypes.size() == 0) {
-                    jPanelQueryParams.removeAll();
                     jPanelQueryParams.setVisible(false);
                     jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(5,0,0,0));                    
                 } else {
@@ -363,8 +363,6 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 }
                 
             } catch(Exception ex) {
-                queryParametersPanel = null;
-                jPanelQueryParams.removeAll();
                 jPanelQueryParams.setLayout(new FlowLayout());
                 jPanelQueryParams.add(new JLabel("Unknown parameter types"));
                 jPanelQueryParams.setVisible(true);
