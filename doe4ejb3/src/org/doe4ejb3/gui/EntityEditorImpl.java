@@ -117,16 +117,19 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
 
         ArrayList<ObjectProperty> properties = new ArrayList<ObjectProperty>();
         try {
-            for(Field field : entityClass.getFields()) {
-                ObjectProperty entityProperty = new ObjectProperty(entity, field);
-                properties.add(entityProperty);
-            }
-
             BeanInfo bi = Introspector.getBeanInfo(entityClass);
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
+                // TODO: inherited properties?
                 ObjectProperty entityProperty = new ObjectProperty(entity, pd);
-                properties.add(entityProperty);
+                if(!properties.contains(entityProperty)) properties.add(entityProperty);
             }
+            
+            for(Field field : entityClass.getFields()) {
+                // TODO: inherited fields
+                ObjectProperty entityProperty = new ObjectProperty(entity, field);
+                if(!properties.contains(entityProperty)) properties.add(entityProperty);
+            }
+            
         } catch(Exception ex) {
             System.out.println("EntityEditorImpl: ERROR: " + ex.getMessage());
         }
@@ -150,8 +153,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
         // (with "getEntity" method as "getter")
         String name = entityProperty.getName();
         Annotation annotations[] = entityProperty.getAnnotations();
-        if( (annotations == null) || (annotations.length == 0) ) return;
-        
+        System.out.println("handlePersistenceAnnotations: Processing property: " + entityProperty.getName());
         
         Class memberClass = null;
         try {
@@ -165,7 +167,11 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
         }
 
         
-        boolean persistent = false;
+        // Only assume setter/getters to be persistence members, except those annotated with javax.persistence.Transient
+        // (public fields must be annotated with persistence annotations, to be considered also as persistence members)
+        boolean persistent = (entityProperty.getPropertyDescriptor() != null) 
+                                && (entityProperty.getPropertyDescriptor().getReadMethod() != null) && (!entityProperty.getPropertyDescriptor().getReadMethod().isAnnotationPresent(javax.persistence.Transient.class))
+                                && (entityProperty.getPropertyDescriptor().getWriteMethod() != null) && (!entityProperty.getPropertyDescriptor().getWriteMethod().isAnnotationPresent(javax.persistence.Transient.class));
         boolean generatedValue = false;
         boolean embedded = false;
         javax.persistence.Temporal temporal = null;
@@ -176,11 +182,13 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
         org.doe4ejb3.annotation.PropertyDescriptor propertyDescriptor = null;
         
         Method compGetter = null;
-        int defaultLength = 0;
+        int defaultLength = 40;
 
-        for(int i = 0; i < annotations.length; i++) 
+        System.out.println("Begin: process property annotation");
+        for(int i = 0; (annotations != null) && (i < annotations.length); i++) 
         {
             Annotation a = annotations[i];
+            System.out.println("> process property annotation: " + a.toString());
 
             if(a instanceof org.doe4ejb3.annotation.PropertyDescriptor)
             {
@@ -191,17 +199,18 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
             {
                 persistent = true;
                 generatedValue = true;
+                defaultLength = 0;
+                System.out.println("Has GeneratedValue annotation!");
             }
             else if(a instanceof javax.persistence.Basic) 
             {
                 persistent = true;
-                defaultLength = 40;
             }
             else if(a instanceof javax.persistence.Column) 
             {
                 javax.persistence.Column column = (javax.persistence.Column)a;
                 if( (column.insertable()) || (column.updatable()) ) {
-                    defaultLength = Math.min(column.length(), 40);
+                    if(!generatedValue) defaultLength = column.length();
                     String columnName = column.name();
                     if(columnName != null) name = columnName;
                     persistent = true;

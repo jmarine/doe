@@ -23,6 +23,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ListSelectionModel;
 
 import javax.persistence.Query;
+import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 import org.doe4ejb3.exception.ApplicationException;
@@ -72,6 +73,16 @@ public class EntityManagerPane extends javax.swing.JPanel {
                         if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {                                                                                               
                             ListItem item = new ListItem(namedQuery, namedQuery.name());                                                                                                    
                             jComboBoxNamedQuery.addItem(item);
+                        }
+                    }
+                    else if(annotation instanceof NamedQueries) {
+                        NamedQueries namedQueries = (NamedQueries)annotation;
+                        for(NamedQuery namedQuery : namedQueries.value()) {
+                            String ejbql = namedQuery.query();                                              
+                            if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {                                                                                               
+                                ListItem item = new ListItem(namedQuery, namedQuery.name());                                                                                                    
+                                jComboBoxNamedQuery.addItem(item);
+                            }
                         }
                     }
                 }
@@ -300,7 +311,8 @@ public class EntityManagerPane extends javax.swing.JPanel {
             } else if(jComboBoxNamedQuery.getSelectedIndex() > 0) {
                 ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
                 NamedQuery namedQuery = (NamedQuery)listItem.getValue();
-                HashMap parameterValues = queryParametersPanel.getParameterValues();
+                HashMap parameterValues = null;
+                if(queryParametersPanel != null) parameterValues = queryParametersPanel.getParameterValues();
                 entities = JPAUtils.executeNamedQuery(entityClass, namedQuery.name(), parameterValues);
             }
             
@@ -313,6 +325,7 @@ public class EntityManagerPane extends javax.swing.JPanel {
             
         } catch(Exception ex) {
             DomainObjectExplorer.getInstance().showStatus("Error: " + ex.getMessage());
+            ex.printStackTrace();
         }
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
@@ -350,6 +363,7 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 }
                 
             } catch(Exception ex) {
+                queryParametersPanel = null;
                 jPanelQueryParams.removeAll();
                 jPanelQueryParams.setLayout(new FlowLayout());
                 jPanelQueryParams.add(new JLabel("Unknown parameter types"));
