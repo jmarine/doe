@@ -208,21 +208,15 @@ public class EditorFactory {
                     }
                     
                 } else { // using JTextField or JTextArea depending on Column's length attribute
-                    int length = defaultLength;
-                    if(property instanceof ObjectProperty) {
-                        ObjectProperty objectProperty = (ObjectProperty)property;
-                        javax.persistence.Column column = (javax.persistence.Column)objectProperty.getAnnotation(javax.persistence.Column.class);
-                        if( (column != null) && (column.length() > 0) ) length = column.length();
-                    }
-                    
+
                     JTextComponent textField = null;
-                    if(length < 100) {
-                        textField = new JTextField(length);
+                    if(defaultLength < 100) {
+                        textField = new JTextField(defaultLength);
                         compGetter = textField.getClass().getMethod("getText");
                         comp = textField;
                     } else {
                         textField = new javax.swing.JTextPane();
-                        textField.setPreferredSize(new java.awt.Dimension(defaultLength * 10, 80));
+                        textField.setPreferredSize(new java.awt.Dimension(400, 80));
                         compGetter = textField.getClass().getMethod("getText");
                         binder = new JComponentDataBinder(textField, compGetter, editor, property);                        
                         comp = new JScrollPane(textField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

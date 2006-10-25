@@ -45,14 +45,23 @@ public class ObjectProperty implements Property
     {
         this.obj = obj;
         this.field = field;
-        this.propertyName = field.getName();
+        this.propertyName = decapitalize(field.getName());
     }
 
     public ObjectProperty(Object obj, PropertyDescriptor propertyDescriptor) throws IllegalArgumentException
     {
         this.obj = obj;
-        this.propertyName = propertyDescriptor.getName();
         this.propertyDescriptor = propertyDescriptor;
+        this.propertyName = decapitalize(propertyDescriptor.getName());
+        
+        try { 
+            // TODO? iterate until superclass
+            this.field = obj.getClass().getDeclaredField(propertyName); 
+            System.out.println("ObjectProperty: INFO: field attribute found for propertyDescriptor  " + propertyName);
+        } catch(Exception ex) { 
+            System.out.println("ObjectProperty: WARN: propertyDescriptor without field attribute: " + propertyName);
+        }
+        
     }
 
     
@@ -61,18 +70,27 @@ public class ObjectProperty implements Property
         return propertyName;
     }
     
+    public PropertyDescriptor getPropertyDescriptor()
+    {
+        return propertyDescriptor;
+    }
+    
     public Annotation[] getAnnotations()
     {
         if(annotations == null) {
-            if(field != null) {
-                annotations = field.getAnnotations();
-            } else if(propertyDescriptor != null) {
+            if(propertyDescriptor != null) {
                 Collection<Annotation> all = new ArrayList<Annotation>();
                 if(propertyDescriptor.getReadMethod() != null) Collections.addAll(all, propertyDescriptor.getReadMethod().getAnnotations());
                 if(propertyDescriptor.getWriteMethod() != null) Collections.addAll(all, propertyDescriptor.getWriteMethod().getAnnotations());
-                annotations = new Annotation[all.size()];
-                annotations = all.toArray(annotations);
-            }
+                if(all.size() > 0) {
+                    annotations = new Annotation[all.size()];
+                    annotations = all.toArray(annotations);
+                }
+            } 
+            
+            if( (annotations == null) && (field != null) ) {
+                annotations = field.getAnnotations();
+            } 
         } 
         return annotations;
     }
@@ -81,19 +99,22 @@ public class ObjectProperty implements Property
     {
         // TODO: use "annotations" cache
         
-        if(field != null) {
-                Annotation annotation = field.getAnnotation(annotationClass);
+        if(propertyDescriptor != null) {
+            if(propertyDescriptor.getReadMethod() != null) {
+                Annotation annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
                 if(annotation != null) return true;
-        } else if(propertyDescriptor != null) {
-                if(propertyDescriptor.getReadMethod() != null) {
-                    Annotation annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
-                    if(annotation != null) return true;
-                }
-                if(propertyDescriptor.getWriteMethod() != null) {
-                    Annotation annotation = propertyDescriptor.getWriteMethod().getAnnotation(annotationClass);
-                    if(annotation != null) return true;
-                }
+            }
+            if(propertyDescriptor.getWriteMethod() != null) {
+                Annotation annotation = propertyDescriptor.getWriteMethod().getAnnotation(annotationClass);
+                if(annotation != null) return true;
+            }
         } 
+
+        if(field != null) {
+            Annotation annotation = field.getAnnotation(annotationClass);
+            if(annotation != null) return true;
+        } 
+
         return false;
     }
 
@@ -101,16 +122,19 @@ public class ObjectProperty implements Property
     {
         // TODO: use "annotations" cache
         Annotation annotation = null;
-        if(field != null) {
-                annotation = field.getAnnotation(annotationClass);
-        } else if(propertyDescriptor != null) {
-                if(propertyDescriptor.getReadMethod() != null) {
-                    annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
-                }
-                if( (annotation == null) && (propertyDescriptor.getWriteMethod() != null) ) {
-                    annotation = propertyDescriptor.getWriteMethod().getAnnotation(annotationClass);
-                }
+        if(propertyDescriptor != null) {
+            if(propertyDescriptor.getReadMethod() != null) {
+                annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);
+            }
+            if( (annotation == null) && (propertyDescriptor.getWriteMethod() != null) ) {
+                annotation = propertyDescriptor.getWriteMethod().getAnnotation(annotationClass);
+            }
         } 
+        
+        if( (annotation == null) && (field != null) ) {
+            annotation = field.getAnnotation(annotationClass);
+        }
+        
         return annotation;
     }
     
@@ -119,32 +143,39 @@ public class ObjectProperty implements Property
     public Class getType() // throws IllegalAccessException, InvocationTargetException
     {
         Class retval = null;
-        if(field != null) {
-            retval = field.getType();
-        } else if(propertyDescriptor != null) {
+        if(propertyDescriptor != null) {
             retval = propertyDescriptor.getReadMethod().getReturnType();
         } 
+
+        if( (retval == null) && (field != null) ) {
+            retval = field.getType();
+        } 
+        
         return retval;
     }
 
     public Type getGenericType() throws IllegalAccessException, InvocationTargetException
     {
         Type retval = null;
-        if(field != null) {
-            retval = field.getGenericType();
-        } else if(propertyDescriptor != null) {
+
+        if(propertyDescriptor != null) {
             retval = propertyDescriptor.getReadMethod().getGenericReturnType();
         } 
+        
+        if( (retval == null) && (field != null) ) {
+            retval = field.getGenericType();
+        } 
+        
         return retval;
     }
 
     public Object getValue() throws IllegalAccessException, InvocationTargetException
     {
         Object retval = null;
-        if(field != null) {
-            retval = field.get(obj);
-        } else if( (propertyDescriptor != null) && (propertyDescriptor.getReadMethod() != null) ) {
+        if( (propertyDescriptor != null) && (propertyDescriptor.getReadMethod() != null) ) {
             retval = propertyDescriptor.getReadMethod().invoke(obj);
+        } else if(field != null) {
+            retval = field.get(obj);
         } else {
             throw new IllegalAccessException("Object without getter method/field");
         }
@@ -153,10 +184,10 @@ public class ObjectProperty implements Property
 
     public void setValue(Object value) throws IllegalAccessException, InvocationTargetException
     {
-        if(field != null) {
-            field.set(obj, value);
-        } else if( (propertyDescriptor != null) && (propertyDescriptor.getWriteMethod() != null) ) {
+        if( (propertyDescriptor != null) && (propertyDescriptor.getWriteMethod() != null) ) {
             propertyDescriptor.getWriteMethod().invoke(obj, value);
+        } else if(field != null) {
+            field.set(obj, value);
         } else {
             throw new IllegalAccessException("Object without setter method/field");
         }
@@ -175,5 +206,19 @@ public class ObjectProperty implements Property
         }
         return name;
     }
-
+    
+    public int hashCode()
+    {
+        return propertyName.hashCode();
+    }
+    
+    public boolean equals(Object obj)
+    {
+        if( (obj != null) && (obj instanceof Property) ) {
+            Property p2 = (Property)obj;
+            return propertyName.equals(p2.getName());
+        }
+        return false;
+    }
+    
 }

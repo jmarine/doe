@@ -281,8 +281,10 @@ public class JPAUtils
         EntityManager manager = JPAUtils.getEntityManager(puName);
         
         javax.persistence.Query query = manager.createNamedQuery(queryName);
-        for(Object paramName : paramValues.keySet()) {
-           query.setParameter((String)paramName, paramValues.get(paramName));
+        if(paramValues != null) {
+            for(Object paramName : paramValues.keySet()) {
+                query.setParameter((String)paramName, paramValues.get(paramName));
+            }
         }
         
         List entities = query.getResultList();
