@@ -108,7 +108,7 @@ public class EditorFactory {
             throw new RuntimeException("Property type error: " + ex.getMessage());
         }
         
-        
+        org.doe4ejb3.beans.TemporalTypeEditorSupport.registerTemporalTypeEditors();
         if(memberClass.getAnnotation(javax.persistence.Entity.class) != null) {
             if(isCollection) {
                 // OneToMany || ManyToMany
@@ -130,16 +130,21 @@ public class EditorFactory {
                 
                 try {
                     JComboBox combo = new JComboBox(JPAUtils.findAllEntities(memberClass).toArray());
+                    combo.insertItemAt(null, 0);
                     comp = combo;
                     compGetter = comp.getClass().getMethod("getSelectedItem");
                     Object value = property.getValue();
                     if(value != null) combo.setSelectedItem(value);
+                    else combo.setSelectedIndex(0);
+                    
                 } catch(Exception ex) {
                     System.out.println("Error loading property: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
-        } else if(java.util.Date.class.isAssignableFrom(memberClass)) {
+/*        
+        } 
+        else if(java.util.Date.class.isAssignableFrom(memberClass)) {
             TemporalType temporalType = defaultTemporalType;
             if(memberClass.isAssignableFrom(java.sql.Date.class)) temporalType = TemporalType.DATE;
             else if(memberClass.isAssignableFrom(java.sql.Time.class)) temporalType = TemporalType.TIME;
@@ -166,11 +171,14 @@ public class EditorFactory {
                 compGetter = spinner.getClass().getMethod("getValue");
                 Object value = property.getValue();
                 if(value != null) spinner.setValue(value);
+                
+                editor = java.beans.PropertyEditorManager.findEditor(memberClass);                
+                
             } catch(Exception ex) {
                 spinner.setValue(new Date());
                 ex.printStackTrace();
             }
-                
+*/                
         } else {
             
             try {
@@ -192,7 +200,7 @@ public class EditorFactory {
                     Object value = property.getValue();
                     if(value != null) editor.setValue(value);
 
-                    binder = new JComponentDataBinder(editor, editorGetter, editor, property);
+                    binder = new JComponentDataBinder(editor, editorGetter, null, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).
                     
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
                     JCheckBox checkBox = new JCheckBox();

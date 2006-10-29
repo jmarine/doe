@@ -246,6 +246,10 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
                 relationType = a;
                 persistent = true;
             }
+            else if(a instanceof javax.persistence.Version) 
+            {
+                generatedValue = true;
+            } 
                 
         }
         
@@ -277,7 +281,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
 
             
             if(comp != null) {
-                if(generatedValue && (!objIsNew) ) {
+                if(generatedValue && (!objIsNew)) {
                     comp.setEnabled(false);
                 } else {
                     if(binder == null) {
