@@ -69,6 +69,7 @@ public class JComponentDataBinder
                 value = collectionClass.cast(list);
 
             } else if(editor != null) {
+                System.out.println("- Converting value with editor " + editor);
                 editor.setAsText(value.toString());  // string representation
                 value = editor.getValue();           // convert to editor's real type
             }

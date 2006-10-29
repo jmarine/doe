@@ -139,7 +139,6 @@ public class ObjectProperty implements Property
     }
     
     
-    
     public Class getType() // throws IllegalAccessException, InvocationTargetException
     {
         Class retval = null;
@@ -153,6 +152,7 @@ public class ObjectProperty implements Property
         
         return retval;
     }
+    
 
     public Type getGenericType() throws IllegalAccessException, InvocationTargetException
     {
@@ -169,6 +169,7 @@ public class ObjectProperty implements Property
         return retval;
     }
 
+    
     public Object getValue() throws IllegalAccessException, InvocationTargetException
     {
         Object retval = null;
@@ -182,9 +183,12 @@ public class ObjectProperty implements Property
         return retval;
     }
 
+    
     public void setValue(Object value) throws IllegalAccessException, InvocationTargetException
     {
         if( (propertyDescriptor != null) && (propertyDescriptor.getWriteMethod() != null) ) {
+            System.out.println("> Setting " + propertyName + " (type: " + propertyDescriptor.getPropertyType().getName() + ") with value = " + value);
+            if(value != null) System.out.println("- Value type: " + value.getClass().getName());
             propertyDescriptor.getWriteMethod().invoke(obj, value);
         } else if(field != null) {
             field.set(obj, value);
@@ -193,6 +197,7 @@ public class ObjectProperty implements Property
         }
     }
 
+    
     private static String capitalize(String name)
     {
         return name.substring(0,1).toUpperCase() + name.substring(1);
@@ -207,10 +212,12 @@ public class ObjectProperty implements Property
         return name;
     }
     
+    
     public int hashCode()
     {
         return propertyName.hashCode();
     }
+    
     
     public boolean equals(Object obj)
     {
