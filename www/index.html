@@ -59,9 +59,8 @@
         <!-- Project Type: Web Service, Tool, Component, or add your own -->
         <li><b>Project Type:</b> Java Web Start application client</li>
       </ul>
+The "Domain Object Explorer" is a rich desktop application designed to ease the management of EJB3 entity beans. It auto-generates the user interface for the business objects on the fly (no need of additional GUI design/programming, althougth in can also be customized by developer), and it can be centrally managed from application server administration console (for datasource configuration, deployment of persistence units, and delivery of application/updates via Java Web Start technology).
       <!-- project info end -->
-The "Domain Object Explorer" is a desktop application that can be included within your Java EE 5 enterprise application, to be deployed on the Glassfish application server, and be launched from Java Web Start to easily browse and edit your EJB3 entities. 
-
     </blockquote>
 
     <a name="contents">
@@ -88,10 +87,11 @@ The "Domain Object Explorer" is a desktop application that can be included withi
     <ul>
       <li>Pros:</li>
       <ul>
-	<li>Easy administration of your business objects, and testing of your EJB3 entity beans.</li>
-        <li>Rich client application, with customizable user interface</li>
+	<li>Easy management and testing of EJB3 entity beans.</li>
+        <li>Rich user interface in zero-code (althought it can also be customized by developer)</li>
 	<li>No more HTML, JavaScript, nor  AJAX handlers on server-side... only 100% pure Java on client side!!!</li>
-	<li>Autodeployment via Java Web Start technology</li>
+	<li>Auto-deployment of application/updates with Java Web Start technology.</li>
+        <li>Data sources can be centrally managed from application server administration console</li>
 	<li>...</li>
       </ul>
       <li>Cons:</li>
@@ -144,7 +144,7 @@ The "Domain Object Explorer" is a desktop application that can be included withi
     <h3>Usage Instructions</h3>
     </a>
     <blockquote>
-    You can launch the "doe" application client from GlassFish administration console (after installation, you also can update and run it from Java Web Start). The application has the next features:
+    You can launch the "doe" application client from GlassFish administration console (after installation, you also can run it from Java Web Start). The application has the next features:
 
     <h4>Create a new entity object:</h4>
     From "File" menu, select "New" option, and the class name of the new EJB3 entity. Then complete the entity properties and press the "Accept" button.
