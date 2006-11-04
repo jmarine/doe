@@ -526,9 +526,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     private JInternalFrame createInternalFrameEntityEditor(final Class entityClass, Object entity) throws Exception 
     {
-
-        // TODO: encapsulate as "EntityInternalFrame":
-
+        showStatus("");
         String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass);
         if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
         else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
@@ -548,13 +546,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         btnAccept.setActionCommand("accept");
         btnAccept.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                Object modifiedEntity = null;
                 try {
-                    modifiedEntity = editor.getEntity();
-                    JPAUtils.saveEntity(modifiedEntity);
+                    iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                    Object oldEntity = editor.getEntity();
+                    Object newEntity = JPAUtils.saveEntity(oldEntity);
                     showStatus(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
                     
-                    EntityEvent entityEvent = new EntityEvent(evt.getSource(), editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, modifiedEntity );
+                    EntityEvent entityEvent = new EntityEvent(evt.getSource(), editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
                     EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
                     Object[] listeners = listenerList.getListenerList();
                     for (int i = listeners.length-2; i>=0; i-=2) {
@@ -566,9 +564,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                     
                     iFrame.dispose();
                 } catch(Exception ex) {
+                    iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                     showStatus(MessageFormat.format("Error saving {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
                     ex.printStackTrace();
+                } finally {
+                    iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                 }
+                
             }
         });
         

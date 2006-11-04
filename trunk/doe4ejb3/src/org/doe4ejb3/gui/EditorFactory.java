@@ -11,6 +11,7 @@ import com.sun.imageio.plugins.common.I18N;
 import com.sun.org.apache.bcel.internal.classfile.JavaClass;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -30,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 
 import javax.swing.JButton;
@@ -49,6 +51,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerDateModel;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListDataEvent;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.EventListenerList;
@@ -126,59 +130,65 @@ public class EditorFactory {
             } else {
                 
                 // OneToOne || ManyToOne
-                // TODO: clear/remove relationship (with "empty" option)
-                
                 try {
-                    JComboBox combo = new JComboBox(JPAUtils.findAllEntities(memberClass).toArray());
-                    combo.insertItemAt(null, 0);
+                    final javax.swing.DefaultComboBoxModel comboBoxModel = new javax.swing.DefaultComboBoxModel();
+                    final JComboBox combo = new JComboBox(comboBoxModel);
+                    final Class optionClass = memberClass;
+
+                    // define combobox prototype dimensions
+                    combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");
+                    for(int i = 0; i < 10; i++) combo.addItem(null);
+
+                    combo.addPopupMenuListener(new PopupMenuListener() {
+                        public void popupMenuCanceled(PopupMenuEvent e) { }
+                        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
+                        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                            // Lazy load of drop-down list items:
+                            if(combo.getClientProperty("lazyModel") == null) 
+                            {
+                                try {
+                                    combo.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                                    Object selectedItem = comboBoxModel.getSelectedItem();
+                                    comboBoxModel.removeAllElements();
+                                    comboBoxModel.addElement(null);
+                                    System.out.println("Searching items!!!");
+                                    for(Object option : JPAUtils.findAllEntities(optionClass).toArray()) {
+                                        comboBoxModel.addElement(option);
+                                    }
+                                    comboBoxModel.setSelectedItem(selectedItem);
+                                
+                                    combo.putClientProperty("lazyModel", comboBoxModel);
+                                    // combo.hidePopup();
+                                    // combo.showPopup();
+
+                                    // combo.getUI().setPopupVisible( combo, true );
+                                    
+                                } finally {
+                                    combo.putClientProperty("lazyModel", null);
+                                    combo.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                                }
+                            }
+                            
+                        }
+                    });
+
                     comp = combo;
                     compGetter = comp.getClass().getMethod("getSelectedItem");
+
                     Object value = property.getValue();
-                    if(value != null) combo.setSelectedItem(value);
-                    else combo.setSelectedIndex(0);
+                    if(value != null) {
+                        combo.addItem(value);
+                        combo.setSelectedItem(value);
+                    } else {
+                        combo.setSelectedIndex(0);
+                    }
                     
                 } catch(Exception ex) {
                     System.out.println("Error loading property: " + ex.getMessage());
                     ex.printStackTrace();
                 }
             }
-/*        
-        } 
-        else if(java.util.Date.class.isAssignableFrom(memberClass)) {
-            TemporalType temporalType = defaultTemporalType;
-            if(memberClass.isAssignableFrom(java.sql.Date.class)) temporalType = TemporalType.DATE;
-            else if(memberClass.isAssignableFrom(java.sql.Time.class)) temporalType = TemporalType.TIME;
-            else if(memberClass.isAssignableFrom(java.sql.Timestamp.class)) temporalType = TemporalType.TIMESTAMP;
-
-            JSpinner spinner = new JSpinner();
-            comp = spinner;
-
-            switch(temporalType) {
-                case DATE:
-                  spinner.setModel(new SpinnerDateModel());
-                  spinner.setEditor(new JSpinner.DateEditor(spinner, "dd/MM/yyyy"));
-                  break;
-                case TIME:
-                  spinner.setModel(new SpinnerDateModel());
-                  spinner.setEditor(new JSpinner.DateEditor(spinner, "HH:mm"));
-                  break;
-                case TIMESTAMP:
-                  spinner.setModel(new SpinnerDateModel());
-                  break;
-            }
-
-            try {
-                compGetter = spinner.getClass().getMethod("getValue");
-                Object value = property.getValue();
-                if(value != null) spinner.setValue(value);
-                
-                editor = java.beans.PropertyEditorManager.findEditor(memberClass);                
-                
-            } catch(Exception ex) {
-                spinner.setValue(new Date());
-                ex.printStackTrace();
-            }
-*/                
+            
         } else {
             
             try {
@@ -292,19 +302,25 @@ public class EditorFactory {
         // configure "add" button?
         JButton btnAddExistingItem = null;
         if(!managerControls) {  /* Only when editing OneToMany or ManyToMany relationships) */
-            btnAddExistingItem = new JButton("Add");
+            final JButton btnAddExistingItemFinal = new JButton("Add");
+            btnAddExistingItem = btnAddExistingItemFinal;
             btnAddExistingItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent evt)  {
-                   List allValues = JPAUtils.findAllEntities(memberClass);
-                   Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
-                   if(newItem != null) {
-                      // FIXME: caution with duplicated relations and "Set" collection types.
-                      if(!listModel.contains(newItem)) {  
-                          listModel.addElement(newItem);
-                      } else {
-                          JOptionPane.showInternalMessageDialog(panel, "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
-                      }
-                   }
+                    try {
+                        btnAddExistingItemFinal.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                        List allValues = JPAUtils.findAllEntities(memberClass);
+                        Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
+                        if(newItem != null) {
+                            // FIXME: caution with duplicated relations and "Set" collection types.
+                            if(!listModel.contains(newItem)) {  
+                                listModel.addElement(newItem);
+                            } else {
+                                JOptionPane.showInternalMessageDialog(panel, "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    } finally {
+                        btnAddExistingItemFinal.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    }
                }
             });
         }
@@ -316,21 +332,23 @@ public class EditorFactory {
         btnNewItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
-                    JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, null); 
-                    final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
-                    listenerList.add(EntityListener.class, new EntityListener() {
-                        public void entityChanged(EntityEvent event) {
-                            if(event.getEventType() == EntityEvent.ENTITY_INSERT) {
-                                listModel.addElement(event.getEntity());
+                    JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, null);
+                    if(!managerControls) {
+                        final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                        listenerList.add(EntityListener.class, new EntityListener() {
+                            public void entityChanged(EntityEvent event) {
+                                if(event.getEventType() == EntityEvent.ENTITY_INSERT) {
+                                    listModel.addElement(event.getNewEntity());
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 } catch(ApplicationException ex) { 
                     JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                 } catch(Exception ex) { 
                     JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                 }
-           }
+            }
         });
 
         // configure "edit" button
@@ -349,9 +367,12 @@ public class EditorFactory {
                             public void entityChanged(EntityEvent event) {
                                 if(event.getEventType() == EntityEvent.ENTITY_UPDATE) {
                                     // update JTable
-                                    int index = listModel.indexOf(event.getEntity());
-                                    if(index != -1) listModel.setElementAt(event.getEntity(), index);
-                                    else listModel.setElementAt(listModel.getElementAt(0), 0);
+                                    System.out.println("EditorFactory: searching index of OldEntity = " + event.getOldEntity());
+                                    System.out.println("EditorFactory: searching index of NewEntity = " + event.getNewEntity());
+                                    int index = listModel.indexOf(event.getOldEntity());
+                                    System.out.println("EditorFactory: index found =  " + index);
+                                    if(index != -1) listModel.setElementAt(event.getNewEntity(), index);
+                                    else listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
                                 }
                             }
                         });
@@ -367,7 +388,7 @@ public class EditorFactory {
         
         
         // configure "delete" button
-        JButton btnDeleteItem = new JButton("Delete");
+        final JButton btnDeleteItem = new JButton("Delete");
         if(managerControls) btnDeleteItem.setMnemonic('d');
         btnDeleteItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt)  {
@@ -375,15 +396,20 @@ public class EditorFactory {
                 if(confirm == JOptionPane.OK_OPTION) 
                 {
                     if(!listSelectionModel.isSelectionEmpty()) {
-                        for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
-                            if(listSelectionModel.isSelectedIndex(index)) {
-                                System.out.println("EditorFactory: removing selected index: " + index);
-                                if(managerControls) {  // delete command from "EntityManagerPane"
-                                    Object entity = listModel.getElementAt(index);
-                                    JPAUtils.removeEntity(entity);                                
+                        try {
+                            btnDeleteItem.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                            for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
+                                if(listSelectionModel.isSelectedIndex(index)) {
+                                    System.out.println("EditorFactory: removing selected index: " + index);
+                                    if(managerControls) {  // delete command from "EntityManagerPane"
+                                        Object entity = listModel.getElementAt(index);
+                                        JPAUtils.removeEntity(entity);                                
+                                    }
+                                    listModel.removeElementAt(index);
                                 }
-                                listModel.removeElementAt(index);
                             }
+                        } finally {
+                            btnDeleteItem.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                         }
                     }
                 }
