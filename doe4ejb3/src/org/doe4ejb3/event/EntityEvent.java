@@ -14,20 +14,27 @@ public class EntityEvent extends java.util.EventObject
     public static final int ENTITY_UPDATE = 2;
     public static final int ENTITY_DELETE = 3;
 
-    private Object entity;
-    private int eventType;
+    private int    eventType;
+    private Object oldEntity;
+    private Object newEntity;
     
     
     /** Creates a new instance of EntityEvent */
-    public EntityEvent(Object source, int eventType, Object entity) {
+    public EntityEvent(Object source, int eventType, Object oldEntity, Object newEntity) {
         super(source);
-        this.entity = entity;
         this.eventType = eventType;
+        this.oldEntity = oldEntity;
+        this.newEntity = newEntity;
     }
     
-    public Object getEntity() {
-        return this.entity;
+    public Object getNewEntity() {
+        return this.newEntity;
     }
+
+    public Object getOldEntity() {
+        return this.oldEntity;
+    }
+
     
     public int getEventType() {
         return eventType;

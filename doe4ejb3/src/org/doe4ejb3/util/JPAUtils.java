@@ -330,7 +330,7 @@ public class JPAUtils
             EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(entityClass);
             EntityTransaction transaction = manager.getTransaction();
             transaction.begin();
-            manager.merge(entity);
+            entity = manager.merge(entity);
             transaction.commit();
             manager.close();
             

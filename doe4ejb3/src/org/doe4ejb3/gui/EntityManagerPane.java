@@ -6,6 +6,7 @@
 
 package org.doe4ejb3.gui;
 
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.lang.annotation.Annotation;
 import java.text.MessageFormat;
@@ -305,6 +306,7 @@ public class EntityManagerPane extends javax.swing.JPanel {
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
         try {
             List entities = null;
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             DomainObjectExplorer.getInstance().showStatus("Searching...");
             if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
                 entities = JPAUtils.findAllEntities(entityClass);
@@ -326,6 +328,8 @@ public class EntityManagerPane extends javax.swing.JPanel {
         } catch(Exception ex) {
             DomainObjectExplorer.getInstance().showStatus("Error: " + ex.getMessage());
             ex.printStackTrace();
+        } finally {
+            this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
     }//GEN-LAST:event_jButtonSearchActionPerformed
 
@@ -347,7 +351,8 @@ public class EntityManagerPane extends javax.swing.JPanel {
             try {
                 queryParametersPanel = null;
                 jPanelQueryParams.removeAll();
-                
+            
+                this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 HashMap ejbqlParameterTypes = EJBQLUtils.parseEJBQLParameterTypes(persistenceUnitName, ejbql);
                 // TODO: create controls for query parameters (depending on its type)
                 
@@ -367,6 +372,8 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 jPanelQueryParams.add(new JLabel("Unknown parameter types"));
                 jPanelQueryParams.setVisible(true);
                 jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(0,0,0,0));
+            } finally {
+                this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
             
             DomainObjectExplorer.getInstance().showStatus("done.");            
