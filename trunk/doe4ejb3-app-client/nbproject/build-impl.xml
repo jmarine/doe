@@ -64,7 +64,6 @@
         <condition property="no.javadoc.preview">
             <isfalse value="${javadoc.preview}"/>
         </condition>
-        <property name="run.jvmargs" value=""/>
         <property name="javac.compilerargs" value=""/>
         <property name="work.dir" value="${basedir}"/>
         <condition property="no.deps">
@@ -74,7 +73,6 @@
         </condition>
         <property name="javac.debug" value="true"/>
         <property name="javadoc.preview" value="true"/>
-        <property name="application.args" value=""/>
         <available file="${meta.inf}/MANIFEST.MF" property="has.custom.manifest"/>
         <condition property="classes.dir" value="${build.ear.classes.dir}">
             <isset property="dist.ear.dir"/>
@@ -92,6 +90,22 @@
         </condition>
         <condition property="do.display.browser">
             <istrue value="${display.browser}"/>
+        </condition>
+        <condition property="application.args.param" value="${application.args}" else="">
+            <and>
+                <isset property="application.args"/>
+                <not>
+                    <equals arg1="${application.args}" arg2="" trim="true"/>
+                </not>
+            </and>
+        </condition>
+        <condition property="run.jvmargs.param" value="${run.jvmargs}" else="">
+            <and>
+                <isset property="run.jvmargs"/>
+                <not>
+                    <equals arg1="${run.jvmargs}" arg2="" trim="true"/>
+                </not>
+            </and>
         </condition>
     </target>
     <target name="-post-init">
@@ -156,7 +170,7 @@
                     </syspropertyset>
                     <formatter type="brief" usefile="false"/>
                     <formatter type="xml"/>
-                    <jvmarg line="${run.jvmargs}"/>
+                    <jvmarg line="${run.jvmargs.param}"/>
                 </junit>
             </sequential>
         </macrodef>
@@ -167,11 +181,10 @@
             <element name="customize" optional="true"/>
             <sequential>
                 <java fork="true" classname="@{classname}" dir="${work.dir}">
-                    <jvmarg line="${j2ee.appclient.jvmoptions}"/>
-                    <jvmarg line="${run.jvmargs}"/>
-                    <arg line="${j2ee.appclient.mainclass.args}"/>
+                    <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
+                    <jvmarg line="${run.jvmargs.param}"/>
                     <classpath>
-                        <path path="${dist.jar}:${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.runtime}"/>
+                        <path path="${dist.jar}:${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
                     </classpath>
                     <syspropertyset>
                         <propertyref prefix="run-sys-prop."/>
@@ -209,14 +222,14 @@
             <attribute name="classname" default="${main.class}"/>
             <attribute name="classpath" default="${debug.classpath}"/>
             <element name="customize" optional="true"/>
-            <attribute name="args" default="${application.args}"/>
+            <attribute name="args" default="${application.args.param}"/>
             <sequential>
                 <java fork="true" classname="@{classname}" dir="${work.dir}">
                     <jvmarg value="-Xdebug"/>
                     <jvmarg value="-Xnoagent"/>
                     <jvmarg value="-Djava.compiler=none"/>
                     <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-                    <jvmarg line="${run.jvmargs}"/>
+                    <jvmarg line="${run.jvmargs.param}"/>
                     <classpath>
                         <path path="@{classpath}"/>
                     </classpath>
@@ -230,14 +243,63 @@
             </sequential>
         </macrodef>
     </target>
-    <target name="init" depends="-pre-init,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check,-init-macrodef-property,-init-macrodef-javac,-init-macrodef-junit,-init-macrodef-java,-init-macrodef-nbjpda,-init-macrodef-debug"/>
+    <target name="-init-macrodef-debug-appclient">
+        <macrodef name="debug-appclient" uri="http://www.netbeans.org/ns/car-project/1">
+            <attribute name="mainclass"/>
+            <attribute name="classpath" default="${debug.classpath}"/>
+            <element name="customize" optional="true"/>
+            <attribute name="args" default="${application.args.param}"/>
+            <sequential>
+                <parallel>
+                    <java fork="true" classname="@{mainclass}" dir="${work.dir}">
+                        <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
+                        <jvmarg value="-Xdebug"/>
+                        <jvmarg value="-Xnoagent"/>
+                        <jvmarg value="-Djava.compiler=none"/>
+                        <jvmarg value="-Xrunjdwp:transport=${jpda.transport},server=y,address=${jpda.address},suspend=y"/>
+                        <jvmarg line="${run.jvmargs.param}"/>
+                        <arg line="@{args}"/>
+                        <classpath>
+                            <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
+                            <path path="@{classpath}"/>
+                        </classpath>
+                        <syspropertyset>
+                            <propertyref prefix="run-sys-prop."/>
+                            <mapper type="glob" from="run-sys-prop.*" to="*"/>
+                        </syspropertyset>
+                        <customize/>
+                    </java>
+                    <nbjpdaconnect name="${name}" host="${jpda.host}" address="${jpda.address}" transport="${jpda.transport}">
+                        <classpath>
+                            <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
+                            <path path="@{classpath}"/>
+                        </classpath>
+                        <sourcepath>
+                            <path path="${src.dir}"/>
+                        </sourcepath>
+                    </nbjpdaconnect>
+                </parallel>
+            </sequential>
+        </macrodef>
+    </target>
+    <target name="init" depends="-pre-init,-init-private,-init-user,-init-project,-do-init,-post-init,-init-check,-init-macrodef-property,-init-macrodef-javac,-init-macrodef-junit,-init-macrodef-java,-init-macrodef-nbjpda,-init-macrodef-debug,-init-macrodef-debug-appclient"/>
     <!--
                 ===================
                 COMPILATION SECTION
                 ===================
             -->
     <target name="-check-main-class">
-        <fail unless="main.class">Main class must be set. Go to doe4ejb3-app-client project properties -&gt; Run and set the main class there.</fail>
+        <fail>
+                    Main class must be set. Go to doe4ejb3-app-client project properties -&gt; Run and set the main class there.
+                    <condition>
+                <not>
+                    <or>
+                        <isset property="dist.ear.dir"/>
+                        <isset property="main.class"/>
+                    </or>
+                </not>
+            </condition>
+        </fail>
     </target>
     <target name="-deps-module-jar" depends="init" unless="no.deps" if="no.dist.ear.dir">
         <ant target="jar" inheritall="false" antfile="${project.doe4ejb3}/build.xml"/>
@@ -380,19 +442,19 @@
     <target name="run-jar" depends="init" description="Run a main class." unless="j2ee.appclient.mainclass.args" if="j2ee.clientName">
         <carproject:java classname="${main.class}">
             <customize>
-                <arg line="${application.args}"/>
+                <arg line="${application.args.param}"/>
             </customize>
         </carproject:java>
     </target>
     <target name="run-tool" depends="init,-as-retrieve-option-workaround" description="Run a main class." if="j2ee.appclient.mainclass.args" unless="j2ee.clientName">
-        <java fork="true" classname="${j2ee.appclient.mainclass}" dir="${work.dir}">
-            <jvmarg line="${j2ee.appclient.jvmoptions}"/>
-            <jvmarg line="${run.jvmargs}"/>
-            <arg line="${j2ee.appclient.args}"/>
+        <java fork="true" classname="${j2ee.appclient.tool.mainclass}" dir="${work.dir}">
+            <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
+            <jvmarg line="${run.jvmargs.param}"/>
+            <arg line="${j2ee.appclient.tool.args}"/>
             <arg line="-client ${client.jar}"/>
-            <arg line="${application.args}"/>
+            <arg line="${application.args.param}"/>
             <classpath>
-                <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.runtime}"/>
+                <path path="${javac.classpath}:${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
             </classpath>
             <syspropertyset>
                 <propertyref prefix="run-sys-prop."/>
@@ -406,6 +468,7 @@
     </target>
     <target name="-as-retrieve-option-workaround" if="j2ee.appclient.mainclass.args" unless="j2ee.clientName">
         <property name="client.jar" value="${dist.dir}/doe4ejb3-app-clientClient.jar"/>
+        <sleep seconds="3"/>
         <copy file="${wa.copy.client.jar.from}/doe4ejb3-app-client/doe4ejb3-app-clientClient.jar" todir="${dist.dir}"/>
     </target>
     <target name="run-deploy" depends="init,compile,dist,-run-deploy-nb,-init-deploy-ant,-deploy-ant"/>
@@ -503,11 +566,17 @@
     <target name="-debug-start-debuggee" depends="init,compile">
         <carproject:debug>
             <customize>
-                <arg line="${application.args}"/>
+                <arg line="${application.args.param}"/>
             </customize>
         </carproject:debug>
     </target>
-    <target name="debug" if="netbeans.home" depends="init,compile,-debug-start-debugger,-debug-start-debuggee" description="Debug project in IDE."/>
+    <target name="debug-jar" unless="j2ee.appclient.mainclass.args" if="j2ee.clientName">
+        <carproject:debug-appclient mainclass="${main.class}" args="${application.args.param}"/>
+    </target>
+    <target name="debug-tool" depends="init,-as-retrieve-option-workaround" if="j2ee.appclient.mainclass.args" unless="j2ee.clientName">
+        <carproject:debug-appclient mainclass="${j2ee.appclient.tool.mainclass}" args="${j2ee.appclient.mainclass.args} ${application.args.param}"/>
+    </target>
+    <target name="debug" if="netbeans.home" depends="init,compile,run-deploy,debug-tool,debug-jar" description="Debug project in IDE."/>
     <target name="-debug-start-debugger-stepinto" if="netbeans.home" depends="init">
         <carproject:nbjpdastart stopclassname="${main.class}"/>
     </target>
