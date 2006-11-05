@@ -1,4 +1,4 @@
-/*
+/**
  * EditorFactory.java
  *
  * Created on 18 / august / 2006, 21:38
@@ -7,8 +7,6 @@
 
 package org.doe4ejb3.gui;
 
-import com.sun.imageio.plugins.common.I18N;
-import com.sun.org.apache.bcel.internal.classfile.JavaClass;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -67,11 +65,8 @@ import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.util.JPAUtils;
 
 
-/**
- *
- * @author Jordi Marine Fort
- */
-public class EditorFactory {
+public class EditorFactory 
+{
     
     /**
      * Creates a new instance of EditorFactory
