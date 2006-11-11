@@ -478,6 +478,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
             String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass) + " manager";
             JInternalFrame iFrame = new JInternalFrame(title, true, true, true, false );
+            iFrame.setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
             iFrame.getContentPane().setLayout(new BorderLayout());
             iFrame.getContentPane().add(new EntityManagerPane(entityClass), BorderLayout.CENTER);
             
@@ -533,6 +534,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         
         System.out.println("Creating internal frame");
         final JInternalFrame iFrame = new JInternalFrame(title, true, true, true, false );
+        iFrame.setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
         iFrame.putClientProperty("entityListeners", new EventListenerList());
         
         System.out.println("Preparing editor ");
