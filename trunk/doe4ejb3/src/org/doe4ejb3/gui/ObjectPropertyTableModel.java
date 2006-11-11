@@ -21,7 +21,7 @@ import javax.swing.event.TableModelListener;
 import org.doe4ejb3.annotation.PropertyDescriptor;
 
 
-class ObjectPropertyTableModel implements javax.swing.table.TableModel, javax.swing.event.ListDataListener
+public class ObjectPropertyTableModel implements javax.swing.table.TableModel, javax.swing.event.ListDataListener
 {
     private Class itemClass;
     private DefaultListModel listModel;
@@ -64,6 +64,11 @@ class ObjectPropertyTableModel implements javax.swing.table.TableModel, javax.sw
         }
         System.out.println("ObjectPropertyDescriptorTableModel: Scan done.");        
 
+    }
+    
+    public DefaultListModel getListModel()
+    {
+        return listModel;
     }
 
     public int getRowCount() {

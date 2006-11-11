@@ -29,9 +29,10 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
-
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -49,6 +50,8 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerDateModel;
 import javax.swing.DefaultListModel;
 import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
@@ -269,7 +272,7 @@ public class EditorFactory
      * Setup an editor for a multi-valued property 
      * TODO: allow drag and drop operations
      */
-    public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean managerControls, int defaultLength, JComponentDataBinder binderOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean isManagerWindow, int defaultLength, JComponentDataBinder binderOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
         final JPanel panel = new JPanel();
         final JTable jTable = new JTable();
         final DefaultListModel listModel = new DefaultListModel();
@@ -294,41 +297,12 @@ public class EditorFactory
             }
         }
 
-        // configure "add" button?
-        JButton btnAddExistingItem = null;
-        if(!managerControls) {  /* Only when editing OneToMany or ManyToMany relationships) */
-            final JButton btnAddExistingItemFinal = new JButton("Add");
-            btnAddExistingItem = btnAddExistingItemFinal;
-            btnAddExistingItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent evt)  {
-                    try {
-                        btnAddExistingItemFinal.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                        List allValues = JPAUtils.findAllEntities(memberClass);
-                        Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
-                        if(newItem != null) {
-                            // FIXME: caution with duplicated relations and "Set" collection types.
-                            if(!listModel.contains(newItem)) {  
-                                listModel.addElement(newItem);
-                            } else {
-                                JOptionPane.showInternalMessageDialog(panel, "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
-                            }
-                        }
-                    } finally {
-                        btnAddExistingItemFinal.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    }
-               }
-            });
-        }
-
-
-        // configure "new" button
-        JButton btnNewItem = new JButton("New");
-        if(managerControls) btnNewItem.setMnemonic('n');
-        btnNewItem.addActionListener(new ActionListener() {
+        // configure actions:
+        AbstractAction newAction = new AbstractAction("New") {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
                     JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, null);
-                    if(!managerControls) {
+                    if(!isManagerWindow) {
                         final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
                         listenerList.add(EntityListener.class, new EntityListener() {
                             public void entityChanged(EntityEvent event) {
@@ -344,34 +318,55 @@ public class EditorFactory
                     JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                 }
             }
-        });
-
-        // configure "edit" button
-        JButton btnEditItem = new JButton("Edit");
-        if(managerControls) btnEditItem.setMnemonic('e');
-        btnEditItem.addActionListener(new ActionListener() {
+        };
+        
+        AbstractAction addExistingAction = new AbstractAction("Add") {
+                public void actionPerformed(ActionEvent evt)  {
+                    try {
+                        panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                        List allValues = JPAUtils.findAllEntities(memberClass);
+                        Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
+                        if(newItem != null) {
+                            // FIXME: caution with duplicated relations and "Set" collection types.
+                            if(!listModel.contains(newItem)) {  
+                                listModel.addElement(newItem);
+                            } else {
+                                JOptionPane.showInternalMessageDialog(panel, "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    } finally {
+                        panel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    }
+               }
+        };
+        
+        final AbstractAction editAction = new AbstractAction("Edit") {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
-                    int index = listSelectionModel.getMinSelectionIndex(); 
-                    if( (index == -1) || (!listSelectionModel.isSelectedIndex(index)) ) {
-                        throw new ApplicationException("No item selected");
+                    if(listSelectionModel.isSelectionEmpty()) {
+                        throw new ApplicationException("No items selected");
                     } else {
-                        JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, listModel.getElementAt(index)); 
-                        EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
-                        listenerList.add(EntityListener.class, new EntityListener() {
-                            public void entityChanged(EntityEvent event) {
-                                if(event.getEventType() == EntityEvent.ENTITY_UPDATE) {
-                                    // update JTable
-                                    System.out.println("EditorFactory: searching index of OldEntity = " + event.getOldEntity());
-                                    System.out.println("EditorFactory: searching index of NewEntity = " + event.getNewEntity());
-                                    int index = listModel.indexOf(event.getOldEntity());
-                                    System.out.println("EditorFactory: index found =  " + index);
-                                    if(index != -1) listModel.setElementAt(event.getNewEntity(), index);
-                                    else listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
-                                }
+                        for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
+                            if(listSelectionModel.isSelectedIndex(index)) {
+                                JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, listModel.getElementAt(index)); 
+                                EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                                listenerList.add(EntityListener.class, new EntityListener() {
+                                    public void entityChanged(EntityEvent event) {
+                                        if(event.getEventType() == EntityEvent.ENTITY_UPDATE) {
+                                            // update JTable
+                                            System.out.println("EditorFactory: searching index of OldEntity = " + event.getOldEntity());
+                                            System.out.println("EditorFactory: searching index of NewEntity = " + event.getNewEntity());
+                                            int index = listModel.indexOf(event.getOldEntity());
+                                            System.out.println("EditorFactory: index found =  " + index);
+                                            if(index != -1) listModel.setElementAt(event.getNewEntity(), index);
+                                            else listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
+                                        }
+                                    }
+                                });
                             }
-                        });
+                        }
                     }
+                    
                 } catch(ApplicationException ex) { 
                     JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
                     
@@ -379,44 +374,45 @@ public class EditorFactory
                     JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
                 }
            }
-        });
+        };
         
-        
-        // configure "delete" button
-        final JButton btnDeleteItem = new JButton("Delete");
-        if(managerControls) btnDeleteItem.setMnemonic('d');
-        btnDeleteItem.addActionListener(new ActionListener() {
+        final AbstractAction deleteAction = new AbstractAction("Delete") {
             public void actionPerformed(ActionEvent evt)  {
-                int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
-                if(confirm == JOptionPane.OK_OPTION) 
-                {
-                    if(!listSelectionModel.isSelectionEmpty()) {
-                        try {
-                            btnDeleteItem.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                            for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
-                                if(listSelectionModel.isSelectedIndex(index)) {
-                                    System.out.println("EditorFactory: removing selected index: " + index);
-                                    if(managerControls) {  // delete command from "EntityManagerPane"
-                                        Object entity = listModel.getElementAt(index);
-                                        JPAUtils.removeEntity(entity);                                
+                try {
+                    if(listSelectionModel.isSelectionEmpty()) {
+                        throw new ApplicationException("No items selected");
+                    } else {
+                        int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+                        if(confirm == JOptionPane.OK_OPTION) 
+                        {
+                            try {
+                                panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                                for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
+                                    if(listSelectionModel.isSelectedIndex(index)) {
+                                        System.out.println("EditorFactory: removing selected index: " + index);
+                                        if(isManagerWindow) {  // delete command from "EntityManagerPane"
+                                            Object entity = listModel.getElementAt(index);
+                                            JPAUtils.removeEntity(entity);                                
+                                        }
+                                        listModel.removeElementAt(index);
                                     }
-                                    listModel.removeElementAt(index);
                                 }
+                            } finally {
+                                panel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                             }
-                        } finally {
-                            btnDeleteItem.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
                         }
                     }
+
+                } catch(ApplicationException ex) { 
+                    JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
+                    
+                } catch(Exception ex) { 
+                    JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
                 }
             }
-        });
+        };         
 
-        // configure "print" button?
-        JButton btnPrint = null;
-        if(managerControls) {
-            btnPrint = new JButton("Print");
-            btnPrint.setMnemonic('p');
-            btnPrint.addActionListener(new ActionListener() {
+        AbstractAction printAction = new AbstractAction("Print") {
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         if(objectPropertyTableModel.getRowCount() == 0) {
@@ -432,16 +428,10 @@ public class EditorFactory
                         JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
-            });
-        }
+        };
         
-        // configure "close" button?
-        JButton btnClose = null;
-        if(managerControls) {
-            // Close command from "EntityManagerPane"
-            btnClose = new JButton("Close");
-            btnClose.setMnemonic('c');
-            btnClose.addActionListener(new ActionListener() {
+        
+        AbstractAction closeAction = new AbstractAction("Close") {
                 public void actionPerformed(ActionEvent evt)  
                 {        
                     Component parent = (Component)evt.getSource();
@@ -454,27 +444,90 @@ public class EditorFactory
                         iFrame.dispose();
                     }
                 }
-            });
-        }
+        };
+
         
+        // setup enable state, and enable change listeners:
+        editAction.setEnabled(false);
+        deleteAction.setEnabled(false);
+        listSelectionModel.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                boolean enabled = !listSelectionModel.isSelectionEmpty();
+                editAction.setEnabled(enabled);
+                deleteAction.setEnabled(enabled);
+            }
+        });
+
+
+        // configure popup menu
+        javax.swing.JPopupMenu popupMenu = new javax.swing.JPopupMenu();
+        popupMenu.add(newAction).setMnemonic('n');
+        popupMenu.add(editAction).setMnemonic('e');
+        popupMenu.add(new javax.swing.JSeparator());
+        popupMenu.add(deleteAction).setMnemonic('d');
+        popupMenu.addPopupMenuListener(new PopupMenuListener() {
+            public void popupMenuCanceled(PopupMenuEvent e) { }
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                boolean enabled = !listSelectionModel.isSelectionEmpty();
+                editAction.setEnabled(enabled);
+                deleteAction.setEnabled(enabled);
+            }
+        });
+        
+
+        // configure button panel:
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
+        
+        if(!isManagerWindow) {  
+            // configure "add" button (only used in OneToMany and ManytoMany relationships)
+            JButton btnAddExistingItem = new JButton(addExistingAction);
+            buttonPanel.add(btnAddExistingItem);
+        }
+
+        // configure "new" button
+        JButton btnNewItem = new JButton(newAction);
+        buttonPanel.add(btnNewItem);
+
+        // configure "edit" button
+        JButton btnEditItem = new JButton(editAction);
+        btnEditItem.addActionListener(editAction);
+        buttonPanel.add(btnEditItem);
+
+        // configure "delete" button
+        JButton btnDeleteItem = new JButton(deleteAction);
+        buttonPanel.add(btnDeleteItem);
+
+        if(isManagerWindow) {
+            // configure "print" button
+            JButton btnPrint = new JButton(printAction);
+            buttonPanel.add(btnPrint);
+
+            // configure "close" button
+            JButton btnClose = new JButton(closeAction);
+            buttonPanel.add(btnClose);
+            
+            // configure mnemonics:
+            btnNewItem.setMnemonic('n');
+            btnEditItem.setMnemonic('e');
+            btnDeleteItem.setMnemonic('d');
+            btnPrint.setMnemonic('p');
+            btnClose.setMnemonic('c');
+        }
+
         
         // configure panel layout
         JScrollPane scrollableItems = new JScrollPane(jTable);
         scrollableItems.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        scrollableItems.setComponentPopupMenu(popupMenu);
         
         jTable.setModel(objectPropertyTableModel);
         jTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        jTable.setCellSelectionEnabled(false);
         jTable.setRowSelectionAllowed(true);
+        jTable.setComponentPopupMenu(popupMenu);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEADING));
-        if(btnAddExistingItem != null)  buttonPanel.add(btnAddExistingItem, gbcButton);
-        if(btnNewItem != null)          buttonPanel.add(btnNewItem, gbcButton);
-        if(btnEditItem != null)         buttonPanel.add(btnEditItem, gbcButton);
-        if(btnDeleteItem != null)       buttonPanel.add(btnDeleteItem, gbcButton);
-        if(btnPrint != null)            buttonPanel.add(btnPrint, gbcButton);
-        if(btnClose != null)            buttonPanel.add(btnClose, gbcButton);
-        
         panel.setPreferredSize(new java.awt.Dimension(450, 180));        
         panel.setLayout(new BorderLayout());
         panel.add("Center", scrollableItems);
@@ -482,13 +535,6 @@ public class EditorFactory
         
         return panel;
     }
-
-    
-    /** Private constants to layout item list */
-    private final static GridBagConstraints gbcList = new GridBagConstraints(0,0, 2, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,0,2,0), 0,0);
-    
-    /** Private constants to layout buttons */
-    private final static GridBagConstraints gbcButton = new GridBagConstraints(GridBagConstraints.RELATIVE,1, 1, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,0,5,3), 0,0);
     
 }
 
