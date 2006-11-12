@@ -289,11 +289,13 @@ public class EditorFactory
 
             // populate listmodel with property's values
             Collection values = (Collection)property.getValue();
-            System.out.println("Property " + property.getName() + " collection size = " + values.size());
-            Iterator iter = values.iterator();
-            while(iter.hasNext()) {
-                Object valueToSelect = iter.next();
-                listModel.addElement(valueToSelect);
+            System.out.println("Property " + property.getName() + " collection size = " + values);
+            if(values != null) {
+                Iterator iter = values.iterator();
+                while(iter.hasNext()) {
+                    Object valueToSelect = iter.next();
+                    listModel.addElement(valueToSelect);
+                }
             }
         }
 
