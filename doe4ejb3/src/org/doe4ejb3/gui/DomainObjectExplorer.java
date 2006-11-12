@@ -214,7 +214,8 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
-            
+
+            System.out.println("Source control: " + sourceControl);
             if(sourceControl instanceof JList) {
                 // Nueva entidad:
                 JList list = (JList)sourceControl; 
@@ -239,17 +240,24 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private void jMenuItemNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemNewActionPerformed
         try {
             DomainObjectExplorer.getInstance().showStatus("");
+
+            // Check "File-->New-->Entity" class:
+            javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
+            Class entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
             
-            Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
-            JComponent sourceControl = (JComponent)invoker;
-            
-            if(sourceControl instanceof JList) {
-                // Nueva entidad:
-                JList list = (JList)sourceControl; 
-                Class entityClass = (Class)list.getSelectedValue();
-                if(entityClass != null) DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(entityClass, null);
-                else throw new ApplicationException("A class must be selected");
+            // Check contextual popup menu in left panel entity lists:
+            if(entityClass == null) {
+                JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)menuItem.getParent()).getInvoker();
+                if(sourceControl instanceof JList) {
+                    JList list = (JList)sourceControl; 
+                    entityClass = (Class)list.getSelectedValue();
+                    if(entityClass == null) {
+                        throw new ApplicationException("A class must be selected");
+                    }
+                }
             }
+            
+            if(entityClass != null) DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(entityClass, null);
             
         } catch(ApplicationException ex) {
             
