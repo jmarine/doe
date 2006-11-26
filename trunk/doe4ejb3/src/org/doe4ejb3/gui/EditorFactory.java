@@ -31,6 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -49,6 +51,7 @@ import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SpinnerDateModel;
 import javax.swing.DefaultListModel;
+import javax.swing.TransferHandler;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -61,8 +64,10 @@ import javax.swing.text.JTextComponent;
 
 import javax.persistence.TemporalType;
 
+import org.doe4ejb3.event.ClipboardAction;
 import org.doe4ejb3.event.EntityEvent;
 import org.doe4ejb3.event.EntityListener;
+import org.doe4ejb3.event.EntityTransferHandler;
 import org.doe4ejb3.exception.ApplicationException;
 import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.util.JPAUtils;
@@ -134,6 +139,8 @@ public class EditorFactory
                     final Class optionClass = memberClass;
 
                     // define combobox prototype dimensions
+                    EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, true);
+                    combo.setTransferHandler(entityTransferHandler);
                     combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");
                     for(int i = 0; i < 10; i++) combo.addItem(null);
 
@@ -432,7 +439,6 @@ public class EditorFactory
                 }
         };
         
-        
         AbstractAction closeAction = new AbstractAction("Close") {
                 public void actionPerformed(ActionEvent evt)  
                 {        
@@ -448,15 +454,25 @@ public class EditorFactory
                 }
         };
 
+        // cut, copy & paste actions
+        final AbstractAction cutAction = new ClipboardAction("Cut", 't', TransferHandler.getCutAction());
+        final AbstractAction copyAction = new ClipboardAction("Copy", 'c', TransferHandler.getCopyAction());
+        final AbstractAction pasteAction = new ClipboardAction("Paste", 'p', TransferHandler.getPasteAction());
         
         // setup enable state, and enable change listeners:
         editAction.setEnabled(false);
         deleteAction.setEnabled(false);
+        copyAction.setEnabled(false);
+        cutAction.setEnabled(false);
+        // pasteAction.setEnabled(getClipboard.isDataFlavorSupported(entityTransferHandler.getEntityDataFlavor()));
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 boolean enabled = !listSelectionModel.isSelectionEmpty();
                 editAction.setEnabled(enabled);
                 deleteAction.setEnabled(enabled);
+                copyAction.setEnabled(enabled);
+                cutAction.setEnabled(!isManagerWindow && enabled);
+                // pasteAction.setEnabled(getClipboard.isDataFlavorSupported(entityTransferHandler.getEntityDataFlavor()));
             }
         });
 
@@ -466,6 +482,10 @@ public class EditorFactory
         popupMenu.add(newAction).setMnemonic('n');
         popupMenu.add(editAction).setMnemonic('e');
         popupMenu.add(new javax.swing.JSeparator());
+        popupMenu.add(cutAction);
+        popupMenu.add(copyAction);
+        popupMenu.add(pasteAction);
+        popupMenu.add(new javax.swing.JSeparator());
         popupMenu.add(deleteAction).setMnemonic('d');
         popupMenu.addPopupMenuListener(new PopupMenuListener() {
             public void popupMenuCanceled(PopupMenuEvent e) { }
@@ -474,6 +494,9 @@ public class EditorFactory
                 boolean enabled = !listSelectionModel.isSelectionEmpty();
                 editAction.setEnabled(enabled);
                 deleteAction.setEnabled(enabled);
+                copyAction.setEnabled(enabled);
+                cutAction.setEnabled(!isManagerWindow && enabled);
+                // pasteAction.setEnabled(getClipboard.isDataFlavorSupported(entityTransferHandler.getEntityDataFlavor()));
             }
         });
         
@@ -523,7 +546,7 @@ public class EditorFactory
         JScrollPane scrollableItems = new JScrollPane(jTable);
         scrollableItems.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         scrollableItems.setComponentPopupMenu(popupMenu);
-        
+
         jTable.setModel(objectPropertyTableModel);
         jTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jTable.setCellSelectionEnabled(false);
@@ -534,6 +557,30 @@ public class EditorFactory
         panel.setLayout(new BorderLayout());
         panel.add("Center", scrollableItems);
         panel.add("South", buttonPanel);
+        
+        // configure drag and drop"
+        EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, !isManagerWindow);
+        jTable.setDragEnabled(true);
+        jTable.setTransferHandler(entityTransferHandler);
+        scrollableItems.setTransferHandler(entityTransferHandler);
+
+        // Configure "copy & paste"
+        ActionMap map = jTable.getActionMap();
+        map.put(TransferHandler.getCutAction().getValue(Action.NAME),
+                TransferHandler.getCutAction());
+        map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
+                TransferHandler.getCopyAction());
+        map.put(TransferHandler.getPasteAction().getValue(Action.NAME),
+                TransferHandler.getPasteAction());
+
+        map = scrollableItems.getActionMap();
+        map.put(TransferHandler.getCutAction().getValue(Action.NAME),
+                TransferHandler.getCutAction());
+        map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
+                TransferHandler.getCopyAction());
+        map.put(TransferHandler.getPasteAction().getValue(Action.NAME),
+                TransferHandler.getPasteAction());
+
         
         return panel;
     }
