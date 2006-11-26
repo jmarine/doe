@@ -9,7 +9,7 @@
       <tr>
 	<td valign="top"><img src="images/icon.gif"></td>
 	<td valign="top">
-          <h1>Domain Object Explorer for EJB3 entities</h1>
+          <h1>Domain Object Explorer for EJB3 entity beans</h1>
   <!-- Navbar begin -->
   <table border="0" cellpadding="0" cellspacing="0" summary="Navigation bar">
     <tr> 
@@ -145,7 +145,7 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
     <h3>Usage Instructions</h3>
     </a>
     <blockquote>
-    You can launch the "doe" application client from GlassFish administration console (after installation, you also can run it from Java Web Start). The application has the next features:
+    You can launch the "doe" application client from GlassFish administration console (after installation, you also can run it from Java Web Start). The application has the following features:
 
     <h4>Create a new entity object:</h4>
     From "File" menu, select "New" option, and the class name of the new EJB3 entity. Then complete the entity properties and press the "Accept" button.
@@ -192,14 +192,15 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
     <h3>Roadmap</h3>
     </a>
     <blockquote>
- Future roadmap for the "doe" application:
+ Future roadmap for the "doe" application ("to do" task list):
  <ul>
  <li>English corrections (I don't speak English).</li>
- <li>Improve "GUI" (menus, toolbars, better navigation, custom queries in search panel, copy&paste operations, drag&drop operations, ...).</li>
+ <li>Improve "GUI" (menus, toolbars, better navigation, allow to create/edit/delete related objects in combos, custom queries in search panel, fix some copy&paste operations, more drag&drop operations, ...).</li>
+ <li>Bidirectional relations suport (automatic link and persistence in both sides)</li>
  <li>Allow user extensions/plugins to add new actions/menus for entity objects.</li>
  <li>Create custom editors for common property types (image viewers/loaders, dates, etc.)</li>
  <li>Login configuration for database connections managed by client applications.</li>
- <li>Printing support (entity lists and object details).</li>
+ <li>Printing support in object detail window (printing is only supported in entity search panel).</li>
  <li>Better i18n support.</li>
  <li>Load/unload of persistence units.</li>
  <li>More sample applications.</li>
@@ -213,9 +214,20 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
     </a>
     <blockquote>
       <ul>
+	<li>Version 0.2 - [Alpha version - CVS head]
+	  <ul>
+	    <li>Cut, copy & paste operations.</li>
+	    <li>Basic drag & drop operations.</li>
+	    <li>Initial printing support (only in search panel).</li>
+	    <li>Improved explorer navigation with contextual menus.</li>
+	    <li>Show entity lists with customizable columns (on search panel and editor of related entities).</li>
+	    <li>Many bug fixes.</li>
+	  </ul>
+        </li>
 	<li>Version 0.1 - [Pre-Alpha version imported in CVS - 2006/09/27]
 	  <ul>
 	    <li>Open source release to java.net.</li>
+	    <li>Simple search/view/edition of EJB3 entities.</li>
 	  </ul>
         </li>
       </ul>
