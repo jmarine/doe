@@ -8,6 +8,7 @@ package org.doe4ejb3.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.*;
 import java.io.*;
 import java.lang.annotation.Annotation;
 import java.text.MessageFormat;
@@ -42,7 +43,7 @@ import org.doe4ejb3.util.EJBQLUtils;
 
 
 
-public class DomainObjectExplorer extends javax.swing.JFrame 
+public class DomainObjectExplorer extends javax.swing.JFrame
 {
     
     /**
@@ -53,7 +54,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     {
         Exception error = null;
         initComponents();
-        
+
         try {
             initPersistenceEntities();
             // TODO: create menu actions (e.g: "File-->New-->EntityXYZ")"
@@ -62,8 +63,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             error = ex;
         }
         
-        // TODO: advice user when no persistence entities were found.
-        // if(jComboBoxEntityClass.getItemCount() == 0) error = new ApplicationException("No persistent entities found.");
         
         // replace JDesktopPane with a better  MDI container
         mdiDesktopPane = new MDIDesktopPane();
@@ -72,6 +71,9 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMainMenuBar.add(new WindowMenu(mdiDesktopPane), 2);
         
         setSize(800,560);
+        
+        // TODO: advice user when no persistence entities were found.
+        // if(jComboBoxEntityClass.getItemCount() == 0) error = new ApplicationException("No persistent entities found.");
         
         if(error != null) {
            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -103,6 +105,9 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenuEdit = new javax.swing.JMenu();
+        jMenuItemCut = new javax.swing.JMenuItem();
+        jMenuItemCopy = new javax.swing.JMenuItem();
+        jMenuItemPaste = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
         jMenuItemAbout = new javax.swing.JMenuItem();
 
@@ -187,6 +192,42 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
         jMenuEdit.setMnemonic('e');
         jMenuEdit.setText("Edit");
+        jMenuItemCut.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_X, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItemCut.setMnemonic('t');
+        jMenuItemCut.setText("Cut");
+        jMenuItemCut.setActionCommand((String)TransferHandler.getCutAction().getValue(Action.NAME));
+        jMenuItemCut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemClipboardActionPerformed(evt);
+            }
+        });
+
+        jMenuEdit.add(jMenuItemCut);
+
+        jMenuItemCopy.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItemCopy.setMnemonic('c');
+        jMenuItemCopy.setText("Copy");
+        jMenuItemCopy.setActionCommand((String)TransferHandler.getCopyAction().getValue(Action.NAME));
+        jMenuItemCopy.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemClipboardActionPerformed(evt);
+            }
+        });
+
+        jMenuEdit.add(jMenuItemCopy);
+
+        jMenuItemPaste.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItemPaste.setMnemonic('p');
+        jMenuItemPaste.setText("Paste");
+        jMenuItemPaste.setActionCommand((String)TransferHandler.getPasteAction().getValue(Action.NAME));
+        jMenuItemPaste.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemClipboardActionPerformed(evt);
+            }
+        });
+
+        jMenuEdit.add(jMenuItemPaste);
+
         jMainMenuBar.add(jMenuEdit);
 
         jMenuHelp.setMnemonic('h');
@@ -208,6 +249,17 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jMenuItemClipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemClipboardActionPerformed
+        System.out.println("Clipboard action original source : " + evt.getSource());
+        JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
+        System.out.println("Clipboard action on frame: " + iFrame + ", selected=" + iFrame.isSelected());
+        if(iFrame != null) {
+            iFrame.restoreSubcomponentFocus(); // fix focus
+            JComponent focusOwner = (JComponent)KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();  // ¿¿¿ iFrame.getMostRecentFocusOwner(); ???
+            clipboardActionPerformed(focusOwner, evt);
+        }
+    }//GEN-LAST:event_jMenuItemClipboardActionPerformed
+   
     private void jMenuItemManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemManagerActionPerformed
         try {
             DomainObjectExplorer.getInstance().showStatus("");
@@ -295,7 +347,19 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_jMenuItemAboutActionPerformed
 
-                                                 
+    public void clipboardActionPerformed(JComponent focusOwner, java.awt.event.ActionEvent evt) {
+        System.out.println("Clipboard action on control: " + focusOwner);
+        if(focusOwner != null) {
+            ActionMap actionMap = focusOwner.getActionMap();
+            Action action = actionMap.get(evt.getActionCommand());
+            System.out.println("Clipboard action : " + action);
+            if (action != null) {
+                action.actionPerformed(new ActionEvent(focusOwner,
+                                          ActionEvent.ACTION_PERFORMED,
+                                          null));
+            }
+        }
+    }                                                 
 
     // </editor-fold>
  
@@ -316,7 +380,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     
     // <editor-fold defaultstate="collapsed" desc=" Other application events ">
 
-
+    
     // </editor-fold>
 
    
@@ -622,9 +686,12 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
     private javax.swing.JMenuItem jMenuItemAbout;
+    private javax.swing.JMenuItem jMenuItemCopy;
+    private javax.swing.JMenuItem jMenuItemCut;
     private javax.swing.JMenuItem jMenuItemExit;
     private javax.swing.JMenuItem jMenuItemManager;
     private javax.swing.JMenuItem jMenuItemNew;
+    private javax.swing.JMenuItem jMenuItemPaste;
     private javax.swing.JMenu jMenuNew;
     private org.doe4ejb3.gui.JOutlinePane jOutlinePanePersistenceUnits;
     private javax.swing.JPopupMenu jPopupMenuContextual;
