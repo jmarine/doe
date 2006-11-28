@@ -60,7 +60,7 @@
         <li><b>Project Type:</b> Java Web Start application client</li>
         <li><b>License:</b> Common Development and Distribution License (CDDL) Version 1.0</li>
       </ul>
-The "Domain Object Explorer" is a rich desktop application designed to ease the management of EJB3 entity beans. It auto-generates the user interface for the business objects on the fly (no need of additional GUI design/programming, althougth in can also be customized by developer), and it can be centrally managed from application server administration console (for datasource configuration, deployment of persistence units, and delivery of application/updates via Java Web Start technology).
+The "Domain Object Explorer" is a rich desktop application designed to ease the management and testing of EJB3 entity beans. The user interface to search/view/edit your business objects can be auto-generated at runtime or customized by developer. The application can also be centrally managed from application server administrative console (datasource configuration, deployment of persistence units, and delivery of application/updates via Java Web Start technology).
       <!-- project info end -->
     </blockquote>
 
@@ -89,10 +89,10 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
       <li>Pros:</li>
       <ul>
 	<li>Easy management and testing of EJB3 entity beans.</li>
-        <li>Rich user interface in zero-code (althought it can also be customized by developer)</li>
-	<li>No more HTML, JavaScript, nor  AJAX handlers on server-side... only 100% pure Java on client side!!!</li>
-	<li>Auto-deployment of application/updates with Java Web Start technology.</li>
+        <li>Provides a rich user interface without necessity for additional programming.</li>
+	<li>Auto-deployment of application/updates via Java Web Start technology.</li>
         <li>Data sources can be centrally managed from application server administration console</li>
+	<li>No more HTML, JavaScript, nor AJAX handlers on server-side... only 100% pure Java on client side!</li>
 	<li>...</li>
       </ul>
       <li>Cons:</li>
@@ -151,7 +151,7 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
     From "File" menu, select "New" option, and the class name of the new EJB3 entity. Then complete the entity properties and press the "Accept" button.
 
     <h4>Search entity beans:</h4>
-    First, you have to select the persistence unit for the EJB3 entity class, and double click on the desired class to open the entity manager window on the desktop. Then select the query type ("All objects" or the name of a "custom named query" defined in the EJB3 entity bean). With custom named queries, you also have to complete the required parameters. Finally, press the "Search" button, and wait for the results (and the "done" indicator in the status bar).
+    First, you have to select the persistence unit for the EJB3 entity class, and double click on the desired class to open the entity manager window on the desktop. Then select the query type ("All objects" or the name of the desired "custom EJBQL named query" that may had been defined in the EJB3 entity bean). With custom named queries, you also have to complete the required parameters. Finally, press the "Search" button, and wait for the results (and the "done" indicator in the status bar).
 
     <h4>Print the objects found:</h4>
     After the search of the desired objects, click the "Print" button from the manager window, then configure page layout in printing dialog, and click the "Print" button from the printing dialog.
@@ -194,14 +194,13 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
     <blockquote>
  Future roadmap for the "doe" application ("to do" task list):
  <ul>
- <li>English corrections (I don't speak English).</li>
- <li>Improve "GUI" (menus, toolbars, better navigation, allow to create/edit/delete related objects in combos, custom queries in search panel, fix some copy&paste operations, more drag&drop operations, ...).</li>
- <li>Bidirectional relations suport (automatic link and persistence in both sides)</li>
+ <li>English corrections and better i18n support (but I don't speak English ;-).</li>
+ <li>Improve "GUI" (menus, toolbars, icons, better navigation, allow to create/edit/delete related objects in combos, custom queries in search panel, fix some copy&paste operations, more drag&drop operations, ...).</li>
+ <li>Lazy and bidirectional relations suport (automatic load and linking in both sides)</li>
  <li>Allow user extensions/plugins to add new actions/menus for entity objects.</li>
  <li>Create custom editors for common property types (image viewers/loaders, dates, etc.)</li>
  <li>Login configuration for database connections managed by client applications.</li>
  <li>Printing support in object detail window (printing is only supported in entity search panel).</li>
- <li>Better i18n support.</li>
  <li>Load/unload of persistence units.</li>
  <li>More sample applications.</li>
  </ul>
