@@ -18,11 +18,8 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.METHOD, ElementType.FIELD}) 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PropertyDescriptor {
-    int index() default 0;
-    String displayName() default "";
+public @interface OptionDescriptor {
+    String value();
+    String text() default "";
     String resourceBundle() default "";
-    String format() default "";
-    boolean showInLists() default false;
-    OptionDescriptor[] options() default {};
 }

@@ -37,6 +37,7 @@ public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport
             this.polymorphicTemporalTypeValue = (java.util.Date)constructor.newInstance(0);
             this.simpleDateFormat = null;
             this.spinner = new JSpinner();
+            this.spinner.putClientProperty("fixedSize", "true");
             if(temporalClass.isAssignableFrom(java.sql.Date.class)) {
                 this.spinner.setModel(new SpinnerDateModel());
                 this.spinner.setEditor(new JSpinner.DateEditor(spinner, "dd/MM/yyyy"));
