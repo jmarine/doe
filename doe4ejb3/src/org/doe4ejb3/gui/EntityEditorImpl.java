@@ -23,10 +23,7 @@ import javax.swing.*;
 import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.ReflectionUtils;
 
-/**
- *
- * @author Jordi Marine Fort
- */
+
 public class EntityEditorImpl extends JPanel implements EntityEditorInterface 
 {
 
@@ -34,7 +31,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
 
     private final static GridBagConstraints gbcTitle = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(5,5,10,5), 0,0);
     private final static GridBagConstraints gbcLabel = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,5,5,5), 0,0);
-    private final static GridBagConstraints gbcComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,5,5,5), 0,0);
+    private final static GridBagConstraints gbcComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5,5,5,5), 0,0);
+    private final static GridBagConstraints gbcFixedSizeComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,5,5,5), 0,0);
     private final static GridBagConstraints gbcEmbeddedComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,-3, 5,-3), 0,0);
     private final static GridBagConstraints gbcGlue = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0,0);
     
@@ -176,13 +174,14 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
         boolean embedded = false;
         javax.persistence.Temporal temporal = null;
         Object relationType = null;
+        GridBagConstraints gbc = gbcComponent;
         Component comp = null;
         JComponentDataBinder binder = null;
         java.beans.PropertyEditor editor = null;
         org.doe4ejb3.annotation.PropertyDescriptor propertyDescriptor = null;
         
         Method compGetter = null;
-        int defaultLength = 40;
+        int maxLength = 255;
 
         System.out.println("Begin: process property annotation");
         for(int i = 0; (annotations != null) && (i < annotations.length); i++) 
@@ -199,7 +198,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
             {
                 persistent = true;
                 generatedValue = true;
-                defaultLength = 0;
+                maxLength = 0;
                 System.out.println("Has GeneratedValue annotation!");
             }
             else if(a instanceof javax.persistence.Basic) 
@@ -210,7 +209,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
             {
                 javax.persistence.Column column = (javax.persistence.Column)a;
                 if( (column.insertable()) || (column.updatable()) ) {
-                    if(!generatedValue) defaultLength = column.length();
+                    if(!generatedValue) maxLength = column.length();
                     String columnName = column.name();
                     if(columnName != null) name = columnName;
                     persistent = true;
@@ -274,7 +273,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
                 // Other editors:
                 javax.persistence.TemporalType defaultTemporalType = javax.persistence.TemporalType.TIMESTAMP;
                 if( (temporal != null) && (temporal.value() != null) ) defaultTemporalType = temporal.value();
-                comp = EditorFactory.getPropertyEditor(entityProperty, defaultLength, defaultTemporalType);
+                comp = EditorFactory.getPropertyEditor(entityProperty, maxLength, defaultTemporalType);
                 binder = (JComponentDataBinder)((JComponent)comp).getClientProperty("dataBinder");
                 
             }
@@ -311,9 +310,14 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
                             }
                         }
                     }
+
+                    if( (comp instanceof JComponent) 
+                            && (((JComponent)comp).getClientProperty("fixedSize") != null) ) {
+                        gbc = gbcFixedSizeComponent;
+                    }
                     
                     add(new JLabel(labelText), gbcLabel);
-                    add(comp, gbcComponent);
+                    add(comp, gbc);
                     
                 } else {
                     add(comp, gbcEmbeddedComponent);

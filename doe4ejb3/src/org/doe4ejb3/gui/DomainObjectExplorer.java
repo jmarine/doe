@@ -8,6 +8,7 @@ package org.doe4ejb3.gui;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.*;
 import java.beans.*;
 import java.io.*;
 import java.lang.annotation.Annotation;
@@ -359,7 +360,16 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                                           null));
             }
         }
-    }                                                 
+    }                    
+    
+    /*
+    public java.awt.datatransfer.Clipboard getClipboard()
+    {
+       java.awt.datatransfer.Clipboard clipboard = getToolkit().getSystemClipboard(); 
+       System.out.println("System clipboard: " + clipboard);
+       return clipboard;
+    }
+    */
 
     // </editor-fold>
  

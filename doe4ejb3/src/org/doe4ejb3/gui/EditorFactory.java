@@ -39,6 +39,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JInternalFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -60,7 +61,9 @@ import javax.swing.event.PopupMenuListener;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.event.EventListenerList;
+import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
+import javax.swing.text.MaskFormatter;
 
 import javax.persistence.TemporalType;
 
@@ -92,7 +95,7 @@ public class EditorFactory
         return entityEditor;
     }
     
-    public static JComponent getPropertyEditor(Property property, int defaultLength, TemporalType defaultTemporalType)
+    public static JComponent getPropertyEditor(Property property, int maxLength, TemporalType defaultTemporalType)
     {
         JComponent comp = null;
         Method compGetter = null;
@@ -122,7 +125,7 @@ public class EditorFactory
                 try {
                     System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
                     JComponentDataBinder binderOutParam[] = new JComponentDataBinder[1];
-                    comp = getCollectionEditor(property, memberClass, false, defaultLength, binderOutParam);
+                    comp = getCollectionEditor(property, memberClass, false, binderOutParam);
                     binder = binderOutParam[0];
 
                 } catch(Exception ex) {
@@ -220,6 +223,7 @@ public class EditorFactory
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
                     JCheckBox checkBox = new JCheckBox();
                     comp = checkBox;
+                    comp.putClientProperty("fixedSize", "true");
                     compGetter = checkBox.getClass().getMethod("isSelected");
 
                     Object booleanObject = property.getValue();
@@ -233,10 +237,11 @@ public class EditorFactory
                 } else { // using JTextField or JTextArea depending on Column's length attribute
 
                     JTextComponent textField = null;
-                    if(defaultLength < 100) {
-                        textField = new JTextField(defaultLength);
+                    if( (maxLength > 0) && (maxLength < 100) ) {
+                        textField = new JTextField(maxLength);
                         compGetter = textField.getClass().getMethod("getText");
                         comp = textField;
+                        comp.putClientProperty("fixedSize", "true");
                     } else {
                         textField = new javax.swing.JTextPane();
                         textField.setPreferredSize(new java.awt.Dimension(400, 80));
@@ -245,6 +250,11 @@ public class EditorFactory
                         comp = new JScrollPane(textField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
                     }
 
+                    if(maxLength > 0) {
+                        AbstractDocument doc = (AbstractDocument)textField.getDocument();
+                        doc.setDocumentFilter(new DocumentSizeFilter(maxLength));
+                    }
+                    
                     Object value = property.getValue();
                     if(value != null) {
                         if(editor != null) {
@@ -279,12 +289,13 @@ public class EditorFactory
      * Setup an editor for a multi-valued property 
      * TODO: allow drag and drop operations
      */
-    public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean isManagerWindow, int defaultLength, JComponentDataBinder binderOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean isManagerWindow, JComponentDataBinder binderOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
         final JPanel panel = new JPanel();
         final JTable jTable = new JTable();
         final DefaultListModel listModel = new DefaultListModel();
         final ListSelectionModel listSelectionModel = jTable.getSelectionModel();
         final ObjectPropertyTableModel objectPropertyTableModel = new ObjectPropertyTableModel(memberClass, listModel);
+        final EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, !isManagerWindow);
         
         panel.putClientProperty("listModel", listModel);
         panel.putClientProperty("listSelectionModel", listSelectionModel);
@@ -464,7 +475,7 @@ public class EditorFactory
         deleteAction.setEnabled(false);
         copyAction.setEnabled(false);
         cutAction.setEnabled(false);
-        // pasteAction.setEnabled(getClipboard.isDataFlavorSupported(entityTransferHandler.getEntityDataFlavor()));
+        // pasteAction.setEnabled(DomainObjectExplorer.getInstance().getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 boolean enabled = !listSelectionModel.isSelectionEmpty();
@@ -472,7 +483,7 @@ public class EditorFactory
                 deleteAction.setEnabled(enabled);
                 copyAction.setEnabled(enabled);
                 cutAction.setEnabled(!isManagerWindow && enabled);
-                // pasteAction.setEnabled(getClipboard.isDataFlavorSupported(entityTransferHandler.getEntityDataFlavor()));
+                // pasteAction.setEnabled(DomainObjectExplorer.getInstance().getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
             }
         });
 
@@ -496,7 +507,7 @@ public class EditorFactory
                 deleteAction.setEnabled(enabled);
                 copyAction.setEnabled(enabled);
                 cutAction.setEnabled(!isManagerWindow && enabled);
-                // pasteAction.setEnabled(getClipboard.isDataFlavorSupported(entityTransferHandler.getEntityDataFlavor()));
+                // pasteAction.setEnabled(DomainObjectExplorer.getInstance().getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
             }
         });
         
@@ -559,7 +570,6 @@ public class EditorFactory
         panel.add("South", buttonPanel);
         
         // configure drag and drop"
-        EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, !isManagerWindow);
         jTable.setDragEnabled(true);
         jTable.setTransferHandler(entityTransferHandler);
         scrollableItems.setTransferHandler(entityTransferHandler);
