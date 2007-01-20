@@ -8,7 +8,8 @@
  * Thanks to <em>Gerald Nunn</em> for his article:
  * <a href="http://www.javaworld.com/javaworld/jw-05-2001/jw-0525-mdi.html">Conquer Swing deficiencies in MDI development</a>.
  * 
- * @author Gerald Nunn 
+ * Author   Gerald Nunn 
+ * Modified Jordi Marine Fort (2007/01/01)
  */
 
 package org.doe4ejb3.gui;
@@ -21,6 +22,8 @@ import java.beans.*;
 
 public class MDIDesktopPane extends JDesktopPane {
     private static int FRAME_OFFSET=20;
+    private static int FRAME_BORDER_SIZE=2;
+    private static int VERTICAL_SCROLL_SIZE=20;
     private MDIDesktopManager manager;
 
     public MDIDesktopPane() {
@@ -41,7 +44,6 @@ public class MDIDesktopPane extends JDesktopPane {
         int h;
 
         Component retval=super.add(frame);
-        checkDesktopSize();
         if (array.length > 0) {
             p = array[0].getLocation();
             p.x = p.x + FRAME_OFFSET;
@@ -51,13 +53,16 @@ public class MDIDesktopPane extends JDesktopPane {
             p = new Point(0, 0);
         }
         frame.setLocation(p.x, p.y);
+        frame.pack();
+        
         if (frame.isResizable()) {
-            w = getWidth() - (getWidth()/3);
-            h = getHeight() - (getHeight()/3);
-            if (w < frame.getMinimumSize().getWidth()) w = (int)frame.getMinimumSize().getWidth();
-            if (h < frame.getMinimumSize().getHeight()) h = (int)frame.getMinimumSize().getHeight();
+            w = (int)frame.getSize().getWidth() + VERTICAL_SCROLL_SIZE;
+            h = (int)frame.getSize().getHeight();
+            if (p.x + w + FRAME_BORDER_SIZE > getParent().getWidth()) w = getParent().getWidth() - p.x - FRAME_BORDER_SIZE;
+            if (p.y + h + FRAME_BORDER_SIZE > getParent().getHeight()) h = getParent().getHeight() - p.y - FRAME_BORDER_SIZE;
             frame.setSize(w, h);
         }
+        
         moveToFront(frame);
         frame.setVisible(true);
         try {
@@ -65,6 +70,9 @@ public class MDIDesktopPane extends JDesktopPane {
         } catch (PropertyVetoException e) {
             frame.toBack();
         }
+
+        checkDesktopSize();
+        
         return retval;
     }
 

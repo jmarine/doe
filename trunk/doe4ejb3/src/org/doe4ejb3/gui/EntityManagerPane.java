@@ -149,7 +149,7 @@ public class EntityManagerPane extends javax.swing.JPanel {
 
         setLayout(new java.awt.BorderLayout());
 
-        jPanelEntidad.setMinimumSize(new java.awt.Dimension(300, 200));
+        jPanelEntidad.setMinimumSize(new java.awt.Dimension(500, 400));
         jLabelQuery.setText("Query:");
 
         jComboBoxNamedQuery.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All" }));
@@ -173,11 +173,11 @@ public class EntityManagerPane extends javax.swing.JPanel {
         jPanelResults.setLayout(jPanelResultsLayout);
         jPanelResultsLayout.setHorizontalGroup(
             jPanelResultsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 492, Short.MAX_VALUE)
+            .add(0, 581, Short.MAX_VALUE)
         );
         jPanelResultsLayout.setVerticalGroup(
             jPanelResultsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 269, Short.MAX_VALUE)
+            .add(0, 357, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout jPanelEntidadLayout = new org.jdesktop.layout.GroupLayout(jPanelEntidad);
@@ -188,11 +188,11 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 .addContainerGap()
                 .add(jPanelEntidadLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanelResults, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .add(jPanelQueryParams, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 492, Short.MAX_VALUE)
+                    .add(jPanelQueryParams, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanelEntidadLayout.createSequentialGroup()
                         .add(jLabelQuery)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jComboBoxNamedQuery, 0, 360, Short.MAX_VALUE)
+                        .add(jComboBoxNamedQuery, 0, 449, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jButtonSearch)))
                 .addContainerGap())

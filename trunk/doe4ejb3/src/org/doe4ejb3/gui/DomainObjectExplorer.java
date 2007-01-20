@@ -71,7 +71,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jSplitPaneCentral.setRightComponent(jScrollDesktopPane);
         jMainMenuBar.add(new WindowMenu(mdiDesktopPane), 2);
         
-        setSize(800,560);
+        setSize(950,700);
         
         // TODO: advice user when no persistence entities were found.
         // if(jComboBoxEntityClass.getItemCount() == 0) error = new ApplicationException("No persistent entities found.");
@@ -165,8 +165,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jSplitPaneCentral.setDividerLocation(300);
         jSplitPaneCentral.setLeftComponent(jOutlinePanePersistenceUnits);
 
-        jScrollDesktopPane.setMinimumSize(new java.awt.Dimension(400, 200));
-        jScrollDesktopPane.setPreferredSize(new java.awt.Dimension(400, 200));
         jSplitPaneCentral.setRightComponent(jScrollDesktopPane);
 
         getContentPane().add(jSplitPaneCentral, java.awt.BorderLayout.CENTER);
@@ -256,7 +254,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         System.out.println("Clipboard action on frame: " + iFrame + ", selected=" + iFrame.isSelected());
         if(iFrame != null) {
             iFrame.restoreSubcomponentFocus(); // fix focus
-            JComponent focusOwner = (JComponent)KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();  // ¿¿¿ iFrame.getMostRecentFocusOwner(); ???
+            JComponent focusOwner = (JComponent)KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();  //  iFrame.getMostRecentFocusOwner(); ???
             clipboardActionPerformed(focusOwner, evt);
         }
     }//GEN-LAST:event_jMenuItemClipboardActionPerformed
@@ -671,13 +669,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         buttons.add(btnAccept);
         buttons.add(btnClose);
 
-        
+
         JScrollPane scrollPaneForEditor = new JAutoScrollPaneOnComponentFocus((java.awt.Container)editor, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
         iFrame.getContentPane().setLayout(new BorderLayout());
         iFrame.getContentPane().add(scrollPaneForEditor, BorderLayout.CENTER);
         iFrame.getContentPane().add(buttons, BorderLayout.SOUTH);
 
-        // iFrame.setMinimumSize(new Dimension(400, 300));
         iFrame.pack();
 
         return iFrame;

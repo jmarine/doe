@@ -53,6 +53,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
     public EntityEditorImpl(boolean embedded) 
     {
         this.embedded = embedded;
+        setMinimumSize(new java.awt.Dimension(550, 400));
     }
 
     public void clearBinders()
@@ -247,8 +248,16 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
             }
             else if(a instanceof javax.persistence.Version) 
             {
+                // TODO? Hide "version" fields
+                persistent = true;      
                 generatedValue = true;
+                maxLength = 0;
             } 
+            else if(a instanceof javax.persistence.Lob) 
+            {
+                persistent = true;
+                maxLength = Integer.MAX_VALUE;
+            }
                 
         }
         
@@ -281,7 +290,12 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
             
             if(comp != null) {
                 if(generatedValue && (!objIsNew)) {
-                    comp.setEnabled(false);
+                    if(comp instanceof JScrollPane) {
+                        JScrollPane scroll = (JScrollPane)comp;
+                        scroll.getViewport().getView().setEnabled(false);
+                    } else {
+                        comp.setEnabled(false);
+                    }
                 } else {
                     if(binder == null) {
                         binder = new JComponentDataBinder(comp, compGetter, editor, entityProperty);
