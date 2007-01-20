@@ -237,8 +237,9 @@ public class EditorFactory
                 } else { // using JTextField or JTextArea depending on Column's length attribute
 
                     JTextComponent textField = null;
-                    if( (maxLength > 0) && (maxLength < 100) ) {
+                    if( (maxLength >= 0) && (maxLength < 100) ) {
                         textField = new JTextField(maxLength);
+                        // textField.setPreferredSize(new java.awt.Dimension(150, 32));
                         compGetter = textField.getClass().getMethod("getText");
                         comp = textField;
                         comp.putClientProperty("fixedSize", "true");
@@ -564,7 +565,7 @@ public class EditorFactory
         jTable.setRowSelectionAllowed(true);
         jTable.setComponentPopupMenu(popupMenu);
 
-        panel.setPreferredSize(new java.awt.Dimension(450, 180));        
+        panel.setPreferredSize(new java.awt.Dimension(400, 180));        
         panel.setLayout(new BorderLayout());
         panel.add("Center", scrollableItems);
         panel.add("South", buttonPanel);
