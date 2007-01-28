@@ -160,7 +160,7 @@ public class EditorFactory
                                     comboBoxModel.removeAllElements();
                                     comboBoxModel.addElement(null);
                                     System.out.println("Searching items!!!");
-                                    for(Object option : JPAUtils.findAllEntities(optionClass).toArray()) {
+                                    for(Object option : JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), optionClass).toArray()) {
                                         comboBoxModel.addElement(option);
                                     }
                                     comboBoxModel.setSelectedItem(selectedItem);
@@ -345,7 +345,7 @@ public class EditorFactory
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                        List allValues = JPAUtils.findAllEntities(memberClass);
+                        List allValues = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), memberClass);
                         Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
                         if(newItem != null) {
                             // FIXME: caution with duplicated relations and "Set" collection types.
@@ -413,7 +413,7 @@ public class EditorFactory
                                         System.out.println("EditorFactory: removing selected index: " + index);
                                         if(isManagerWindow) {  // delete command from "EntityManagerPane"
                                             Object entity = listModel.getElementAt(index);
-                                            JPAUtils.removeEntity(entity);                                
+                                            JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), entity);                                
                                         }
                                         listModel.removeElementAt(index);
                                     }

@@ -150,6 +150,7 @@ public class EntityManagerPane extends javax.swing.JPanel {
         setLayout(new java.awt.BorderLayout());
 
         jPanelEntidad.setMinimumSize(new java.awt.Dimension(500, 400));
+        jPanelEntidad.setPreferredSize(new java.awt.Dimension(500, 401));
         jLabelQuery.setText("Query:");
 
         jComboBoxNamedQuery.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All" }));
@@ -177,7 +178,7 @@ public class EntityManagerPane extends javax.swing.JPanel {
         );
         jPanelResultsLayout.setVerticalGroup(
             jPanelResultsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 357, Short.MAX_VALUE)
+            .add(0, 317, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout jPanelEntidadLayout = new org.jdesktop.layout.GroupLayout(jPanelEntidad);
@@ -233,7 +234,7 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 {
                     if(listSelectionModel.isSelectedIndex(index)) {
                         Object entity = listModel.getElementAt(index);
-                        JPAUtils.removeEntity(entity);
+                        JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), entity);
                         listModel.removeElementAt(index);
                     }
                 }
@@ -309,13 +310,13 @@ public class EntityManagerPane extends javax.swing.JPanel {
             this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             DomainObjectExplorer.getInstance().showStatus("Searching...");
             if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
-                entities = JPAUtils.findAllEntities(entityClass);
+                entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass);
             } else if(jComboBoxNamedQuery.getSelectedIndex() > 0) {
                 ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
                 NamedQuery namedQuery = (NamedQuery)listItem.getValue();
                 HashMap parameterValues = null;
                 if(queryParametersPanel != null) parameterValues = queryParametersPanel.getParameterValues();
-                entities = JPAUtils.executeNamedQuery(entityClass, namedQuery.name(), parameterValues);
+                entities = JPAUtils.executeNamedQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, namedQuery.name(), parameterValues);
             }
             
             listModel.clear();

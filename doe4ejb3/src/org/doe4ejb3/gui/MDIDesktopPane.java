@@ -21,7 +21,9 @@ import java.beans.*;
 
 
 public class MDIDesktopPane extends JDesktopPane {
-    private static int FRAME_OFFSET=20;
+    private static int FRAME_POSITION=0;
+    private static int FRAME_OFFSET_X=20;
+    private static int FRAME_OFFSET_Y=26;
     private static int FRAME_BORDER_SIZE=2;
     private static int VERTICAL_SCROLL_SIZE=20;
     private MDIDesktopManager manager;
@@ -36,24 +38,33 @@ public class MDIDesktopPane extends JDesktopPane {
         super.setBounds(x,y,w,h);
         checkDesktopSize();
     }
-
+    
+    public void centerFrame(JInternalFrame frame) 
+    {
+        frame.setLocation( Math.max(1,(getParent().getWidth()  - frame.getWidth())/2), 
+                           Math.max(1,(getParent().getHeight() - frame.getHeight())/2) );
+    }
+    
     public Component add(JInternalFrame frame) {
-        JInternalFrame[] array = getAllFrames();
+        return add(frame, false);
+    }
+
+    public Component add(JInternalFrame frame, boolean center) {
         Point p;
         int w;
         int h;
 
+        frame.pack();
         Component retval=super.add(frame);
-        if (array.length > 0) {
-            p = array[0].getLocation();
-            p.x = p.x + FRAME_OFFSET;
-            p.y = p.y + FRAME_OFFSET;
-        }
-        else {
-            p = new Point(0, 0);
+        if(center) {
+            p = new Point( Math.max(1,(getParent().getWidth()  - frame.getWidth())/2), 
+                           Math.max(1,(getParent().getHeight() - frame.getHeight())/2) );
+        } else {
+            p = new Point( 1 + (FRAME_POSITION * FRAME_OFFSET_X) % 100,
+                           1 + (FRAME_POSITION * FRAME_OFFSET_Y) % 120);
+            FRAME_POSITION++;
         }
         frame.setLocation(p.x, p.y);
-        frame.pack();
         
         if (frame.isResizable()) {
             w = (int)frame.getSize().getWidth() + VERTICAL_SCROLL_SIZE;
@@ -90,13 +101,13 @@ public class MDIDesktopPane extends JDesktopPane {
         JInternalFrame allFrames[] = getAllFrames();
 
         manager.setNormalSize();
-        int frameHeight = (getBounds().height - 5) - allFrames.length * FRAME_OFFSET;
-        int frameWidth = (getBounds().width - 5) - allFrames.length * FRAME_OFFSET;
+        int frameHeight = (getBounds().height - 5) - allFrames.length * FRAME_OFFSET_Y;
+        int frameWidth = (getBounds().width - 5) - allFrames.length * FRAME_OFFSET_X;
         for (int i = allFrames.length - 1; i >= 0; i--) {
             allFrames[i].setSize(frameWidth,frameHeight);
             allFrames[i].setLocation(x,y);
-            x = x + FRAME_OFFSET;
-            y = y + FRAME_OFFSET;
+            x = x + FRAME_OFFSET_X;
+            y = y + FRAME_OFFSET_Y;
         }
     }
 

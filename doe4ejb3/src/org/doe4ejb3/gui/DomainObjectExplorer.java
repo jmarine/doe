@@ -12,6 +12,10 @@ import java.awt.datatransfer.*;
 import java.beans.*;
 import java.io.*;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,6 +83,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         if(error != null) {
            JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        
     }
     // </editor-fold> 
   
@@ -94,6 +99,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuItemNew = new javax.swing.JMenuItem();
         jMenuItemManager = new javax.swing.JMenuItem();
         jToolBar = new javax.swing.JToolBar();
+        jButtonConnectionProperties = new javax.swing.JButton();
         jButtonExit = new javax.swing.JButton();
         jStatusPanel = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
@@ -109,6 +115,8 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuItemCut = new javax.swing.JMenuItem();
         jMenuItemCopy = new javax.swing.JMenuItem();
         jMenuItemPaste = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JSeparator();
+        jMenuItemConnectionProperties = new javax.swing.JMenuItem();
         jMenuHelp = new javax.swing.JMenu();
         jMenuItemAbout = new javax.swing.JMenuItem();
 
@@ -142,6 +150,16 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 formWindowOpened(evt);
             }
         });
+
+        jButtonConnectionProperties.setMnemonic('n');
+        jButtonConnectionProperties.setText("Connection properties");
+        jButtonConnectionProperties.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonConnectionPropertiesActionPerformed(evt);
+            }
+        });
+
+        jToolBar.add(jButtonConnectionProperties);
 
         jButtonExit.setMnemonic('x');
         jButtonExit.setText("Exit");
@@ -227,6 +245,18 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
         jMenuEdit.add(jMenuItemPaste);
 
+        jMenuEdit.add(jSeparator2);
+
+        jMenuItemConnectionProperties.setMnemonic('n');
+        jMenuItemConnectionProperties.setText("Connection properties...");
+        jMenuItemConnectionProperties.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItemConnectionPropertiesActionPerformed(evt);
+            }
+        });
+
+        jMenuEdit.add(jMenuItemConnectionProperties);
+
         jMainMenuBar.add(jMenuEdit);
 
         jMenuHelp.setMnemonic('h');
@@ -247,6 +277,14 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jMenuItemConnectionPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemConnectionPropertiesActionPerformed
+        openConnectionManager();
+    }//GEN-LAST:event_jMenuItemConnectionPropertiesActionPerformed
+
+    private void jButtonConnectionPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConnectionPropertiesActionPerformed
+        openConnectionManager();
+    }//GEN-LAST:event_jButtonConnectionPropertiesActionPerformed
 
     private void jMenuItemClipboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemClipboardActionPerformed
         System.out.println("Clipboard action original source : " + evt.getSource());
@@ -326,7 +364,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     // <editor-fold defaultstate="collapsed" desc=" Window events ">
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        
+        openConnectionManager();
     }//GEN-LAST:event_formWindowOpened
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
@@ -393,6 +431,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
    
     // <editor-fold defaultstate="collapsed" desc=" Public methods ">
+    public HashMap getConnectionParams()
+    {
+        return connectionParams;
+    }
     
     public static final void main(String args[]) throws Exception
     {
@@ -544,6 +586,25 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
         return persistenceEntities;
     }
+    
+    public void openConnectionManager()
+    {
+        try {
+            if(connectionManagerFrame == null) {
+                connectionManagerFrame = new ConnectionManager(connectionParams);
+            }
+            if(connectionManagerFrame.getParent() == null) {
+                mdiDesktopPane.add(connectionManagerFrame, true);
+            }
+            mdiDesktopPane.centerFrame(connectionManagerFrame);
+            connectionManagerFrame.setVisible(true);
+            connectionManagerFrame.setSelected(true);
+        } catch(java.beans.PropertyVetoException pve) {
+            System.out.println("DOE.openConnectionManager(): Error " + pve.getMessage());
+            pve.printStackTrace();
+        }
+    }
+    
 
     public void openInternalFrameEntityManager(Class entityClass) throws Exception
     {
@@ -603,7 +664,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         
         return iFrame;
     }
-
+    
 
     private JInternalFrame createInternalFrameEntityEditor(final Class entityClass, Object entity) throws Exception 
     {
@@ -631,7 +692,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 try {
                     iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Object oldEntity = editor.getEntity();
-                    Object newEntity = JPAUtils.saveEntity(oldEntity);
+                    Object newEntity = JPAUtils.saveEntity(getConnectionParams(), oldEntity);
                     showStatus(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
                     
                     EntityEvent entityEvent = new EntityEvent(evt.getSource(), editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
@@ -687,6 +748,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     
     // <editor-fold defaultstate="collapsed" desc=" Attributes ">
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonConnectionProperties;
     private javax.swing.JButton jButtonExit;
     private javax.swing.JLabel jLabelStatus;
     private javax.swing.JMenuBar jMainMenuBar;
@@ -694,6 +756,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
     private javax.swing.JMenuItem jMenuItemAbout;
+    private javax.swing.JMenuItem jMenuItemConnectionProperties;
     private javax.swing.JMenuItem jMenuItemCopy;
     private javax.swing.JMenuItem jMenuItemCut;
     private javax.swing.JMenuItem jMenuItemExit;
@@ -705,6 +768,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private javax.swing.JPopupMenu jPopupMenuContextual;
     private javax.swing.JScrollPane jScrollDesktopPane;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSplitPane jSplitPaneCentral;
     private javax.swing.JPanel jStatusPanel;
     private javax.swing.JToolBar jToolBar;
@@ -714,10 +778,15 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private static DomainObjectExplorer DOE = null;
     private MDIDesktopPane mdiDesktopPane = null;
 
+    /** Connection Manager */ 
+    private HashMap<String,String> connectionParams = new HashMap<String,String>();
+    private ConnectionManager connectionManagerFrame = null;
+
     /** Caches */ 
     private HashMap<Object,JInternalFrame> openedInternalFrames = new HashMap<Object,JInternalFrame>();
     private HashMap<Class,JMenuItem> newMenuItemsForEntityClasses = new HashMap<Class,JMenuItem>();
 
     // </editor-fold>
-}
+    
 
+}

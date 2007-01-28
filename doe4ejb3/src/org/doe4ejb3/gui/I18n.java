@@ -15,9 +15,10 @@ public class I18n
 {
     
     /** Creates a new instance of I18n */
-    public static String getLiteral(String msg) 
+    public static String getLiteral(String key) 
     {
-        return msg;
+        // TODO: get localization for key
+        return key;
     }
     
     public static String getEntityName(Class entity)

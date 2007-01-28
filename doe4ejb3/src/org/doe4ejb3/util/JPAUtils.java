@@ -45,7 +45,6 @@ public class JPAUtils
     private static Hashtable<String, ArrayList<Class>> entityListByPU = new Hashtable<String, ArrayList<Class>>();
     private static Hashtable puNameByEntity = new Hashtable();
     private static Hashtable<String, Class> classesByPUNameAndEntityName = new Hashtable<String, Class>();
-    private static Hashtable entityManagerFactoryByPUName = new Hashtable();
     
     /**
      * Creates a new instance of JPAUtils
@@ -53,6 +52,7 @@ public class JPAUtils
     private JPAUtils() { }
 
     
+
     public static Class getClassFromEntityName(String puName, String entityName)
     {
         String key = puName + "/" + entityName;
@@ -220,22 +220,17 @@ public class JPAUtils
         return (String)puNameByEntity.get(entityClass.getName());
     }
 
-    public static EntityManager getEntityManager(Class entityClass)
+    public static EntityManager getEntityManager(HashMap connectionParams, Class entityClass)
     {
         String puName = getPersistentUnitNameForEntity(entityClass);
-        return getEntityManager(puName);
+        return getEntityManager(connectionParams, puName);
     }
     
-    public static EntityManager getEntityManager(String puName)
+    public static EntityManager getEntityManager(HashMap connectionParams, String puName)
     {    
-        EntityManagerFactory emf = (EntityManagerFactory)entityManagerFactoryByPUName.get(puName);
-        if(emf == null) {
-            emf = javax.persistence.Persistence.createEntityManagerFactory(puName);
-            entityManagerFactoryByPUName.put(puName, emf);
-        }
-        
-        // FIXME: the EntityManager should also be pooled? (thread safe & high creation time)
-        EntityManager manager = emf.createEntityManager(); // Retrieve an application managed entity manager
+        // TODO: the EntityManagerFactory should be pooled and create redefined EntityManager with specific user/password?
+        EntityManagerFactory emf = javax.persistence.Persistence.createEntityManagerFactory(puName, connectionParams);
+        EntityManager manager = emf.createEntityManager(connectionParams); // Retrieve an application managed entity manager
         
         return manager;
     }
@@ -254,10 +249,10 @@ public class JPAUtils
         return entityName;
     }
     
-    public static List findAllEntities(Class entityClass)
+    public static List findAllEntities(HashMap connectionParams, Class entityClass)
     {
         String entityName = getEntityName(entityClass);
-        EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(entityClass);
+        EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, entityClass);
             
         System.out.println("Querying for all " + entityName);
         Query query = manager.createQuery("SELECT OBJECT(e) FROM " + entityName + " e");
@@ -275,10 +270,10 @@ public class JPAUtils
     }
 
     
-    public static List executeNamedQuery(Class entityClass, String queryName, HashMap paramValues) 
+    public static List executeNamedQuery(HashMap connectionParams, Class entityClass, String queryName, HashMap paramValues) 
     {
         String puName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
-        EntityManager manager = JPAUtils.getEntityManager(puName);
+        EntityManager manager = JPAUtils.getEntityManager(connectionParams, puName);
         
         javax.persistence.Query query = manager.createNamedQuery(queryName);
         if(paramValues != null) {
@@ -301,13 +296,11 @@ public class JPAUtils
     }   
     
     
-    public static Object createNewEntity(Object entity)
+    public static Object createNewEntity(HashMap connectionParams, Object entity)
     {
         if(entity != null) {
             Class entityClass = entity.getClass();
-            String entityName = getEntityName(entityClass);
-
-            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(entityClass);
+            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, entityClass);
             EntityTransaction transaction = manager.getTransaction();
             transaction.begin();
             manager.persist(entity);
@@ -321,13 +314,11 @@ public class JPAUtils
     }
 
 
-    public static Object saveEntity(Object entity)
+    public static Object saveEntity(HashMap connectionParams, Object entity)
     {
         if(entity != null) {
             Class entityClass = entity.getClass();
-            String entityName = getEntityName(entityClass);
-
-            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(entityClass);
+            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, entityClass);
             EntityTransaction transaction = manager.getTransaction();
             transaction.begin();
             entity = manager.merge(entity);
@@ -341,13 +332,11 @@ public class JPAUtils
     }
 
     
-    public static void removeEntity(Object entity)
+    public static void removeEntity(HashMap connectionParams, Object entity)
     {
         if(entity != null) {
             Class entityClass = entity.getClass();
-            String entityName = getEntityName(entityClass);
-
-            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(entityClass);
+            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, entityClass);
             EntityTransaction transaction = manager.getTransaction();
             transaction.begin();
             entity = manager.merge(entity);
