@@ -309,7 +309,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
 
             if(comp != null) {
                 if(!embedded) {
-                    String labelText = I18n.getLiteral(name);
+                    String labelText = I18n.getLiteral(name.toUpperCase());
                     if( (propertyDescriptor != null) && (propertyDescriptor.displayName() != null) && (propertyDescriptor.displayName().length() > 0) )
                     {
                         labelText = propertyDescriptor.displayName();
