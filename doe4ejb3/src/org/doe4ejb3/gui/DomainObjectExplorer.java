@@ -9,6 +9,7 @@ package org.doe4ejb3.gui;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
+import java.awt.print.*;
 import java.beans.*;
 import java.io.*;
 import java.lang.annotation.Annotation;
@@ -44,6 +45,7 @@ import org.doe4ejb3.event.EntityListener;
 import org.doe4ejb3.exception.ApplicationException;
 import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.EJBQLUtils;
+import org.doe4ejb3.util.PrintUtils;
 
 
 
@@ -725,9 +727,32 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 iFrame.dispose();
             }
         });
+        
+        JButton btnPrint = new JButton("Print");
+        btnPrint.setMnemonic('p');
+        btnPrint.setActionCommand("print");
+        btnPrint.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if(editor instanceof Printable) {
+                    PrinterJob printJob = PrinterJob.getPrinterJob();
+                    printJob.setPrintable((Printable)editor);
+                    if (printJob.printDialog()) {
+                        try {
+                            printJob.print();
+                        } catch(PrinterException pe) {
+                            System.out.println("Error printing: " + pe);
+                        }                    
+                    }
+                } else {
+                    PrintUtils.printComponent((Component)editor);
+                }
+            }
+        });
+        
 
         JPanel buttons = new JPanel();
         buttons.add(btnAccept);
+        buttons.add(btnPrint);
         buttons.add(btnClose);
 
 
