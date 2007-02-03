@@ -245,10 +245,11 @@ public class EditorFactory
                         comp.putClientProperty("fixedSize", "true");
                     } else {
                         textField = new javax.swing.JTextPane();
-                        textField.setPreferredSize(new java.awt.Dimension(400, 80));
+                        //textField.setPreferredSize(new java.awt.Dimension(400, 80));
                         compGetter = textField.getClass().getMethod("getText");
                         binder = new JComponentDataBinder(textField, compGetter, editor, property);                        
                         comp = new JScrollPane(textField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                        comp.setPreferredSize(new java.awt.Dimension(400, 80));
                     }
 
                     if(maxLength > 0) {
@@ -291,8 +292,10 @@ public class EditorFactory
      * TODO: allow drag and drop operations
      */
     public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean isManagerWindow, JComponentDataBinder binderOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
-        final JPanel panel = new JPanel();
         final JTable jTable = new JTable();
+        final JScrollPane scrollableItems = new JScrollPane(jTable);
+        final JPanel panel = new ComposedEditorHolder(scrollableItems);
+        
         final DefaultListModel listModel = new DefaultListModel();
         final ListSelectionModel listSelectionModel = jTable.getSelectionModel();
         final ObjectPropertyTableModel objectPropertyTableModel = new ObjectPropertyTableModel(memberClass, listModel);
@@ -555,7 +558,6 @@ public class EditorFactory
 
         
         // configure panel layout
-        JScrollPane scrollableItems = new JScrollPane(jTable);
         scrollableItems.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         scrollableItems.setComponentPopupMenu(popupMenu);
 

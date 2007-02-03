@@ -13,6 +13,7 @@ import java.lang.annotation.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.print.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.ReflectionUtils;
 
 
-public class EntityEditorImpl extends JPanel implements EntityEditorInterface 
+public class EntityEditorImpl extends JPanel implements EntityEditorInterface, Printable
 {
 
     private final static Insets borderInsets = new Insets(20,10,20,10);
@@ -351,5 +352,153 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface
         return borderInsets;
     }
 
-   
+
+  private int getPrintingHeight()
+  {
+    // TODO: SMALL COMPONENT SHOULDN'T BE CUTTED IN TWO PAGES
+    // TODO: COMPOSITE EDITORS SHOULD EXTRACT PROPERTY VALUES/TABLES      
+    int total = 0;
+    int EXTRA_SPACE = 50;
+    Component all[] = this.getComponents();
+    for(int i = 1; (all != null) && (i < all.length); i=i+2) {
+        Component label = all[i-1];
+        Component comp  = all[i];
+        int height = Math.max(getComponentPrintHeight(label), getComponentPrintHeight(comp));
+        total = total + height;
+    }
+    return total + EXTRA_SPACE;
+  }
+  
+  private int getComponentPrintHeight(Component comp)
+  {
+      int headerHeight = 0;
+      int componentHeight = 0;
+      if( comp != null) {
+          if(comp instanceof ComposedEditorHolder)
+          {
+              ComposedEditorHolder composedEditor = (ComposedEditorHolder)comp;
+              comp = composedEditor.getComponentWithValues();
+          }
+          if(comp instanceof JScrollPane) {
+              JScrollPane scrollPane = (JScrollPane)comp;
+              if(scrollPane.getColumnHeader() != null) {
+                headerHeight = scrollPane.getColumnHeader().getHeight();
+              }
+              comp = scrollPane.getViewport().getView();
+          } 
+          componentHeight = comp.getHeight();
+      }
+      return headerHeight + componentHeight;
+  }
+    
+  public int print(Graphics g, PageFormat pf, int pageIndex) {
+    // TODO: SMALL COMPONENT SHOULDN'T BE CUTTED IN TWO PAGES
+    // TODO: COMPOSITE EDITORS SHOULD EXTRACT PROPERTY VALUES/TABLES
+      
+    int response = NO_SUCH_PAGE;
+
+    Graphics2D g2 = (Graphics2D) g;
+
+    //  for faster printing, turn off double buffering
+    disableDoubleBuffering(this);
+
+    Dimension d = this.getSize(); //get size of document
+    double panelWidth = d.width; //width in pixels
+    double panelHeight = getPrintingHeight(); //height in pixels
+
+    double pageHeight = pf.getImageableHeight(); //height of printer page
+    double pageWidth = pf.getImageableWidth(); //width of printer page
+
+    double scale = pageWidth / panelWidth;
+    int totalNumPages = (int) Math.ceil(scale * panelHeight / pageHeight);
+
+    System.out.println("Printing: " + pageIndex + "/" + totalNumPages);
+    //  make sure not print empty pages
+    if (pageIndex >= totalNumPages) {
+      System.out.println("Printing done.");
+      response = NO_SUCH_PAGE;
+    }
+    else {
+
+      //  shift Graphic to line up with beginning of print-imageable region
+      g2.translate(pf.getImageableX(), pf.getImageableY());
+
+      //  shift Graphic to line up with beginning of next page to print
+      g2.translate(0f, -pageIndex * pageHeight);
+
+      //  scale the page so the width fits...
+      g2.scale(scale, scale);
+      
+      
+
+      Color bg = this.getBackground();
+      try {
+          this.setBackground(Color.WHITE);
+
+      
+          double interlineHeight = 10.0;
+          Component all[] = this.getComponents();
+          for(int i = 1; (all != null) && (i < all.length); i=i+2) {
+                Component label = all[i-1];
+                Component comp  = all[i];
+                Component header = null;
+                double offset = (double)comp.getX();
+
+                if(comp instanceof ComposedEditorHolder)
+                {
+                    ComposedEditorHolder composedEditor = (ComposedEditorHolder)comp;
+                    comp = composedEditor.getComponentWithValues();
+                }
+                if(comp instanceof JScrollPane) {
+                    JScrollPane scrollPane = (JScrollPane)comp;
+                    header = scrollPane.getColumnHeader();
+                    comp = scrollPane.getViewport().getView();
+                }
+                double height = Math.max(getComponentPrintHeight(label), getComponentPrintHeight(comp));
+                
+                System.out.println("Printing label? " + label);
+                label.print(g2);
+
+                g2.translate(offset, 0.0);
+                if(header != null) {
+                    header.print(g2);
+                    g2.translate(0.0, (double)header.getHeight());
+                }
+
+                System.out.println("Printing component? " + comp);
+                comp.print(g2);
+
+                System.out.println("Next component height " + height);
+                g2.translate((double)-offset, (double)height + interlineHeight);
+          }
+      
+      
+      } finally {
+          this.setBackground(bg);
+      }
+
+      enableDoubleBuffering(this);
+      response = Printable.PAGE_EXISTS;
+    }
+    return response;
+  }
+ 
+
+  /** The speed and quality of printing suffers dramatically if
+   *  any of the containers have double buffering turned on.
+   *  So this turns if off globally.
+   *  @see enableDoubleBuffering
+   */
+  public static void disableDoubleBuffering(Component c) {
+    RepaintManager currentManager = RepaintManager.currentManager(c);
+    currentManager.setDoubleBufferingEnabled(false);
+  }
+
+  /* Re-enables double buffering globally. */
+  
+  public static void enableDoubleBuffering(Component c) {
+    RepaintManager currentManager = RepaintManager.currentManager(c);
+    currentManager.setDoubleBufferingEnabled(true);
+  }
+ 
 }
