@@ -32,15 +32,17 @@ public class HashKeyProperty implements Property
     private HashMap hashMap;
     private String key;
     private Class type;
+    private Type genericType;
     
-    public HashKeyProperty(HashMap hashMap, String key, Class type) throws IllegalArgumentException
+    public HashKeyProperty(HashMap hashMap, String key, Class type, Type genericType) throws IllegalArgumentException
     {
         this.hashMap = hashMap;
         this.key = key;
         this.type = type;
+        this.genericType = genericType;
     }
 
-    
+   
     public String getName()
     {
         return key;
@@ -49,13 +51,24 @@ public class HashKeyProperty implements Property
     
     public Class getType() // throws IllegalAccessException, InvocationTargetException
     {
-        return type;
+        Class returnType = type;
+        if(java.util.Collection.class.isAssignableFrom(returnType)) {
+            System.out.println("HashKeyProperty: property " + getName() + " is a collection, but only 1 item can be selected");
+            try {
+                ParameterizedType paramType = (ParameterizedType)getGenericType();
+                if(paramType != null) returnType = (Class)(paramType.getActualTypeArguments()[0]);
+            } catch(Exception ex) {
+                System.out.println("HashKeyProperty.getType(): ERROR = " + ex.getMessage());
+                System.err.println("HashKeyProperty.getType(): ERROR = " + ex.getMessage());
+                ex.printStackTrace();
+            }
+        }
+        return returnType;
     }
 
     public Type getGenericType() throws IllegalAccessException, InvocationTargetException
     {
-        // TODO
-        return null;
+        return genericType;
     }
 
 
@@ -67,6 +80,11 @@ public class HashKeyProperty implements Property
     public void setValue(Object value) throws IllegalAccessException, InvocationTargetException
     {
         hashMap.put(key, value);
+    }
+    
+    public String toString()
+    {
+        return key;
     }
 
 }

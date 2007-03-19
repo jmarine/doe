@@ -73,7 +73,8 @@ public class QueryParametersEditorImpl extends JPanel
 
         for(Object parameterName : parameterTypes.keySet()) 
         {
-            HashKeyProperty property = new HashKeyProperty(parameterValues, (String)parameterName, (Class)parameterTypes.get(parameterName));
+            // TODO: implement generic type (i.e.: entity has property relation with some value?)
+            HashKeyProperty property = new HashKeyProperty(parameterValues, (String)parameterName, (Class)parameterTypes.get(parameterName), null);
             handleParameterProperty(property);
         }
     }
