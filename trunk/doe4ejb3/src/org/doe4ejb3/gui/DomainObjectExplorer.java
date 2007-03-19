@@ -566,7 +566,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             });
             
-            String title = "PU: " + persistenceUnit;
+            String title = persistenceUnit;  // Outline section title
             if(persistenceUnit.length() == 0) title = "Default PU";
             jOutlinePanePersistenceUnits.addTab(title, new JScrollPane(entityList));
             
