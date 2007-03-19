@@ -269,7 +269,33 @@ public class JPAUtils
         return entities;
     }
 
-    
+
+    public static List executeQuery(HashMap connectionParams, Class entityClass, String ejbql, HashMap paramValues) 
+    {
+        String puName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
+        EntityManager manager = JPAUtils.getEntityManager(connectionParams, puName);
+        
+        javax.persistence.Query query = manager.createQuery(ejbql);
+        if(paramValues != null) {
+            for(Object paramName : paramValues.keySet()) {
+                query.setParameter((String)paramName, paramValues.get(paramName));
+            }
+        }
+        
+        List entities = query.getResultList();
+
+        // FIXME: this is only for debug purpose (it will only be done in FINER trace level):
+        for(Object obj : entities) {
+            System.out.println("> found: " + obj.toString());
+        }
+
+        manager.close();
+        System.out.println("PersistenceProviders: search done.");
+        
+        return entities;
+    }   
+
+        
     public static List executeNamedQuery(HashMap connectionParams, Class entityClass, String queryName, HashMap paramValues) 
     {
         String puName = JPAUtils.getPersistentUnitNameForEntity(entityClass);

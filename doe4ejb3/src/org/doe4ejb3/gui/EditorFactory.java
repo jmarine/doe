@@ -200,7 +200,7 @@ public class EditorFactory
         } else {
             
             try {
-                editor = java.beans.PropertyEditorManager.findEditor(memberClass);
+                editor = findEditor(memberClass);
                 System.out.println("EditorFactory: property editor for " + memberClass.getName() + "=" + editor);
                 
                 Component customComponent = null;
@@ -238,7 +238,7 @@ public class EditorFactory
 
                     JTextComponent textField = null;
                     if( (maxLength >= 0) && (maxLength < 100) ) {
-                        textField = new JTextField(maxLength);
+                        textField = (maxLength > 0) ? new JTextField(maxLength) : new JTextField();
                         // textField.setPreferredSize(new java.awt.Dimension(150, 32));
                         compGetter = textField.getClass().getMethod("getText");
                         comp = textField;
@@ -284,6 +284,17 @@ public class EditorFactory
             }
         }
         return comp;
+    }
+    
+    protected static java.beans.PropertyEditor findEditor(Class memberClass)
+    {
+        if(memberClass.isAssignableFrom(java.lang.Byte.class)) memberClass = Byte.TYPE;
+        else if(memberClass.isAssignableFrom(java.lang.Short.class)) memberClass = Short.TYPE;
+        else if(memberClass.isAssignableFrom(java.lang.Integer.class)) memberClass = Integer.TYPE;
+        else if(memberClass.isAssignableFrom(java.lang.Long.class)) memberClass = Long.TYPE;
+        else if(memberClass.isAssignableFrom(java.lang.Float.class)) memberClass = Float.TYPE;
+        else if(memberClass.isAssignableFrom(java.lang.Double.class)) memberClass = Double.TYPE;
+        return java.beans.PropertyEditorManager.findEditor(memberClass);
     }
     
 

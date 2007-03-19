@@ -39,6 +39,7 @@ import org.doe4ejb3.util.EJBQLUtils;
 public class EntityManagerPane extends javax.swing.JPanel {
     
     private Class entityClass = null;
+    private CustomQueryEditorImpl customQueryEditor = null;
     private QueryParametersEditorImpl queryParametersPanel = null;
     private ListSelectionModel listSelectionModel = null;
     private DefaultListModel   listModel = null;
@@ -65,7 +66,8 @@ public class EntityManagerPane extends javax.swing.JPanel {
 
 
             // load queries in combobox:
-            jComboBoxNamedQuery.addItem("All");                                                                                                                             
+            jComboBoxNamedQuery.addItem("All");
+            jComboBoxNamedQuery.addItem("Custom");
             if(entityClass.getAnnotations() != null) {                                          
                 for(Annotation annotation : entityClass.getAnnotations()) {                         
                     if(annotation instanceof NamedQuery) {                                              
@@ -311,7 +313,13 @@ public class EntityManagerPane extends javax.swing.JPanel {
             DomainObjectExplorer.getInstance().showStatus("Searching...");
             if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
                 entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass);
-            } else if(jComboBoxNamedQuery.getSelectedIndex() > 0) {
+            } else if(jComboBoxNamedQuery.getSelectedIndex() == 1) {   // Custom
+
+                String ejbql = customQueryEditor.prepareEJBQL();
+                HashMap parameterValues = customQueryEditor.prepareParameterValues();
+                entities = JPAUtils.executeQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, ejbql, parameterValues);
+                
+            } else if(jComboBoxNamedQuery.getSelectedIndex() > 1) {
                 ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
                 NamedQuery namedQuery = (NamedQuery)listItem.getValue();
                 HashMap parameterValues = null;
@@ -338,11 +346,19 @@ public class EntityManagerPane extends javax.swing.JPanel {
         String persistenceUnitName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
         
         listModel.clear();
+        jPanelQueryParams.removeAll();
+
         if(jComboBoxNamedQuery.getSelectedIndex() <= 0) {
-            jPanelQueryParams.removeAll();
             jPanelQueryParams.setVisible(false);
             jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(5,0,0,0));
-        } else  {
+        } else if (jComboBoxNamedQuery.getSelectedIndex() == 1) {
+            customQueryEditor = new CustomQueryEditorImpl(entityClass);
+            jPanelQueryParams.setLayout(new java.awt.BorderLayout());
+            jPanelQueryParams.add(customQueryEditor, java.awt.BorderLayout.CENTER);
+            jPanelQueryParams.setVisible(true);
+            jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(0,0,0,0));
+
+        } else {
             DomainObjectExplorer.getInstance().showStatus("Searching parameter types...");
             
             ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
@@ -351,7 +367,6 @@ public class EntityManagerPane extends javax.swing.JPanel {
             
             try {
                 queryParametersPanel = null;
-                jPanelQueryParams.removeAll();
             
                 this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 HashMap ejbqlParameterTypes = EJBQLUtils.parseEJBQLParameterTypes(persistenceUnitName, ejbql);
@@ -377,8 +392,10 @@ public class EntityManagerPane extends javax.swing.JPanel {
                 this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
             
-            DomainObjectExplorer.getInstance().showStatus("done.");            
         }
+        
+        DomainObjectExplorer.getInstance().showStatus("ready");            
+        revalidate();
 
     }//GEN-LAST:event_jComboBoxNamedQueryItemStateChanged
     
