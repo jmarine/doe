@@ -1,5 +1,5 @@
 /*
- * QueryParametersEditorImpl.java
+ * CustomQueryEditorImpl.java
  *
  * Created on June 6, 2006, 5:45 PM
  * @author Jordi Marine Fort
@@ -30,10 +30,7 @@ import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.ReflectionUtils;
 import org.doe4ejb3.gui.HashKeyProperty;
 
-/**
- *
- * @author Jordi Marine Fort
- */
+
 public class CustomQueryEditorImpl extends JPanel implements java.awt.event.ItemListener
 {
 
