@@ -2,6 +2,7 @@
  * EntityManagerPane.java
  *
  * Created on 14 October 2006, 13:44
+ * @author Jordi Marine Fort
  */
 
 package org.doe4ejb3.gui;
@@ -32,11 +33,8 @@ import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.EJBQLUtils;
 
 
-/**
- *
- * @author  jordi
- */
-public class EntityManagerPane extends javax.swing.JPanel {
+public class EntityManagerPane extends javax.swing.JPanel 
+{
     
     private Class entityClass = null;
     private CustomQueryEditorImpl customQueryEditor = null;
