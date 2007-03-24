@@ -60,7 +60,7 @@
         <li><b>Project Type:</b> Java Web Start application client</li>
         <li><b>License:</b> Common Development and Distribution License (CDDL) Version 1.0</li>
       </ul>
-The "Domain Object Explorer" is a rich desktop application designed to ease the management and testing of EJB3 entity beans. The user interface to search/view/edit your business objects can be auto-generated at runtime or customized by developer. The application can also be centrally managed from application server administrative console (datasource configuration, deployment of persistence units, and delivery of application/updates via Java Web Start technology).
+The "Domain Object Explorer" is a rich desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without additional programming (althought it can also be customized by developers). The application can also be centrally managed from application server administrative console (for datasource configuration, deployment of persistence units, and delivery of application/updates via Java Web Start technology).
       <!-- project info end -->
     </blockquote>
 
@@ -89,15 +89,15 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
       <li>Pros:</li>
       <ul>
 	<li>Easy management and testing of EJB3 entity beans.</li>
-        <li>Provides a rich user interface without necessity for additional programming.</li>
+        <li>Provides a rich user interface without any extra programming.</li>
 	<li>Auto-deployment of application/updates via Java Web Start technology.</li>
-        <li>Data sources can be centrally managed from application server administration console</li>
-	<li>No more HTML, JavaScript, nor AJAX handlers on server-side... only 100% pure Java on client side!</li>
+        <li>Data sources can be centrally managed from application server administrative console</li>
+	<li>No HTML, JavaScript, nor AJAX handlers on server-side... only 100% pure Java on client side.</li>
 	<li>...</li>
       </ul>
       <li>Cons:</li>
       <ul>
-	<li>Only runs on <a href="https://glassfish.dev.java.net/public/downloadsindex.html">GlassFish v2</a> build 19 (M2)</li>
+	<li>Only runs on <a href="https://glassfish.dev.java.net/public/downloadsindex.html">GlassFish v2</a> since build 19 (M2)</li>
 	<li>Deployed aplications are really big (about 40Mb)</li>
 	<li>No stable version, yet</li>
 	<li>...</li>
@@ -110,16 +110,16 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
     <h3>Download</h3>
     </a>
     <blockquote>
-      There is no archived release, yet. But you can checkout the "doe" projects from <a href="https://doe.dev.java.net/source/browse/doe/">CVS</a>:
+      There is no archived release, yet. But you can checkout the following "doe" projects from <a href="https://doe.dev.java.net/source/browse/doe/">CVS</a>.
       <ol>
 	<li> "doe4ejb3" is the core library (it also contains custom annotations for EJB3 entities).</li>
  	<li> "doe4ejb3-app-client" is a Java EE 5 application client to be included in the users's enterprise application.</li>
       </ol>
  
-      There is also a sample enterprise application (based on "trails" demos):
+      Also, there are the following example modules (based on "trails" demos):
  	<ol>
-	<li> "doe4ejb3-test-ejb3": demo EJB3 entity beans.</li>
- 	<li> "doe4ejb3-test-app" : enterprise application sample where "doe" is included to allow browsing/editing of the previous "EJB3" entities.</li>
+	<li> "doe4ejb3-test-ejb3": sample EJB3 entity beans.</li>
+ 	<li> "doe4ejb3-test-app" : enterprise application with the "doe" application client to manage the previous "EJB3" entities.</li>
   	</ol>
     </blockquote>
 
@@ -132,9 +132,13 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
 	<ol>
         <li>Download, install and start <a href="https://glassfish.dev.java.net/public/downloadsindex.html">GlassFish v2</a> application server (important note: "doe" has only been tested with GlassFish v2 build 19, prior versions may not work because of "issue 1173").
         </li>
-        <li>Include the "doe4ejb3-app-client" into your Java EE 5 application, and deploy the new EAR to the application server.<br> Note: if you want to try with the sample application, you have to create a database for the EJB3 entities, and configure the connection parameters in GlassFish administration console (the JDBC datasource name should be "jdbc/doe4ejb3"), then open the projects in NetBeans 5.5, and deploy the "doe4ejb3-test-app" project into the application server.</li>
-	<li>Launch the new Java Web Start application client (note: you can use GlassFish administration console to browse the deployed application, and launch the new "doe4ejb3-app-client" module).</li>
-        <li>See the instructions below for how to use the application.</li>
+        <li>Include the "doe4ejb3-app-client" into your Java EE 5 application.</li>
+	<li>Specify EJB3 entity class names in your "META-INF/persistence.xml" descriptors.</li>
+	<li>Assemble all modules into an EAR archive, and deploy to the application server.</li>
+	<li>Note: if you want to test "doe" with the sample EJB3 entities, you should have to create a database for the tests, configure the connection parameters in GlassFish administration console (the JDBC datasource should be named "jdbc/doe4ejb3"), then open the "doe4ejb3-test-app" project with NetBeans 5.5.1, and deploy into the application server.
+	</li>
+	<li>Launch the new deployed "doe4ejb3-app-client" application from GlassFish administrative console.</li>
+        <li>See the instructions below.</li>
 	</ol>
     </blockquote>
 
@@ -145,22 +149,23 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
     <h3>Usage Instructions</h3>
     </a>
     <blockquote>
-    You can launch the "doe" application client from GlassFish administration console (after installation, you also can run it from Java Web Start). The application has the following features:
+    You can easily launch the "doe" application client from GlassFish administration console (after installation, you can also start it from Java Web Start viewer). The application has the following features:
 
     <h4>Create a new entity object:</h4>
     From "File" menu, select "New" option, and the class name of the new EJB3 entity. Then complete the entity properties and press the "Accept" button.
 
     <h4>Search entity beans:</h4>
-    First, you have to select the persistence unit for the EJB3 entity class, and double click on the desired class to open the entity manager window on the desktop. Then select the query type ("All objects" or the name of the desired "custom EJBQL named query" that may had been defined in the EJB3 entity bean). With custom named queries, you also have to complete the required parameters. Finally, press the "Search" button, and wait for the results (and the "done" indicator in the status bar).
+    First, you have to select the persistence unit for the EJB3 entity class, and double click with left button on the desired class to open the entity manager window on the desktop. Then select the query type (to search "All" objects, specify a "Custom" query, or the name of the desired "named query", when defined in the EJB3 entity bean). With "custom" or "named" queries, you also have to complete the required parameters. Finally, press the "Search" button, and wait for the results (note the "done" indicator in the status bar).
 
-    <h4>Print the objects found:</h4>
-    After the search of the desired objects, click the "Print" button from the manager window, then configure page layout in printing dialog, and click the "Print" button from the printing dialog.
 
     <h4>Browse/edit an object:</h4>
-    You have to select the object found, and click the "Edit" button from the manager window to view the entity details on the right panel (desktop). You can modify it's properties, and press the "Accept" button to save the changes.
+    You have to select one of the objects found, and click the "Edit" button from the manager window to view the entity details on the right panel (desktop). You can modify it's properties, and press the "Accept" button to save the changes.
+
+    <h4>Print the objects:</h4>
+    Use the "Print" button from the manager/detail window, configure the printing dialog, and click the "Print" button to confirm.
 
     <h4>Delete an object:</h4>
-    You have to select the object found, click the "Delete" button from the manager window, and confirm the deletion in the next window popup.
+    You have to select the object found, click "Delete" button from the manager window, and confirm the deletion in the next window popup.
     </blockquote>
 
     <a name="screenshot">
@@ -195,12 +200,11 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
  Future roadmap for the "doe" application ("to do" task list):
  <ul>
  <li>English corrections and better i18n support (but I don't speak English ;-).</li>
- <li>Improve "GUI" (menus, toolbars, icons, better navigation, allow to create/edit/delete related objects in combos, custom queries in search panel, fix some copy&paste operations, more drag&drop operations, ...).</li>
+ <li>Improve "GUI" (menus, toolbars, icons, better navigation, allow to create/edit/delete related objects in combos, better custom queries support, fix some copy&paste operations, more drag&drop operations, ...).</li>
  <li>Lazy and bidirectional relations suport (automatic load and linking in both sides)</li>
  <li>Allow user extensions/plugins to add new actions/menus for entity objects.</li>
  <li>Create custom editors for common property types (image viewers/loaders, dates, etc.)</li>
- <li>Login configuration for database connections managed by client applications.</li>
- <li>Printing support in object detail window (printing is only supported in entity search panel).</li>
+ <li>Better printing support.</li>
  <li>Load/unload of persistence units.</li>
  <li>More sample applications.</li>
  </ul>
@@ -215,18 +219,20 @@ The "Domain Object Explorer" is a rich desktop application designed to ease the 
       <ul>
 	<li>Version 0.2 - [Alpha version - CVS head]
 	  <ul>
+	    <li>Improved navigation.</li>
 	    <li>Cut, copy & paste operations.</li>
 	    <li>Basic drag & drop operations.</li>
-	    <li>Initial printing support (only in search panel).</li>
-	    <li>Improved explorer navigation with contextual menus.</li>
-	    <li>Show entity lists with customizable columns (on search panel and editor of related entities).</li>
+	    <li>Initial printing support.</li>
+	    <li>Custom queries in search panel.</li>
+ 	    <li>Allows user authentication with database connections managed by client applications.</li>
+	    <li>Shows entity lists with customizable columns (on search panel and relationships).</li>
 	    <li>Many bug fixes.</li>
 	  </ul>
         </li>
 	<li>Version 0.1 - [Pre-Alpha version imported in CVS - 2006/09/27]
 	  <ul>
 	    <li>Open source release to java.net.</li>
-	    <li>Simple search/view/edition of EJB3 entities.</li>
+	    <li>Simple search/view/edition of EJB3 entity objects.</li>
 	  </ul>
         </li>
       </ul>
