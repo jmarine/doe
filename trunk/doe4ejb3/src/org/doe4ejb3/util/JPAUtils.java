@@ -14,6 +14,7 @@ import java.io.IOException;
 
 import java.net.URI;
 import java.net.URL;
+import java.net.URLClassLoader;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -76,7 +77,9 @@ public class JPAUtils
     {
         try {
             System.out.println("Searching persistence providers");
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            //Until GF2b33: ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            ClassLoader classLoader =  JPAUtils.class.getClassLoader();
+            Thread.currentThread().setContextClassLoader(classLoader);  // why?
             java.util.Enumeration<URL> iter = classLoader.getResources("META-INF/persistence.xml");
             while(iter.hasMoreElements()) {
                 URL url = (URL)iter.nextElement();
@@ -84,6 +87,7 @@ public class JPAUtils
                 scanPersistentEntitiesFromPU(classLoader, url);
             }
             System.out.println("END of search");
+            
         } catch(Exception ex) {
             throw new Exception("ERROR searching persistence providers", ex);
         }
