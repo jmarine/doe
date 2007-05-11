@@ -76,10 +76,12 @@ public class JPAUtils
     private static Collection<Class> getPersistentEntities() throws Exception
     {
         try {
-            System.out.println("Searching persistence providers");
-            //Until GF2b33: ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-            ClassLoader classLoader =  JPAUtils.class.getClassLoader();
-            Thread.currentThread().setContextClassLoader(classLoader);  // why?
+            // GLASSFISHv2 Beta
+            System.out.println("JPAUtils.getPersistentEntities: Setting up application's classloader for GFv2 beta2...");
+            Thread.currentThread().setContextClassLoader(JPAUtils.class.getClassLoader());  
+
+            System.out.println("JPAUtils.getPersistentEntities: Searching persistence providers");
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
             java.util.Enumeration<URL> iter = classLoader.getResources("META-INF/persistence.xml");
             while(iter.hasMoreElements()) {
                 URL url = (URL)iter.nextElement();
