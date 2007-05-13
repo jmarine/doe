@@ -44,7 +44,7 @@ public class QueryParametersEditorImpl extends JPanel
     
     private HashMap parameterTypes = null;
     private HashMap parameterValues = null;
-    private ArrayList<JComponentDataBinder> binders = null;
+    private ArrayList<JComponentDataBinder> bindings = null;
     
     
     /**
@@ -53,15 +53,15 @@ public class QueryParametersEditorImpl extends JPanel
     public QueryParametersEditorImpl(HashMap parameterTypes) {
         this.parameterTypes = parameterTypes;
         this.parameterValues = new HashMap();
-        this.binders = new ArrayList();
+        this.bindings = new ArrayList();
         initComponents();
     }    
 
     
     public HashMap getParameterValues() throws IllegalAccessException, InvocationTargetException
     {
-        for(JComponentDataBinder binder : binders) {
-            binder.executeObjSetterWithValueFromCompGetter();
+        for(JComponentDataBinder binding : bindings) {
+            binding.executeObjSetterWithValueFromCompGetter();
         }
         return parameterValues;
     }
@@ -88,7 +88,7 @@ public class QueryParametersEditorImpl extends JPanel
         JComponent comp = EditorFactory.getPropertyEditor(property, defaultLength, TemporalType.TIMESTAMP);
         if(comp != null) {
             JComponentDataBinder binder = (JComponentDataBinder)comp.getClientProperty("dataBinder");
-            if(binder != null) binders.add(binder);
+            if(binder != null) bindings.add(binder);
 
             add(new JLabel(capitalize(I18n.getLiteral(property.getName())) + ":"), gbcLabel);
             add(comp, gbcComponent);

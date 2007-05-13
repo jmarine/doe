@@ -41,7 +41,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     private Object entity = null;
     private boolean objIsNew = false;
     private boolean embedded = false;
-    private ArrayList<JComponentDataBinder> binders = new ArrayList();
+    private ArrayList<JComponentDataBinder> bindings = new ArrayList();
     
     
     /**
@@ -59,7 +59,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
 
     public void clearBinders()
     {
-        binders.clear();
+        bindings.clear();
     }
     
     public boolean isNew()
@@ -69,8 +69,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
 
     public Object getEntity() throws IllegalAccessException, InvocationTargetException
     {
-        for(JComponentDataBinder binder : binders) {
-            binder.executeObjSetterWithValueFromCompGetter();
+        for(JComponentDataBinder binding : bindings) {
+            binding.executeObjSetterWithValueFromCompGetter();
         }
         return this.entity;
     }
@@ -304,7 +304,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                     if( (comp != null) && (comp instanceof JComponent) ) {
                         ((JComponent)comp).putClientProperty("dataBinder", binder);
                     }
-                    binders.add(binder);
+                    bindings.add(binder);
                 }
             }
 
