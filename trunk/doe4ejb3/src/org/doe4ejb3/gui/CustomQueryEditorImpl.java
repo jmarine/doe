@@ -43,7 +43,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     
     private Class entityClass = null;
     private HashMap parameterValues = null;
-    private ArrayList<JComponentDataBinder> binders = null;
+    private ArrayList<JComponentDataBinder> bindings = null;
     private ArrayList<JComboBox> propertySelectors = null;
     
     
@@ -54,7 +54,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         // this.parameterTypes = parameterTypes;
         // this.parameterValues = new HashMap();
         this.entityClass = entityClass;
-        this.binders = new ArrayList();
+        this.bindings = new ArrayList();
         this.propertySelectors = new ArrayList();
         initComponents();
     }    
@@ -73,11 +73,11 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             count++;
             JComboBox operator = (JComboBox)selector.getClientProperty("operator");
             if( (selector.getSelectedIndex() > 0) && (operator.getSelectedIndex() > 0) ) {
-                JComponentDataBinder binder = (JComponentDataBinder)selector.getClientProperty("binder");
+                JComponentDataBinder binding = (JComponentDataBinder)selector.getClientProperty("binder");
                 try {
                     HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
                     String parameterName = property.getName() + count;
-                    binder.executeObjSetterWithValueFromCompGetter();
+                    binding.executeObjSetterWithValueFromCompGetter();
 
                     if(where.length() > 0) where.append(" AND ");
                     if(operator.getSelectedItem().toString().indexOf("MEMBER") == -1) {
@@ -95,8 +95,8 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
                     System.out.println("DEBUG: Parameter " + parameterName + " = " + property.getValue());
                 } catch(Exception ex) {
-                    System.out.println("CustomQueryEditorImpl.prepareEJBQL: Error executing binder (" + binder + "): " + ex.getMessage());
-                    System.err.println("CustomQueryEditorImpl.prepareEJBQL: Error executing binder (" + binder + "): " + ex.getMessage());
+                    System.out.println("CustomQueryEditorImpl.prepareEJBQL: Error executing binder (" + binding + "): " + ex.getMessage());
+                    System.err.println("CustomQueryEditorImpl.prepareEJBQL: Error executing binder (" + binding + "): " + ex.getMessage());
                     ex.printStackTrace();
                 }
                 
@@ -164,7 +164,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         JComponentDataBinder oldBinder = (JComponentDataBinder)selector.getClientProperty("binder");
         if(oldBinder != null) 
         {
-            binders.remove(oldBinder);
+            bindings.remove(oldBinder);
             selector.putClientProperty("binder", null);
         }
         editorContainer.removeAll();
@@ -191,7 +191,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
             JComponentDataBinder binder = (JComponentDataBinder)comp.getClientProperty("dataBinder");
             if(binder != null) {
-                binders.add(binder);
+                bindings.add(binder);
                 selector.putClientProperty("binder", binder);
             }
 

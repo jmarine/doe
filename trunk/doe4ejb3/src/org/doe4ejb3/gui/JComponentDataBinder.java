@@ -1,5 +1,5 @@
 /*
- * DataBinder.java
+ * JComponentDataBinder.java
  *
  * Created on 24 July 2006, 20:01
  * @author Jordi Marine Fort
@@ -9,25 +9,14 @@ package org.doe4ejb3.gui;
 
 import java.beans.PropertyEditor;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.lang.reflect.InvocationTargetException;
 
-import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
-import javax.swing.JComponent;
 import org.doe4ejb3.util.ReflectionUtils;
 
 
-/**
- *
- * @author Jordi Marine Fort
- */
 public class JComponentDataBinder 
 {
     private Object comp;
@@ -35,7 +24,7 @@ public class JComponentDataBinder
     private PropertyEditor editor;
     private Property entityProperty;
     
-    /** Creates a new instance of DataBinder */
+    
     public JComponentDataBinder(Object comp, Method compGetter, PropertyEditor editor, Property entityProperty) 
     {
         this.comp = comp;
