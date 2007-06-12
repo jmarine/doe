@@ -9,7 +9,8 @@
 
 package org.doe4ejb3.javaee;
 
-import org.doe4ejb3.gui.DomainObjectExplorer;
+//import org.doe4ejb3.gui.DomainObjectExplorer;
+import org.doe4ejb3.gui.Application;
 
 /**
  *
@@ -22,7 +23,8 @@ public class ApplicationClient {
      */
     public static final void main(String args[]) throws Exception
     {
-        DomainObjectExplorer.main(args);
+        //DomainObjectExplorer.main(args);
+        Application.main(args);
     }
 
     

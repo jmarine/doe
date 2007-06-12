@@ -103,6 +103,7 @@ public class EntityManagerPane extends javax.swing.JPanel
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
+
         jPopupMenuContextual = new javax.swing.JPopupMenu();
         jMenuItemContextualNew = new javax.swing.JMenuItem();
         jMenuItemContextualEdit = new javax.swing.JMenuItem();
@@ -122,7 +123,6 @@ public class EntityManagerPane extends javax.swing.JPanel
                 jMenuItemContextualNewActionPerformed(evt);
             }
         });
-
         jPopupMenuContextual.add(jMenuItemContextualNew);
 
         jMenuItemContextualEdit.setMnemonic('e');
@@ -132,9 +132,7 @@ public class EntityManagerPane extends javax.swing.JPanel
                 jMenuItemContextualEditActionPerformed(evt);
             }
         });
-
         jPopupMenuContextual.add(jMenuItemContextualEdit);
-
         jPopupMenuContextual.add(jMenuItemContextualSeparator1);
 
         jMenuItemContextualDelete.setMnemonic('d');
@@ -144,13 +142,13 @@ public class EntityManagerPane extends javax.swing.JPanel
                 jMenuItemContextualDeleteActionPerformed(evt);
             }
         });
-
         jPopupMenuContextual.add(jMenuItemContextualDelete);
 
         setLayout(new java.awt.BorderLayout());
 
         jPanelEntidad.setMinimumSize(new java.awt.Dimension(500, 400));
         jPanelEntidad.setPreferredSize(new java.awt.Dimension(500, 401));
+
         jLabelQuery.setText("Query:");
 
         jComboBoxNamedQuery.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "All" }));
@@ -162,13 +160,7 @@ public class EntityManagerPane extends javax.swing.JPanel
 
         jPanelQueryParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parameters:"));
 
-        jButtonSearch.setMnemonic('s');
-        jButtonSearch.setText("Search");
-        jButtonSearch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonSearchActionPerformed(evt);
-            }
-        });
+        jButtonSearch.setAction(application.ApplicationContext.getInstance().getActionMap(EntityManagerPane.class, this).get("searchEntities"));
 
         org.jdesktop.layout.GroupLayout jPanelResultsLayout = new org.jdesktop.layout.GroupLayout(jPanelResults);
         jPanelResults.setLayout(jPanelResultsLayout);
@@ -178,7 +170,7 @@ public class EntityManagerPane extends javax.swing.JPanel
         );
         jPanelResultsLayout.setVerticalGroup(
             jPanelResultsLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-            .add(0, 317, Short.MAX_VALUE)
+            .add(0, 316, Short.MAX_VALUE)
         );
 
         org.jdesktop.layout.GroupLayout jPanelEntidadLayout = new org.jdesktop.layout.GroupLayout(jPanelEntidad);
@@ -193,7 +185,7 @@ public class EntityManagerPane extends javax.swing.JPanel
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanelEntidadLayout.createSequentialGroup()
                         .add(jLabelQuery)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jComboBoxNamedQuery, 0, 449, Short.MAX_VALUE)
+                        .add(jComboBoxNamedQuery, 0, 429, Short.MAX_VALUE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jButtonSearch)))
                 .addContainerGap())
@@ -212,8 +204,8 @@ public class EntityManagerPane extends javax.swing.JPanel
                 .add(jPanelResults, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
-        add(jPanelEntidad, java.awt.BorderLayout.CENTER);
 
+        add(jPanelEntidad, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItemContextualDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualDeleteActionPerformed
@@ -304,42 +296,7 @@ public class EntityManagerPane extends javax.swing.JPanel
         }
     }//GEN-LAST:event_jMenuItemContextualNewActionPerformed
 
-    private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
-        try {
-            List entities = null;
-            this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            DomainObjectExplorer.getInstance().showStatus("Searching...");
-            if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
-                entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass);
-            } else if(jComboBoxNamedQuery.getSelectedIndex() == 1) {   // Custom
-
-                String ejbql = customQueryEditor.prepareEJBQL();
-                HashMap parameterValues = customQueryEditor.prepareParameterValues();
-                entities = JPAUtils.executeQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, ejbql, parameterValues);
-                
-            } else if(jComboBoxNamedQuery.getSelectedIndex() > 1) {
-                ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
-                NamedQuery namedQuery = (NamedQuery)listItem.getValue();
-                HashMap parameterValues = null;
-                if(queryParametersPanel != null) parameterValues = queryParametersPanel.getParameterValues();
-                entities = JPAUtils.executeNamedQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, namedQuery.name(), parameterValues);
-            }
-            
-            listModel.clear();
-            if(entities.size() > 0) {
-                for(Object obj : entities) listModel.addElement(obj);
-            }
-            
-            DomainObjectExplorer.getInstance().showStatus(MessageFormat.format("Search done: {0} entities found", entities.size()));
-            
-        } catch(Exception ex) {
-            DomainObjectExplorer.getInstance().showStatus("Error: " + ex.getMessage());
-            ex.printStackTrace();
-        } finally {
-            this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        }
-    }//GEN-LAST:event_jButtonSearchActionPerformed
-
+    
     private void jComboBoxNamedQueryItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxNamedQueryItemStateChanged
         String persistenceUnitName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
         
@@ -392,7 +349,7 @@ public class EntityManagerPane extends javax.swing.JPanel
             
         }
         
-        DomainObjectExplorer.getInstance().showStatus("ready");            
+        DomainObjectExplorer.getInstance().showStatus("done");            
         revalidate();
 
     }//GEN-LAST:event_jComboBoxNamedQueryItemStateChanged
@@ -412,5 +369,63 @@ public class EntityManagerPane extends javax.swing.JPanel
     private javax.swing.JPopupMenu jPopupMenuContextual;
     // End of variables declaration//GEN-END:variables
 
+
+    
+    @application.Action
+    public application.Task searchEntities()
+    {
+        return new SearchEntitiesTask();
+    }
+    
+    /**
+     * An example task showing how to create tasks for asynchronous actions
+     * running on background and indicating their progress.
+     */
+    private class SearchEntitiesTask extends application.Task<Void, Void> 
+    {
+        private boolean ok = false;
+        @Override protected Void doInBackground() 
+        {
+            try {
+                List entities = null;
+                EntityManagerPane.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                DomainObjectExplorer.getInstance().showStatus("Searching...");
+                if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
+                    entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass);
+                } else if(jComboBoxNamedQuery.getSelectedIndex() == 1) {   // Custom
+
+                    String ejbql = customQueryEditor.prepareEJBQL();
+                    HashMap parameterValues = customQueryEditor.prepareParameterValues();
+                    entities = JPAUtils.executeQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, ejbql, parameterValues);
+
+                } else if(jComboBoxNamedQuery.getSelectedIndex() > 1) {
+                    ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
+                    NamedQuery namedQuery = (NamedQuery)listItem.getValue();
+                    HashMap parameterValues = null;
+                    if(queryParametersPanel != null) parameterValues = queryParametersPanel.getParameterValues();
+                    entities = JPAUtils.executeNamedQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, namedQuery.name(), parameterValues);
+                }
+
+                listModel.clear();
+                if(entities.size() > 0) {
+                    for(Object obj : entities) listModel.addElement(obj);
+                }
+
+                DomainObjectExplorer.getInstance().showStatus(MessageFormat.format("Search done: {0} entities found", entities.size()));
+                ok = true;
+
+            } catch(Exception ex) {
+                DomainObjectExplorer.getInstance().showStatus("Error: " + ex.getMessage());
+                ex.printStackTrace();
+            } finally {
+                EntityManagerPane.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }        
+            return null;
+        }
+        
+        protected void finished() {
+            // DomainObjectExplorer.getInstance().showStatus("done");
+        }
+    }
 
 }
