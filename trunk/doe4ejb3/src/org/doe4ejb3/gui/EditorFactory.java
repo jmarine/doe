@@ -333,7 +333,7 @@ public class EditorFactory
         }
 
         // configure actions:
-        AbstractAction newAction = new AbstractAction("New") {
+        AbstractAction newAction = new AbstractAction("New", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
                     JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, null);
@@ -355,7 +355,7 @@ public class EditorFactory
             }
         };
         
-        AbstractAction addExistingAction = new AbstractAction("Add") {
+        AbstractAction addExistingAction = new AbstractAction("Add", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/add.png"))) {
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -375,7 +375,7 @@ public class EditorFactory
                }
         };
         
-        final AbstractAction editAction = new AbstractAction("Edit") {
+        final AbstractAction editAction = new AbstractAction("Edit", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/edit.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
                     if(listSelectionModel.isSelectionEmpty()) {
@@ -411,7 +411,7 @@ public class EditorFactory
            }
         };
         
-        final AbstractAction deleteAction = new AbstractAction("Delete") {
+        final AbstractAction deleteAction = new AbstractAction("Delete", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/delete.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try {
                     if(listSelectionModel.isSelectionEmpty()) {
@@ -447,7 +447,7 @@ public class EditorFactory
             }
         };         
 
-        AbstractAction printAction = new AbstractAction("Print") {
+        AbstractAction printAction = new AbstractAction("Print", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/print.png"))) {
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         if(objectPropertyTableModel.getRowCount() == 0) {
@@ -465,7 +465,7 @@ public class EditorFactory
                 }
         };
         
-        AbstractAction closeAction = new AbstractAction("Close") {
+        AbstractAction closeAction = new AbstractAction("Close", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cancel.png"))) {
                 public void actionPerformed(ActionEvent evt)  
                 {        
                     Component parent = (Component)evt.getSource();
@@ -481,9 +481,9 @@ public class EditorFactory
         };
 
         // cut, copy & paste actions
-        final AbstractAction cutAction = new ClipboardAction("Cut", 't', TransferHandler.getCutAction());
-        final AbstractAction copyAction = new ClipboardAction("Copy", 'c', TransferHandler.getCopyAction());
-        final AbstractAction pasteAction = new ClipboardAction("Paste", 'p', TransferHandler.getPasteAction());
+        final AbstractAction cutAction = new ClipboardAction("Cut", 't', TransferHandler.getCutAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cut.png")));  // application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("cut"));
+        final AbstractAction copyAction = new ClipboardAction("Copy", 'c', TransferHandler.getCopyAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/copy.png")));  // application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("copy"));
+        final AbstractAction pasteAction = new ClipboardAction("Paste", 'p', TransferHandler.getPasteAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/paste.png")));  // application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("paste"));
         
         // setup enable state, and enable change listeners:
         editAction.setEnabled(false);
@@ -501,7 +501,7 @@ public class EditorFactory
                 // pasteAction.setEnabled(DomainObjectExplorer.getInstance().getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
             }
         });
-
+        
 
         // configure popup menu
         javax.swing.JPopupMenu popupMenu = new javax.swing.JPopupMenu();
@@ -522,10 +522,12 @@ public class EditorFactory
                 deleteAction.setEnabled(enabled);
                 copyAction.setEnabled(enabled);
                 cutAction.setEnabled(!isManagerWindow && enabled);
+                if(isManagerWindow) pasteAction.setEnabled(false);
                 // pasteAction.setEnabled(DomainObjectExplorer.getInstance().getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
             }
         });
-        
+
+
 
         // configure button panel:
         JPanel buttonPanel = new JPanel();
@@ -534,20 +536,24 @@ public class EditorFactory
         if(!isManagerWindow) {  
             // configure "add" button (only used in OneToMany and ManytoMany relationships)
             JButton btnAddExistingItem = new JButton(addExistingAction);
+            // btnAddExistingItem.setIcon(new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/add.png")));
             buttonPanel.add(btnAddExistingItem);
         }
 
         // configure "new" button
         JButton btnNewItem = new JButton(newAction);
+        // btnNewItem.setIcon(new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png")));        
         buttonPanel.add(btnNewItem);
 
         // configure "edit" button
         JButton btnEditItem = new JButton(editAction);
         btnEditItem.addActionListener(editAction);
+        // btnEditItem.setIcon(new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/edit.png")));
         buttonPanel.add(btnEditItem);
 
         // configure "delete" button
         JButton btnDeleteItem = new JButton(deleteAction);
+        // btnDeleteItem.setIcon(new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/delete.png")));        
         buttonPanel.add(btnDeleteItem);
 
         if(isManagerWindow) {

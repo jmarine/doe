@@ -33,6 +33,7 @@ public class ConnectionManager extends javax.swing.JInternalFrame {
      */
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
+
         jLabelJPAimpl = new javax.swing.JLabel();
         jComboBoxJPAimpl = new javax.swing.JComboBox();
         jLabelUsername = new javax.swing.JLabel();
@@ -44,6 +45,7 @@ public class ConnectionManager extends javax.swing.JInternalFrame {
 
         setClosable(true);
         setTitle("Connection properties");
+
         jLabelJPAimpl.setLabelFor(jComboBoxJPAimpl);
         jLabelJPAimpl.setText("JPA implementation:");
 
@@ -55,6 +57,8 @@ public class ConnectionManager extends javax.swing.JInternalFrame {
         jLabelPassword.setLabelFor(jPasswordField);
         jLabelPassword.setText("Password:");
 
+        jButtonAccept.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/accept.png"))); // NOI18N
+        jButtonAccept.setMnemonic('a');
         jButtonAccept.setText("Accept");
         jButtonAccept.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -62,7 +66,9 @@ public class ConnectionManager extends javax.swing.JInternalFrame {
             }
         });
 
-        jButtonCancel.setText("Cancel");
+        jButtonCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/cancel.png"))); // NOI18N
+        jButtonCancel.setMnemonic('c');
+        jButtonCancel.setText("Close");
         jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButtonCancelActionPerformed(evt);
@@ -107,12 +113,13 @@ public class ConnectionManager extends javax.swing.JInternalFrame {
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabelPassword)
                     .add(jPasswordField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 46, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 45, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jButtonAccept)
                     .add(jButtonCancel))
                 .addContainerGap())
         );
+
         pack();
     }// </editor-fold>//GEN-END:initComponents
 

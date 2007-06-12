@@ -77,8 +77,8 @@ public class JPAUtils
     {
         try {
             // GLASSFISHv2 Beta
-            System.out.println("JPAUtils.getPersistentEntities: Setting up application's classloader for GFv2 beta2...");
-            Thread.currentThread().setContextClassLoader(JPAUtils.class.getClassLoader());  
+            // System.out.println("JPAUtils.getPersistentEntities: Setting up application's classloader for GFv2 beta2...");
+            // Thread.currentThread().setContextClassLoader(JPAUtils.class.getClassLoader());  
 
             System.out.println("JPAUtils.getPersistentEntities: Searching persistence providers");
             ClassLoader classLoader = Thread.currentThread().getContextClassLoader();

@@ -2,7 +2,11 @@
 
 <Form version="1.3" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
-    <Menu class="javax.swing.JPopupMenu" name="jPopupMenuContextual">
+    <Container class="javax.swing.JPopupMenu" name="jPopupMenuContextual">
+
+      <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
+        <Property name="useNullLayout" type="boolean" value="true"/>
+      </Layout>
       <SubComponents>
         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemContextualNew">
           <Properties>
@@ -22,8 +26,8 @@
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemContextualEditActionPerformed"/>
           </Events>
         </MenuItem>
-        <MenuItem class="javax.swing.JSeparator" name="jMenuItemContextualSeparator1">
-        </MenuItem>
+        <Component class="javax.swing.JSeparator" name="jMenuItemContextualSeparator1">
+        </Component>
         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemContextualDelete">
           <Properties>
             <Property name="mnemonic" type="int" value="100"/>
@@ -34,10 +38,12 @@
           </Events>
         </MenuItem>
       </SubComponents>
-    </Menu>
+    </Container>
   </NonVisualComponents>
   <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
     <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
@@ -73,7 +79,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabelQuery" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jComboBoxNamedQuery" pref="449" max="32767" attributes="1"/>
+                          <Component id="jComboBoxNamedQuery" pref="429" max="32767" attributes="1"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jButtonSearch" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -131,12 +137,10 @@
         </Container>
         <Component class="javax.swing.JButton" name="jButtonSearch">
           <Properties>
-            <Property name="mnemonic" type="int" value="115"/>
-            <Property name="text" type="java.lang.String" value="Search"/>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+              <action class="org.doe4ejb3.gui.EntityManagerPane" id="searchEntities"/>
+            </Property>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSearchActionPerformed"/>
-          </Events>
         </Component>
         <Container class="javax.swing.JPanel" name="jPanelResults">
 
@@ -148,7 +152,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="317" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="316" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>

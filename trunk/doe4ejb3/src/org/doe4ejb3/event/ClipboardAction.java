@@ -15,11 +15,12 @@ import org.doe4ejb3.gui.DomainObjectExplorer;
 
 public class ClipboardAction extends AbstractAction
 {
-    public ClipboardAction(String name, char mnemonic, Action clipboardAction) 
+    public ClipboardAction(String name, char mnemonic, Action clipboardAction, javax.swing.Icon icon) 
     {
         putValue(NAME, name);
         putValue(MNEMONIC_KEY, new Integer((int)mnemonic));
         putValue(ACTION_COMMAND_KEY, clipboardAction.getValue(NAME));
+        putValue(SMALL_ICON, icon);
     }
     
     public void actionPerformed(ActionEvent event) {
