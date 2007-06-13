@@ -783,13 +783,14 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         else editor.setEntity(entity);
         
         System.out.println("Preparing buttons...");
-        JButton btnAccept = new JButton("Accept");
-        btnAccept.setMnemonic('a');
-        btnAccept.setActionCommand("accept");
-        btnAccept.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/org/doe4ejb3/gui/resources/accept.png")));
-        btnAccept.addActionListener(new ActionListener() {
+        JButton btnSave = new JButton("Save");
+        btnSave.setMnemonic('s');
+        btnSave.setActionCommand("save");
+        btnSave.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/org/doe4ejb3/gui/resources/save.png")));
+        btnSave.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 try {
+                    // TODO: convert to asynchronous action
                     iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     Object oldEntity = editor.getEntity();
                     Object newEntity = JPAUtils.saveEntity(getConnectionParams(), oldEntity);
@@ -849,12 +850,23 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             }
         });
         
-
+       
         JPanel buttons = new JPanel();
-        buttons.add(btnAccept);
-        buttons.add(btnPrint);
+        buttons.add(btnSave);
+        if(!editor.isNew()) {
+            //buttons.add(new javax.swing.JSeparator());
+            buttons.add(btnPrint);
+            //TODO: buttons.add(btnDelete);
+            ActionMap actionMap = application.ApplicationContext.getInstance().getActionMap(entityClass, editor.getEntity());
+            if(actionMap != null) {
+                for(Object action : actionMap.keys()) {
+                    JButton btnAction = new JButton(actionMap.get(action));
+                    buttons.add(btnAction);
+                }
+            }
+        }
         buttons.add(btnClose);
-
+        
 
         JScrollPane scrollPaneForEditor = new JAutoScrollPaneOnComponentFocus((java.awt.Container)editor, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         

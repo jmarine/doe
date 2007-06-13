@@ -138,8 +138,9 @@
         <Component class="javax.swing.JButton" name="jButtonSearch">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.EntityManagerPane" id="searchEntities"/>
+              <action class="org.doe4ejb3.gui.EntityManagerPane" id="searchInstances"/>
             </Property>
+            <Property name="mnemonic" type="int" value="115"/>
           </Properties>
         </Component>
         <Container class="javax.swing.JPanel" name="jPanelResults">
