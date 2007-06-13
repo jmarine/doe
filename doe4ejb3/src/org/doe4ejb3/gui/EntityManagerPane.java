@@ -160,7 +160,8 @@ public class EntityManagerPane extends javax.swing.JPanel
 
         jPanelQueryParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parameters:"));
 
-        jButtonSearch.setAction(application.ApplicationContext.getInstance().getActionMap(EntityManagerPane.class, this).get("searchEntities"));
+        jButtonSearch.setAction(application.ApplicationContext.getInstance().getActionMap(EntityManagerPane.class, this).get("searchInstances"));
+        jButtonSearch.setMnemonic('s');
 
         org.jdesktop.layout.GroupLayout jPanelResultsLayout = new org.jdesktop.layout.GroupLayout(jPanelResults);
         jPanelResults.setLayout(jPanelResultsLayout);
@@ -372,7 +373,7 @@ public class EntityManagerPane extends javax.swing.JPanel
 
     
     @application.Action
-    public application.Task searchEntities()
+    public application.Task searchInstances()
     {
         return new SearchEntitiesTask();
     }
