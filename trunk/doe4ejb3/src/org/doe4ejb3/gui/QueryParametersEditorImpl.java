@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.binding.JComponentDataBinding;
 import java.beans.*;
 import java.lang.reflect.*;
 import java.lang.annotation.*;
@@ -26,6 +27,7 @@ import javax.swing.*;
 import javax.persistence.TemporalType;
 import javax.persistence.Entity;
 
+import org.doe4ejb3.binding.*;
 import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.ReflectionUtils;
 
@@ -44,7 +46,7 @@ public class QueryParametersEditorImpl extends JPanel
     
     private HashMap parameterTypes = null;
     private HashMap parameterValues = null;
-    private ArrayList<JComponentDataBinding> bindingContext = null;
+    private BindingContext bindingContext = null;
     
     
     /**
@@ -53,16 +55,14 @@ public class QueryParametersEditorImpl extends JPanel
     public QueryParametersEditorImpl(HashMap parameterTypes) {
         this.parameterTypes = parameterTypes;
         this.parameterValues = new HashMap();
-        this.bindingContext = new ArrayList();
+        this.bindingContext = new BindingContext();
         initComponents();
     }    
 
     
     public HashMap getParameterValues() throws IllegalAccessException, InvocationTargetException
     {
-        for(JComponentDataBinding binding : bindingContext) {
-            binding.commitUncommittedValues();
-        }
+        bindingContext.commitUncommittedValues();
         return parameterValues;
     }
     
@@ -78,7 +78,7 @@ public class QueryParametersEditorImpl extends JPanel
             handleParameterProperty(property);
         }
         
-        //bindingContext.bind();
+        bindingContext.bind();
     }
 
 
@@ -90,7 +90,7 @@ public class QueryParametersEditorImpl extends JPanel
         JComponent comp = EditorFactory.getPropertyEditor(property, defaultLength, TemporalType.TIMESTAMP);
         if(comp != null) {
             JComponentDataBinding binding = (JComponentDataBinding)comp.getClientProperty("dataBinding");
-            if(binding != null) bindingContext.add(binding);
+            if(binding != null) bindingContext.addBinding(binding);
 
             add(new JLabel(capitalize(I18n.getLiteral(property.getName())) + ":"), gbcLabel);
             add(comp, gbcComponent);

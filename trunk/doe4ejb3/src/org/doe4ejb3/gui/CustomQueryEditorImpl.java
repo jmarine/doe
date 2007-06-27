@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.binding.JComponentDataBinding;
 import java.beans.*;
 import java.lang.reflect.*;
 import java.lang.annotation.*;
@@ -26,6 +27,7 @@ import javax.swing.*;
 import javax.persistence.TemporalType;
 import javax.persistence.Entity;
 
+import org.doe4ejb3.binding.*;
 import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.ReflectionUtils;
 import org.doe4ejb3.gui.HashKeyProperty;
@@ -43,7 +45,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     
     private Class entityClass = null;
     private HashMap parameterValues = null;
-    private ArrayList<JComponentDataBinding> bindingContext = null;
+    private BindingContext bindingContext = null;
     private ArrayList<JComboBox> propertySelectors = null;
     
     
@@ -54,7 +56,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         // this.parameterTypes = parameterTypes;
         // this.parameterValues = new HashMap();
         this.entityClass = entityClass;
-        this.bindingContext = new ArrayList();
+        this.bindingContext = new BindingContext();
         this.propertySelectors = new ArrayList();
         initComponents();
     }    
@@ -64,6 +66,8 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     {
         int count = 0;
         this.parameterValues = new HashMap();
+        
+        bindingContext.commitUncommittedValues();
         
         String entityName = JPAUtils.getEntityName(entityClass);        
         StringBuffer sb = new StringBuffer("SELECT OBJECT(e) FROM " + entityName + " e");
@@ -77,7 +81,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                 try {
                     HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
                     String parameterName = property.getName() + count;
-                    binding.commitUncommittedValues();
+                    //bindingContext.commitUncommittedValues();
 
                     if(where.length() > 0) where.append(" AND ");
                     if(operator.getSelectedItem().toString().indexOf("MEMBER") == -1) {
@@ -123,13 +127,6 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     {
         setLayout(new GridBagLayout());
         addPropertySelector();
-
-        //for(Object parameterName : parameterTypes.keySet()) 
-        //{
-        //    HashKeyProperty property = new HashKeyProperty(parameterValues, (String)parameterName, (Class)parameterTypes.get(parameterName));
-        //    handleParameterProperty(property);
-        //}
-        
     }
     
     private void addPropertySelector()
@@ -165,7 +162,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         if(oldBinding != null) 
         {
             // oldBinding.unbind();
-            bindingContext.remove(oldBinding);
+            bindingContext.removeBinding(oldBinding);
             selector.putClientProperty("dataBinding", null);
         }
         editorContainer.removeAll();
@@ -192,7 +189,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
             JComponentDataBinding binding = (JComponentDataBinding)comp.getClientProperty("dataBinding");
             if(binding != null) {
-                bindingContext.add(binding);
+                bindingContext.addBinding(binding);
                 //binding.bind();
                 selector.putClientProperty("dataBinding", binding);
             }

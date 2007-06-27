@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.binding.JComponentDataBinding;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;

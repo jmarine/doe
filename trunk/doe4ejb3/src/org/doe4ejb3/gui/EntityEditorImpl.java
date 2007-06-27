@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.binding.JComponentDataBinding;
 import java.beans.*;
 import java.lang.reflect.*;
 import java.lang.annotation.*;
@@ -21,6 +22,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.*;
+
+import org.doe4ejb3.binding.*;
 import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.ReflectionUtils;
 
@@ -41,7 +44,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     private Object entity = null;
     private boolean objIsNew = false;
     private boolean embedded = false;
-    private ArrayList<JComponentDataBinding> bindingContext = new ArrayList();
+    private BindingContext bindingContext = new BindingContext();
     
     
     /**
@@ -59,8 +62,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
 
     public void clearBindings()
     {
-        // if(bindingContext != null) bindingContext.unbind();
-        bindingContext = new ArrayList();
+        if(bindingContext != null) bindingContext.unbind();
+        bindingContext = new BindingContext();
     }
     
     public boolean isNew()
@@ -70,9 +73,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
 
     public Object getEntity() throws IllegalAccessException, InvocationTargetException
     {
-        for(JComponentDataBinding binding : bindingContext) {
-            binding.commitUncommittedValues();
-        }
+        bindingContext.commitUncommittedValues();
         return this.entity;
     }
 
@@ -147,7 +148,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
 
         add(Box.createVerticalGlue(), gbcGlue);
         
-        //bindingContext.bind();
+        bindingContext.bind();
     }
     
     public void handlePersistenceAnnotations(ObjectProperty entityProperty)
@@ -307,7 +308,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                     if( (comp != null) && (comp instanceof JComponent) ) {
                         ((JComponent)comp).putClientProperty("dataBinding", binding);
                     }
-                    bindingContext.add(binding);
+                    bindingContext.addBinding(binding);
                 }
             }
 

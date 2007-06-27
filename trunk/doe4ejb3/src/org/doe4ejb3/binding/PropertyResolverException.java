@@ -15,12 +15,12 @@ package org.doe4ejb3.binding;
  */
 public class PropertyResolverException extends java.lang.RuntimeException
 {
-    public PropertyResolverException(java.lang.String msg, java.lang.Object o, java.lang.String b)
+    public PropertyResolverException(String msg, Object source, String path)
     {
-        this(msg, o, b, null);
+        this(msg, source, path, null);
     }
     
-    public PropertyResolverException(java.lang.String msg, java.lang.Object o, java.lang.String b,  java.lang.Exception ex)
+    public PropertyResolverException(String msg, Object source, String path, java.lang.Exception ex)
     {
         super(msg, ex);
     }
