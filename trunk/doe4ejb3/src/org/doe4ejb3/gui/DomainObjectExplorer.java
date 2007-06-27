@@ -858,7 +858,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             buttons.add(btnPrint);
             //TODO: buttons.add(btnDelete);
             ActionMap actionMap = application.ApplicationContext.getInstance().getActionMap(entityClass, editor.getEntity());
-            if(actionMap != null) {
+            if( (actionMap != null) && (actionMap.keys() != null) ) {
                 for(Object action : actionMap.keys()) {
                     JButton btnAction = new JButton(actionMap.get(action));
                     buttons.add(btnAction);

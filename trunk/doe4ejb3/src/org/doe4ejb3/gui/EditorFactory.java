@@ -100,7 +100,7 @@ public class EditorFactory
         JComponent comp = null;
         Method compGetter = null;
         java.beans.PropertyEditor editor = null;        
-        JComponentDataBinder binder = null;
+        JComponentDataBinding binding = null;
         
         boolean isCollection = false;
         Class memberClass = null;
@@ -124,9 +124,9 @@ public class EditorFactory
                 // OneToMany || ManyToMany
                 try {
                     System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
-                    JComponentDataBinder binderOutParam[] = new JComponentDataBinder[1];
-                    comp = getCollectionEditor(property, memberClass, false, binderOutParam);
-                    binder = binderOutParam[0];
+                    JComponentDataBinding bindingOutParam[] = new JComponentDataBinding[1];
+                    comp = getCollectionEditor(property, memberClass, false, bindingOutParam);
+                    binding = bindingOutParam[0];
 
                 } catch(Exception ex) {
                     System.out.println("Error loading property: " + ex.getMessage());
@@ -208,7 +208,7 @@ public class EditorFactory
                     if(customComponent instanceof JComponent) {
                         comp = (JComponent)customComponent;
                     } else {
-                        JPanel panel = new JPanel();  // A JComponent is needed to putClientProperty("dataBinder", binder)
+                        JPanel panel = new JPanel();  // A JComponent is needed to putClientProperty("dataBinding", binding)
                         panel.setLayout(new FlowLayout());
                         panel.add(customComponent);
                         comp = panel;
@@ -218,7 +218,7 @@ public class EditorFactory
                     Object value = property.getValue();
                     if(value != null) editor.setValue(value);
 
-                    binder = new JComponentDataBinder(editor, editorGetter, null, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).
+                    binding = new JComponentDataBinding(editor, editorGetter, null, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).
                     
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
                     JCheckBox checkBox = new JCheckBox();
@@ -247,7 +247,7 @@ public class EditorFactory
                         textField = new javax.swing.JTextPane();
                         //textField.setPreferredSize(new java.awt.Dimension(400, 80));
                         compGetter = textField.getClass().getMethod("getText");
-                        binder = new JComponentDataBinder(textField, compGetter, editor, property);                        
+                        binding = new JComponentDataBinding(textField, compGetter, editor, property);                        
                         comp = new JScrollPane(textField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
                         comp.setPreferredSize(new java.awt.Dimension(400, 80));
                     }
@@ -276,11 +276,14 @@ public class EditorFactory
 
             
         if(comp != null) {
-            if(binder == null) {
-                binder = new JComponentDataBinder(comp, compGetter, editor, property);
+            if(binding == null) {
+                binding = new JComponentDataBinding(comp, compGetter, editor, property);
             }
+
+            //binding.setUpdateStrategy(Binding.UpdateStrategy.READ_ONCE);
+
             if( (comp != null) && (comp instanceof JComponent) ) {
-                ((JComponent)comp).putClientProperty("dataBinder", binder);
+                ((JComponent)comp).putClientProperty("dataBinding", binding);
             }
         }
         return comp;
@@ -302,7 +305,7 @@ public class EditorFactory
      * Setup an editor for a multi-valued property 
      * TODO: allow drag and drop operations
      */
-    public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean isManagerWindow, JComponentDataBinder binderOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean isManagerWindow,JComponentDataBinding bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
         final JTable jTable = new JTable();
         final JScrollPane scrollableItems = new JScrollPane(jTable);
         final JPanel panel = new ComposedEditorHolder(scrollableItems);
@@ -316,9 +319,9 @@ public class EditorFactory
         panel.putClientProperty("listSelectionModel", listSelectionModel);
         
         if(property != null) {
-            // configure data binder
+            // configure data binding
             Method modelGetter = listModel.getClass().getMethod("toArray");
-            binderOutParam[0] = new JComponentDataBinder(listModel, modelGetter, null, property);
+            bindingOutParam[0] = new JComponentDataBinding(listModel, modelGetter, null, property);
 
             // populate listmodel with property's values
             Collection values = (Collection)property.getValue();
@@ -407,6 +410,7 @@ public class EditorFactory
                     
                 } catch(Exception ex) { 
                     JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
+                    ex.printStackTrace();
                 }
            }
         };
