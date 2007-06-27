@@ -51,8 +51,8 @@ public class EntityManagerPane extends javax.swing.JPanel
 
         try {
             // post initialization:
-            JComponentDataBinder outBinder[] = new JComponentDataBinder[1];
-            JComponent entityListEditor = EditorFactory.getCollectionEditor(null, entityClass, true, outBinder);
+            JComponentDataBinding outBinding[] = new JComponentDataBinding[1];
+            JComponent entityListEditor = EditorFactory.getCollectionEditor(null, entityClass, true, outBinding);
             listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");
             listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");
 

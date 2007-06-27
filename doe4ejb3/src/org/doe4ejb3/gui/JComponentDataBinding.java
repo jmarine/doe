@@ -1,5 +1,5 @@
 /*
- * JComponentDataBinder.java
+ * JComponentDataBinding.java
  *
  * Created on 24 July 2006, 20:01
  * @author Jordi Marine Fort
@@ -17,7 +17,7 @@ import java.util.HashSet;
 import org.doe4ejb3.util.ReflectionUtils;
 
 
-public class JComponentDataBinder 
+public class JComponentDataBinding 
 {
     private Object comp;
     private Method compGetter;
@@ -25,7 +25,7 @@ public class JComponentDataBinder
     private Property entityProperty;
     
     
-    public JComponentDataBinder(Object comp, Method compGetter, PropertyEditor editor, Property entityProperty) 
+    public JComponentDataBinding(Object comp, Method compGetter, PropertyEditor editor, Property entityProperty) 
     {
         this.comp = comp;
         this.compGetter = compGetter;
@@ -34,7 +34,7 @@ public class JComponentDataBinder
 
     }
     
-    public void executeObjSetterWithValueFromCompGetter() throws IllegalAccessException, InvocationTargetException
+    public void commitUncommittedValues() throws IllegalAccessException, InvocationTargetException
     {
         try {
         
@@ -66,7 +66,7 @@ public class JComponentDataBinder
             entityProperty.setValue(value);
 
         } catch(Exception ex) {
-            System.out.println("JComponentDataBinder.executeObjSetterWithValueFromCompGetter: ERROR: " + ex.getMessage());
+            System.out.println("JComponentDataBinding.commitUncommittedValues: ERROR: " + ex.getMessage());
             ex.printStackTrace();
             // throw ex;  // FIXME: SHOULD REALLY FAIL
         }

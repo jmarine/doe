@@ -44,7 +44,7 @@ public class QueryParametersEditorImpl extends JPanel
     
     private HashMap parameterTypes = null;
     private HashMap parameterValues = null;
-    private ArrayList<JComponentDataBinder> bindings = null;
+    private ArrayList<JComponentDataBinding> bindingContext = null;
     
     
     /**
@@ -53,15 +53,15 @@ public class QueryParametersEditorImpl extends JPanel
     public QueryParametersEditorImpl(HashMap parameterTypes) {
         this.parameterTypes = parameterTypes;
         this.parameterValues = new HashMap();
-        this.bindings = new ArrayList();
+        this.bindingContext = new ArrayList();
         initComponents();
     }    
 
     
     public HashMap getParameterValues() throws IllegalAccessException, InvocationTargetException
     {
-        for(JComponentDataBinder binding : bindings) {
-            binding.executeObjSetterWithValueFromCompGetter();
+        for(JComponentDataBinding binding : bindingContext) {
+            binding.commitUncommittedValues();
         }
         return parameterValues;
     }
@@ -77,6 +77,8 @@ public class QueryParametersEditorImpl extends JPanel
             HashKeyProperty property = new HashKeyProperty(parameterValues, (String)parameterName, (Class)parameterTypes.get(parameterName), null);
             handleParameterProperty(property);
         }
+        
+        //bindingContext.bind();
     }
 
 
@@ -87,8 +89,8 @@ public class QueryParametersEditorImpl extends JPanel
         int defaultLength = 20;
         JComponent comp = EditorFactory.getPropertyEditor(property, defaultLength, TemporalType.TIMESTAMP);
         if(comp != null) {
-            JComponentDataBinder binder = (JComponentDataBinder)comp.getClientProperty("dataBinder");
-            if(binder != null) bindings.add(binder);
+            JComponentDataBinding binding = (JComponentDataBinding)comp.getClientProperty("dataBinding");
+            if(binding != null) bindingContext.add(binding);
 
             add(new JLabel(capitalize(I18n.getLiteral(property.getName())) + ":"), gbcLabel);
             add(comp, gbcComponent);

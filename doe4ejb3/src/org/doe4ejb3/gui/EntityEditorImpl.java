@@ -41,7 +41,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     private Object entity = null;
     private boolean objIsNew = false;
     private boolean embedded = false;
-    private ArrayList<JComponentDataBinder> bindings = new ArrayList();
+    private ArrayList<JComponentDataBinding> bindingContext = new ArrayList();
     
     
     /**
@@ -57,9 +57,10 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         setMinimumSize(new java.awt.Dimension(550, 400));
     }
 
-    public void clearBinders()
+    public void clearBindings()
     {
-        bindings.clear();
+        // if(bindingContext != null) bindingContext.unbind();
+        bindingContext = new ArrayList();
     }
     
     public boolean isNew()
@@ -69,8 +70,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
 
     public Object getEntity() throws IllegalAccessException, InvocationTargetException
     {
-        for(JComponentDataBinder binding : bindings) {
-            binding.executeObjSetterWithValueFromCompGetter();
+        for(JComponentDataBinding binding : bindingContext) {
+            binding.commitUncommittedValues();
         }
         return this.entity;
     }
@@ -96,7 +97,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         this.entity = entity;
         this.objIsNew = objIsNew;
         
-        clearBinders();
+        clearBindings();
         removeAll();
         setLayout(new GridBagLayout());
 
@@ -145,6 +146,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         
 
         add(Box.createVerticalGlue(), gbcGlue);
+        
+        //bindingContext.bind();
     }
     
     public void handlePersistenceAnnotations(ObjectProperty entityProperty)
@@ -178,7 +181,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         Object relationType = null;
         GridBagConstraints gbc = gbcComponent;
         Component comp = null;
-        JComponentDataBinder binder = null;
+        JComponentDataBinding binding = null;
         java.beans.PropertyEditor editor = null;
         org.doe4ejb3.annotation.PropertyDescriptor propertyDescriptor = null;
         
@@ -284,7 +287,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                 javax.persistence.TemporalType defaultTemporalType = javax.persistence.TemporalType.TIMESTAMP;
                 if( (temporal != null) && (temporal.value() != null) ) defaultTemporalType = temporal.value();
                 comp = EditorFactory.getPropertyEditor(entityProperty, maxLength, defaultTemporalType);
-                binder = (JComponentDataBinder)((JComponent)comp).getClientProperty("dataBinder");
+                binding = (JComponentDataBinding)((JComponent)comp).getClientProperty("dataBinding");
                 
             }
 
@@ -298,13 +301,13 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                         comp.setEnabled(false);
                     }
                 } else {
-                    if(binder == null) {
-                        binder = new JComponentDataBinder(comp, compGetter, editor, entityProperty);
+                    if(binding == null) {
+                        binding = new JComponentDataBinding(comp, compGetter, editor, entityProperty);
                     }
                     if( (comp != null) && (comp instanceof JComponent) ) {
-                        ((JComponent)comp).putClientProperty("dataBinder", binder);
+                        ((JComponent)comp).putClientProperty("dataBinding", binding);
                     }
-                    bindings.add(binder);
+                    bindingContext.add(binding);
                 }
             }
 
