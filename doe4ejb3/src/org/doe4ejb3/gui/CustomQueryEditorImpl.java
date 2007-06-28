@@ -47,12 +47,15 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     private HashMap parameterValues = null;
     private BindingContext bindingContext = null;
     private ArrayList<JComboBox> propertySelectors = null;
+    private JPanel conditionPanel = null;
+    private JComboBox filterTypeComboBox = null;
     
     
     /**
      * Creates a new instance of QueryParametersEditorImpl
      */
-    public CustomQueryEditorImpl(Class entityClass) {
+    public CustomQueryEditorImpl(Class entityClass) 
+    {
         // this.parameterTypes = parameterTypes;
         // this.parameterValues = new HashMap();
         this.entityClass = entityClass;
@@ -83,7 +86,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                     String parameterName = property.getName() + count;
                     //bindingContext.commitUncommittedValues();
 
-                    if(where.length() > 0) where.append(" AND ");
+                    if(where.length() > 0) where.append(" " + filterTypeComboBox.getSelectedItem() + " ");
                     if(operator.getSelectedItem().toString().indexOf("MEMBER") == -1) {
                         // normal operands order
                         where.append("e."); where.append(property.getName()); where.append(" ");
@@ -125,7 +128,14 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
     private void initComponents()
     {
-        setLayout(new GridBagLayout());
+        setLayout(new BorderLayout());
+        conditionPanel = new JPanel();
+        conditionPanel.setLayout(new GridBagLayout());
+        
+        filterTypeComboBox = new JComboBox(new String[] { "AND", "OR" });
+        filterTypeComboBox.setVisible(false);
+        add("West", filterTypeComboBox);
+        add("Center", conditionPanel);
         addPropertySelector();
     }
     
@@ -144,10 +154,11 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         selector.addItemListener(this);
         propertySelectors.add(selector);
        
-        add(selector, gbcProperty);
-        add(operator, gbcOperator);
-        add(editorContainer, gbcComponent);
+        conditionPanel.add(selector, gbcProperty);
+        conditionPanel.add(operator, gbcOperator);
+        conditionPanel.add(editorContainer, gbcComponent);
         revalidate();
+        repaint();
     }
 
 
@@ -161,7 +172,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         JComponentDataBinding oldBinding = (JComponentDataBinding)selector.getClientProperty("dataBinding");
         if(oldBinding != null) 
         {
-            // oldBinding.unbind();
+            oldBinding.unbind();
             bindingContext.removeBinding(oldBinding);
             selector.putClientProperty("dataBinding", null);
         }
@@ -173,6 +184,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             selector.putClientProperty("editorValue", null);
             operator.setSelectedIndex(0);
             editorContainer.revalidate();
+            editorContainer.repaint();
 
         } else {
 
@@ -190,7 +202,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             JComponentDataBinding binding = (JComponentDataBinding)comp.getClientProperty("dataBinding");
             if(binding != null) {
                 bindingContext.addBinding(binding);
-                //binding.bind();
+                binding.bind();
                 selector.putClientProperty("dataBinding", binding);
             }
 
@@ -203,7 +215,12 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                 emptyPropertySelector = true;
             }
         }
-        if(!emptyPropertySelector) addPropertySelector();
+        if(!emptyPropertySelector) {
+            addPropertySelector();
+            filterTypeComboBox.setVisible(true);
+            revalidate();
+            repaint();
+        }
         
     }
 
