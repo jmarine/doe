@@ -7,7 +7,6 @@
 
 package org.doe4ejb3.gui;
 
-import org.doe4ejb3.binding.JComponentDataBinding;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -74,6 +73,8 @@ import org.doe4ejb3.event.EntityListener;
 import org.doe4ejb3.event.EntityTransferHandler;
 import org.doe4ejb3.exception.ApplicationException;
 import org.doe4ejb3.annotation.EntityDescriptor;
+import org.doe4ejb3.binding.Binding;
+import org.doe4ejb3.binding.JComponentDataBinding;
 import org.doe4ejb3.util.JPAUtils;
 
 
@@ -281,7 +282,7 @@ public class EditorFactory
                 binding = new JComponentDataBinding(comp, compGetter, editor, property);
             }
 
-            //binding.setUpdateStrategy(Binding.UpdateStrategy.READ_ONCE);
+            binding.setUpdateStrategy(Binding.UpdateStrategy.READ_ONCE);
 
             if( (comp != null) && (comp instanceof JComponent) ) {
                 ((JComponent)comp).putClientProperty("dataBinding", binding);
@@ -323,6 +324,7 @@ public class EditorFactory
             // configure data binding
             Method modelGetter = listModel.getClass().getMethod("toArray");
             bindingOutParam[0] = new JComponentDataBinding(listModel, modelGetter, null, property);
+            bindingOutParam[0].setUpdateStrategy(Binding.UpdateStrategy.READ_ONCE);
 
             // populate listmodel with property's values
             Collection values = (Collection)property.getValue();

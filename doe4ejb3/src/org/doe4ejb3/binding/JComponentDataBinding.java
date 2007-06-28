@@ -18,28 +18,32 @@ import java.util.HashSet;
 import org.doe4ejb3.util.ReflectionUtils;
 
 
-public class JComponentDataBinding 
+public class JComponentDataBinding extends Binding
 {
-    private Object comp;
-    private Method compGetter;
+    private Object  componentUI;
+    private Method  componentDataGetter;
     private PropertyEditor editor;
     private Property entityProperty;
     
     
-    public JComponentDataBinding(Object comp, Method compGetter, PropertyEditor editor, Property entityProperty) 
+    public JComponentDataBinding(Object componentUI, Method componentDataGetter, PropertyEditor editor, Property entityProperty) 
     {
-        this.comp = comp;
-        this.compGetter = compGetter;
+        this.componentUI = componentUI;
+        this.componentDataGetter = componentDataGetter;
         this.editor = editor;
         this.entityProperty = entityProperty;
-
+        setUpdateStrategy(UpdateStrategy.READ_ONCE);
     }
     
-    void commit() throws IllegalAccessException, InvocationTargetException
+    
+    @Override
+    void commitChanges() throws IllegalStateException, IllegalAccessException, InvocationTargetException
     {
+        super.commitChanges();
+                
         try {
         
-            Object value = ReflectionUtils.getMemberValue(comp, compGetter); 
+            Object value = ReflectionUtils.getMemberValue(componentUI, componentDataGetter); 
             
             Class memberClass = entityProperty.getType();
             boolean convertToCollection = java.util.Collection.class.isAssignableFrom(memberClass);
