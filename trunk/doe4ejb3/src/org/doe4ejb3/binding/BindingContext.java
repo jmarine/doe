@@ -2,23 +2,16 @@
  * BindingContext.java
  * 
  * Created on Jun 27, 2007, 9:13:57 PM
- * 
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * @author Jordi Marine Fort
  */
 
 package org.doe4ejb3.binding;
 
 import java.util.ArrayList;
 
-/**
- *
- * @author jordi
- */;
+
 public class BindingContext extends ArrayList<JComponentDataBinding> {
     
-    private boolean bindActive = true;
-
     public BindingContext() {
     }
     
@@ -32,25 +25,36 @@ public class BindingContext extends ArrayList<JComponentDataBinding> {
     
     public void commitUncommittedValues()
     {
-        if(bindActive) {
-            for(JComponentDataBinding binding : this) {
-                try {
-                    binding.commit();
-                } catch(Exception ex) {
-                    throw new PropertyResolverException("Binding error", binding, null, ex);
-                }
+        for(JComponentDataBinding binding : this) {
+            try {
+                binding.commitChanges();
+            } catch(Exception ex) {
+                throw new PropertyResolverException("Binding error", binding, null, ex);
             }
-        }
+         }
     }
     
     public void bind()
     {
-        bindActive = true;
+        for(JComponentDataBinding binding : this) {
+            try {
+                binding.bind();
+            } catch(Exception ex) {
+                throw new PropertyResolverException("Binding error", binding, null, ex);
+            }
+        }
+
     }
     
     public void unbind()
     {
-        bindActive = false;
+        for(JComponentDataBinding binding : this) {
+            try {
+                binding.unbind();
+            } catch(Exception ex) {
+                throw new PropertyResolverException("Unbinding error", binding, null, ex);
+            }
+        }
     }
     
 }

@@ -2,17 +2,12 @@
  * PropertyResolverException.java
  * 
  * Created on Jun 27, 2007, 9:20:23 PM
- * 
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
+ * @author Jordi Marine Fort
  */
 
 package org.doe4ejb3.binding;
 
-/**
- *
- * @author jordi
- */
+
 public class PropertyResolverException extends java.lang.RuntimeException
 {
     public PropertyResolverException(String msg, Object source, String path)
