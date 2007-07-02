@@ -393,14 +393,29 @@ public class EditorFactory
                                 EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
                                 listenerList.add(EntityListener.class, new EntityListener() {
                                     public void entityChanged(EntityEvent event) {
-                                        if(event.getEventType() == EntityEvent.ENTITY_UPDATE) {
-                                            // update JTable
-                                            System.out.println("EditorFactory: searching index of OldEntity = " + event.getOldEntity());
-                                            System.out.println("EditorFactory: searching index of NewEntity = " + event.getNewEntity());
-                                            int index = listModel.indexOf(event.getOldEntity());
-                                            System.out.println("EditorFactory: index found =  " + index);
-                                            if(index != -1) listModel.setElementAt(event.getNewEntity(), index);
-                                            else listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
+                                        int index;
+                                        switch(event.getEventType())
+                                        { 
+                                            case EntityEvent.ENTITY_UPDATE:
+                                                // update JTable
+                                                System.out.println("EditorFactory: searching index of OldEntity = " + event.getOldEntity());
+                                                System.out.println("EditorFactory: searching index of NewEntity = " + event.getNewEntity());
+                                                index = listModel.indexOf(event.getOldEntity());
+                                                System.out.println("EditorFactory: index found =  " + index);
+                                                if(index != -1) listModel.setElementAt(event.getNewEntity(), index);
+                                                else listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
+                                                break;
+                                                
+                                            case EntityEvent.ENTITY_DELETE:
+                                                System.out.println("EditorFactory: searching index of OldEntity = " + event.getOldEntity());
+                                                index = listModel.indexOf(event.getOldEntity());
+                                                System.out.println("EditorFactory: index found =  " + index);
+                                                if(index != -1) listModel.removeElementAt(index);
+                                                else listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
+                                                break;
+                                            
+                                            default:
+                                                System.out.println("EditorFactory: event type not expected: " + event.getEventType());
                                         }
                                     }
                                 });
