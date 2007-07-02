@@ -817,6 +817,46 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 
             }
         });
+
+        JButton btnDelete = new JButton("Delete");
+        btnDelete.setMnemonic('d');
+        btnDelete.setActionCommand("delete");
+        btnDelete.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/org/doe4ejb3/gui/resources/delete.png")));
+        btnDelete.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete this object?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+                if(confirm == JOptionPane.OK_OPTION) 
+                {                
+                    try {
+                        // TODO: convert to asynchronous action
+                        iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                        Object entity = editor.getEntity();
+                        JPAUtils.removeEntity(getConnectionParams(), entity);
+                        showStatus(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
+
+                        EntityEvent entityEvent = new EntityEvent(evt.getSource(), EntityEvent.ENTITY_DELETE, entity, null);
+                        EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                        Object[] listeners = listenerList.getListenerList();
+                        for (int i = listeners.length-2; i>=0; i-=2) {
+                            if (listeners[i]==EntityListener.class) {
+                                System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
+                                ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
+                            }
+                        }
+
+                        iFrame.dispose();
+                    } catch(Exception ex) {
+                        iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                        showStatus(MessageFormat.format("Error deleting {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
+                        ex.printStackTrace();
+                    } finally {
+                        iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                    }
+                }
+                
+            }
+        });
+       
         
         JButton btnClose = new JButton("Close");
         btnClose.setMnemonic('c');
@@ -855,8 +895,8 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         buttons.add(btnSave);
         if(!editor.isNew()) {
             //buttons.add(new javax.swing.JSeparator());
+            buttons.add(btnDelete);
             buttons.add(btnPrint);
-            //TODO: buttons.add(btnDelete);
             ActionMap actionMap = application.ApplicationContext.getInstance().getActionMap(entityClass, editor.getEntity());
             if( (actionMap != null) && (actionMap.keys() != null) ) {
                 for(Object action : actionMap.keys()) {
