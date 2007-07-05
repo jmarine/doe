@@ -145,6 +145,7 @@ public class EditorFactory
 
                     // define combobox prototype dimensions
                     EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, true);
+                    combo.setMinimumSize(new java.awt.Dimension(50,26));  // it was too wided
                     combo.setTransferHandler(entityTransferHandler);
                     combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");
                     for(int i = 0; i < 10; i++) combo.addItem(null);
@@ -241,13 +242,11 @@ public class EditorFactory
                     JTextComponent textField = null;
                     if( (maxLength >= 0) && (maxLength < 100) ) {
                         textField = (maxLength > 0) ? new JTextField(maxLength) : new JTextField();
-                        // textField.setPreferredSize(new java.awt.Dimension(150, 32));
                         compGetter = textField.getClass().getMethod("getText");
                         comp = textField;
                         comp.putClientProperty("fixedSize", "true");
                     } else {
                         textField = new javax.swing.JTextPane();
-                        //textField.setPreferredSize(new java.awt.Dimension(400, 80));
                         compGetter = textField.getClass().getMethod("getText");
                         binding = new JComponentDataBinding(textField, compGetter, editor, property);                        
                         comp = new JScrollPane(textField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
