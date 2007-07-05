@@ -260,7 +260,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
         getContentPane().add(jStatusPanel, java.awt.BorderLayout.SOUTH);
 
-        jSplitPaneCentral.setDividerLocation(300);
+        jSplitPaneCentral.setDividerLocation(200);
         jSplitPaneCentral.setLeftComponent(jOutlinePanePersistenceUnits);
         jSplitPaneCentral.setRightComponent(jScrollDesktopPane);
 
@@ -348,6 +348,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private void taskMonitorPropertyChange(java.beans.PropertyChangeEvent evt) {                                     
         String propertyName = evt.getPropertyName();
         if ("started".equals(propertyName)) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             if (!busyIconTimer.isRunning()) {
                 jStatusAnimationLabel.setIcon(busyIcons[0]);
                 busyIconIndex = 0;
@@ -361,6 +362,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             jStatusAnimationLabel.setIcon(idleIcon);
             jProgressBar.setVisible(false);
             jProgressBar.setValue(0);
+            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
         else if ("message".equals(propertyName)) {
             String text = (String)(evt.getNewValue());
@@ -746,7 +748,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         JInternalFrame iFrame = openedInternalFrames.get(key);
 
         if(iFrame == null) {
-            iFrame = createInternalFrameEntityEditor(entityClass, entity);
+            iFrame = new EntityEditorFrame(entityClass, entity);
             iFrame.addInternalFrameListener(new InternalFrameAdapter() {
                 public void internalFrameClosed(InternalFrameEvent evt) {
                     openedInternalFrames.remove(key);
@@ -763,163 +765,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         
         return iFrame;
     }
-    
 
-    private JInternalFrame createInternalFrameEntityEditor(final Class entityClass, Object entity) throws Exception 
-    {
-        showStatus("");
-        String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass);
-        if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
-        else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
-        
-        System.out.println("Creating internal frame");
-        final JInternalFrame iFrame = new JInternalFrame(title, true, true, true, false );
-        iFrame.setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
-        iFrame.putClientProperty("entityListeners", new EventListenerList());
-        
-        System.out.println("Preparing editor ");
-        final EntityEditorInterface editor = EditorFactory.getEntityEditor(entityClass);
-        if(entity == null) editor.newEntity(entityClass);
-        else editor.setEntity(entity);
-        
-        System.out.println("Preparing buttons...");
-        JButton btnSave = new JButton("Save");
-        btnSave.setMnemonic('s');
-        btnSave.setActionCommand("save");
-        btnSave.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/org/doe4ejb3/gui/resources/save.png")));
-        btnSave.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                try {
-                    // TODO: convert to asynchronous action
-                    iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    Object oldEntity = editor.getEntity();
-                    Object newEntity = JPAUtils.saveEntity(getConnectionParams(), oldEntity);
-                    showStatus(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
-                    
-                    EntityEvent entityEvent = new EntityEvent(evt.getSource(), editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
-                    EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
-                    Object[] listeners = listenerList.getListenerList();
-                    for (int i = listeners.length-2; i>=0; i-=2) {
-                        if (listeners[i]==EntityListener.class) {
-                            System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
-                            ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
-                        }
-                    }
-                    
-                    iFrame.dispose();
-                } catch(Exception ex) {
-                    iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    showStatus(MessageFormat.format("Error saving {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
-                    ex.printStackTrace();
-                } finally {
-                    iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                }
-                
-            }
-        });
-
-        JButton btnDelete = new JButton("Delete");
-        btnDelete.setMnemonic('d');
-        btnDelete.setActionCommand("delete");
-        btnDelete.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/org/doe4ejb3/gui/resources/delete.png")));
-        btnDelete.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete this object?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
-                if(confirm == JOptionPane.OK_OPTION) 
-                {                
-                    try {
-                        // TODO: convert to asynchronous action
-                        iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                        Object entity = editor.getEntity();
-                        JPAUtils.removeEntity(getConnectionParams(), entity);
-                        showStatus(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
-
-                        EntityEvent entityEvent = new EntityEvent(evt.getSource(), EntityEvent.ENTITY_DELETE, entity, null);
-                        EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
-                        Object[] listeners = listenerList.getListenerList();
-                        for (int i = listeners.length-2; i>=0; i-=2) {
-                            if (listeners[i]==EntityListener.class) {
-                                System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
-                                ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
-                            }
-                        }
-
-                        iFrame.dispose();
-                    } catch(Exception ex) {
-                        iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                        showStatus(MessageFormat.format("Error deleting {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
-                        ex.printStackTrace();
-                    } finally {
-                        iFrame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    }
-                }
-                
-            }
-        });
-       
-        
-        JButton btnClose = new JButton("Close");
-        btnClose.setMnemonic('c');
-        btnClose.setActionCommand("close");
-        btnClose.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/org/doe4ejb3/gui/resources/cancel.png")));        
-        btnClose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                iFrame.dispose();
-            }
-        });
-        
-        JButton btnPrint = new JButton("Print");
-        btnPrint.setMnemonic('p');
-        btnPrint.setActionCommand("print");
-        btnPrint.setIcon(new javax.swing.ImageIcon(this.getClass().getResource("/org/doe4ejb3/gui/resources/print.png")));
-        btnPrint.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                if(editor instanceof Printable) {
-                    PrinterJob printJob = PrinterJob.getPrinterJob();
-                    printJob.setPrintable((Printable)editor);
-                    if (printJob.printDialog()) {
-                        try {
-                            printJob.print();
-                        } catch(PrinterException pe) {
-                            System.out.println("Error printing: " + pe);
-                        }                    
-                    }
-                } else {
-                    PrintUtils.printComponent((Component)editor);
-                }
-            }
-        });
-        
-       
-        JPanel buttons = new JPanel();
-        buttons.add(btnSave);
-        if(!editor.isNew()) {
-            //buttons.add(new javax.swing.JSeparator());
-            buttons.add(btnDelete);
-            buttons.add(btnPrint);
-            ActionMap actionMap = application.ApplicationContext.getInstance().getActionMap(entityClass, editor.getEntity());
-            if( (actionMap != null) && (actionMap.keys() != null) ) {
-                for(Object action : actionMap.keys()) {
-                    JButton btnAction = new JButton(actionMap.get(action));
-                    buttons.add(btnAction);
-                }
-            }
-        }
-        buttons.add(btnClose);
-        
-
-        JScrollPane scrollPaneForEditor = new JAutoScrollPaneOnComponentFocus((java.awt.Container)editor, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        
-        iFrame.getContentPane().setLayout(new BorderLayout());
-        iFrame.getContentPane().add(scrollPaneForEditor, BorderLayout.CENTER);
-        iFrame.getContentPane().add(buttons, BorderLayout.SOUTH);
-
-        iFrame.pack();
-
-        return iFrame;
-    }
-    
- 
     // </editor-fold>
 
     
