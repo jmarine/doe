@@ -16,23 +16,27 @@ import java.awt.print.*;
 public class PrintUtils implements Printable {
   private Component componentToBePrinted;
 
-  public static void printComponent(Component c) {
-    new PrintUtils(c).print();
+  public static boolean printComponent(Component c) {
+      PrintUtils tool = new PrintUtils(c);
+      return tool.print();
   }
   
-  public PrintUtils(Component componentToBePrinted) {
+  protected PrintUtils(Component componentToBePrinted) {
     this.componentToBePrinted = componentToBePrinted;
   }
   
-  public void print() {
+  public boolean print() {
     PrinterJob printJob = PrinterJob.getPrinterJob();
     printJob.setPrintable(this);
-    if (printJob.printDialog())
-      try {
-        printJob.print();
-      } catch(PrinterException pe) {
-        System.out.println("Error printing: " + pe);
-      }
+    if (printJob.printDialog()) {
+        try {
+            printJob.print();
+            return true;
+        } catch(PrinterException pe) {
+            System.out.println("Error printing: " + pe);
+        }
+    }
+    return false;
   }
 
   public int print(Graphics g, PageFormat pf, int pageIndex) {
