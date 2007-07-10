@@ -212,20 +212,27 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
             @Override 
             protected Void doInBackground() 
             {        
+                boolean printJobSubmited = false;
                 setMessage(MessageFormat.format("Printing {0}.", JPAUtils.getEntityName(entityClass)));                    
-                if(editor instanceof Printable) {
-                    PrinterJob printJob = PrinterJob.getPrinterJob();
-                    printJob.setPrintable((Printable)editor);
-                    if (printJob.printDialog()) {
-                        try {
+                try {
+                    if(editor instanceof Printable) {
+                        PrinterJob printJob = PrinterJob.getPrinterJob();
+                        printJob.setPrintable((Printable)editor);
+                        if(printJob.printDialog()) {
                             printJob.print();
-                        } catch(PrinterException pe) {
-                            System.out.println("Error printing: " + pe);
-                        }                    
+                            printJobSubmited = true;
+                        }
+                    } else {
+                        printJobSubmited = PrintUtils.printComponent((Component)editor);
                     }
-                } else {
-                    PrintUtils.printComponent((Component)editor);
-                }
+                    if(printJobSubmited) setMessage("Printing job has been submited");
+                    else setMessage("Printing job has been cancelled");
+                } catch(PrinterException pe) {
+                    setMessage("Printing error: " + pe.getMessage());
+                    System.out.println("Printing error: " + pe.getMessage());
+                    pe.printStackTrace();
+                }                    
+                
                 return null;
             }
         };
