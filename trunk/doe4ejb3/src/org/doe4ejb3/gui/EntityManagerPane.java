@@ -18,9 +18,7 @@ import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.DefaultListModel;
 import javax.swing.ListSelectionModel;
@@ -40,6 +38,7 @@ public class EntityManagerPane extends javax.swing.JPanel
     private Class entityClass = null;
     private CustomQueryEditorImpl customQueryEditor = null;
     private QueryParametersEditorImpl queryParametersPanel = null;
+    private JComponent entityListEditor = null;
     private ListSelectionModel listSelectionModel = null;
     private DefaultListModel   listModel = null;
     
@@ -53,7 +52,7 @@ public class EntityManagerPane extends javax.swing.JPanel
         try {
             // post initialization:
             JComponentDataBinding outBinding[] = new JComponentDataBinding[1];
-            JComponent entityListEditor = EditorFactory.getCollectionEditor(null, entityClass, true, outBinding);
+            entityListEditor = EditorFactory.getCollectionEditor(null, entityClass, true, outBinding);
             listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");
             listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");
 
@@ -383,24 +382,24 @@ public class EntityManagerPane extends javax.swing.JPanel
      * An example task showing how to create tasks for asynchronous actions
      * running on background and indicating their progress.
      */
-    private class SearchEntitiesTask extends application.Task<Void, Void> 
+    private class SearchEntitiesTask extends application.Task<List, Void> 
     {
-        private boolean ok = false;
-        @Override protected Void doInBackground() 
+        @Override 
+        protected List doInBackground() throws Exception
         {
+            List entities = null;
             try {
-                List entities = null;
                 EntityManagerPane.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 DomainObjectExplorer.getInstance().showStatus("Searching...");
                 if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
                     entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass);
-                } else if(jComboBoxNamedQuery.getSelectedIndex() == 1) {   // Custom
 
+                } else if(jComboBoxNamedQuery.getSelectedIndex() == 1) {   // Custom query editor
                     String ejbql = customQueryEditor.prepareEJBQL();
                     HashMap parameterValues = customQueryEditor.prepareParameterValues();
                     entities = JPAUtils.executeQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, ejbql, parameterValues);
 
-                } else if(jComboBoxNamedQuery.getSelectedIndex() > 1) {
+                } else {  // NamedQuery: jComboBoxNamedQuery.getSelectedIndex() > 1
                     ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
                     NamedQuery namedQuery = (NamedQuery)listItem.getValue();
                     HashMap parameterValues = null;
@@ -408,26 +407,53 @@ public class EntityManagerPane extends javax.swing.JPanel
                     entities = JPAUtils.executeNamedQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, namedQuery.name(), parameterValues);
                 }
 
-                listModel.clear();
-                if(entities.size() > 0) {
-                    for(Object obj : entities) listModel.addElement(obj);
-                }
-
-                DomainObjectExplorer.getInstance().showStatus(MessageFormat.format("Search done: {0} entities found", entities.size()));
-                ok = true;
-
-            } catch(Exception ex) {
-                DomainObjectExplorer.getInstance().showStatus("Error: " + ex.getMessage());
-                ex.printStackTrace();
             } finally {
                 EntityManagerPane.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-            }        
-            return null;
+            }    
+            
+            return entities;
+        }
+
+        @Override
+        protected void cancelled() 
+        {
+            setMessage("Search cancelled.");
+        }        
+        
+        @Override
+        protected void succeeded(List result) 
+        {
+            int count = 0;
+            if(result != null) {
+                //JTable table = (JTable)entityListEditor.getClientProperty("table");
+                //table.setIgnoreRepaint(true);
+                listModel.clear();
+                if (result.size() > 0) {
+                    for (java.lang.Object obj : result) {
+                        listModel.addElement(obj);
+                        count++;
+                    }
+                }
+                //table.setIgnoreRepaint(false);
+                //table.repaint();
+            }
+            
+            setMessage(MessageFormat.format("Search done: {0} entities found", count));
         }
         
-        protected void finished() {
-            // DomainObjectExplorer.getInstance().showStatus("done");
+
+        @Override
+        protected void interrupted(InterruptedException ex) 
+        {
+            setMessage("Search interrupted: " + ex.getMessage());
         }
+        
+        @Override
+        protected void failed(Throwable cause) 
+        {
+            setMessage("Error: " + cause.getClass().getName() + ":" + getMessage());
+            cause.printStackTrace();
+        }         
     }
 
 }
