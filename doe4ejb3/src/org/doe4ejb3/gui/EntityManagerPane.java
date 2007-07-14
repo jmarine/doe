@@ -446,6 +446,7 @@ public class EntityManagerPane extends javax.swing.JPanel
         protected void interrupted(InterruptedException ex) 
         {
             setMessage("Search interrupted: " + ex.getMessage());
+            cause.printStackTrace();
         }
         
         @Override
