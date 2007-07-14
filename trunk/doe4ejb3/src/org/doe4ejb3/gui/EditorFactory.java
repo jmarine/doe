@@ -316,6 +316,8 @@ public class EditorFactory
         final ObjectPropertyTableModel objectPropertyTableModel = new ObjectPropertyTableModel(memberClass, listModel);
         final EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, !isManagerWindow);
         
+        panel.putClientProperty("scrollPane", scrollableItems);
+        panel.putClientProperty("table", jTable);
         panel.putClientProperty("listModel", listModel);
         panel.putClientProperty("listSelectionModel", listSelectionModel);
         
