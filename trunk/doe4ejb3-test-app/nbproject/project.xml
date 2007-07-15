@@ -15,6 +15,10 @@
                     <file>${reference.doe4ejb3-test-ejb3.jar}</file>
                     <path-in-war>/</path-in-war>
                 </library>
+                <library files="1">
+                    <file>${file.reference.postgresql-8.2-504.jdbc4.jar}</file>
+                    <path-in-war>/</path-in-war>
+                </library>
             </web-module-additional-libraries>
         </data>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">

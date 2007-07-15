@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+  <jdbc-resource enabled="true" jndi-name="jdbc/doe4ejb3" object-type="user" pool-name="doeTestPool">
+    <description>DOE test database</description>
+  </jdbc-resource>
+</resources>
