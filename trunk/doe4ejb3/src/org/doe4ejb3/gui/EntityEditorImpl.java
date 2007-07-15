@@ -270,8 +270,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
             if(embedded) {
                 // TO TEST:
                 try {
-                    EntityEditorImpl ee = new EntityEditorImpl(embedded);
-                    comp = ee;
+                    EntityEditorInterface ee = EditorFactory.getEntityEditor(memberClass, true);
+                    comp = (Component)ee;
 
                     compGetter = ee.getClass().getMethod("getEntity");
                     Object value = entityProperty.getValue();

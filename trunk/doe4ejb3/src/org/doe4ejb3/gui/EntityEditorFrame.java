@@ -46,7 +46,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         putClientProperty("entityListeners", new EventListenerList());
         
         System.out.println("Preparing editor ");
-        editor = EditorFactory.getEntityEditor(entityClass);
+        editor = EditorFactory.getEntityEditor(entityClass, false);
         if(entity == null) {
             editor.newEntity(entityClass);
             jButtonDelete.setVisible(false);
