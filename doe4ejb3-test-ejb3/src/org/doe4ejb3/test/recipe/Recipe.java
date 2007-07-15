@@ -12,6 +12,7 @@
  * See the License for the specific language governing permissions and limitations under the License.
  */
 package org.doe4ejb3.test.recipe;
+import application.Action;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -26,6 +27,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -47,6 +49,8 @@ public class Recipe implements java.io.Serializable
     private String description;
 
     private Date date;
+    
+    private byte photo[];
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -139,9 +143,28 @@ public class Recipe implements java.io.Serializable
         this.instructions = instructions;
     }
     
+   @PropertyDescriptor(index=7,editorClassName="org.doe4ejb3.editor.ImagePropertyEditor",displayName="Photo")
+   @Lob
+   @Column(name = "PHOTO", columnDefinition="BLOB")
+   public byte[] getPhoto()
+   {
+        return this.photo;
+   }
+
+   public void setPhoto(byte photo[])
+   {
+        this.photo = photo;
+   }    
+    
     public String toString()
     {
         return title;
+    }
+    
+    @Action
+    public void cookIt()
+    {
+        System.out.println("Not implemented");
     }
 
 }
