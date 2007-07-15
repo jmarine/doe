@@ -84,7 +84,7 @@ public class EditorFactory
     /**
      * Creates a new instance of EditorFactory
      */
-    public static EntityEditorInterface getEntityEditor(Class entityClass) throws ClassNotFoundException, IllegalAccessException, InstantiationException
+    public static EntityEditorInterface getEntityEditor(Class entityClass, boolean embedded) throws ClassNotFoundException, IllegalAccessException, InstantiationException
     {
         // search for @EntityDescriptor annotation in @Entity/@Embedded class.
         EntityEditorInterface entityEditor = null;
@@ -92,7 +92,7 @@ public class EditorFactory
         if( (editorAnnotation != null) && (editorAnnotation.editorClassName() != null) && (editorAnnotation.editorClassName().length() > 0) ) {
             entityEditor = (EntityEditorInterface)Class.forName(editorAnnotation.editorClassName()).newInstance();
         } else {
-            entityEditor = new EntityEditorImpl();
+            entityEditor = new EntityEditorImpl(embedded);
         }
         return entityEditor;
     }
@@ -121,91 +121,124 @@ public class EditorFactory
         }
         
         org.doe4ejb3.beans.TemporalTypeEditorSupport.registerTemporalTypeEditors();
-        if(memberClass.getAnnotation(javax.persistence.Entity.class) != null) {
-            if(isCollection) {
-                // OneToMany || ManyToMany
-                try {
-                    System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
-                    JComponentDataBinding bindingOutParam[] = new JComponentDataBinding[1];
-                    comp = getCollectionEditor(property, memberClass, false, bindingOutParam);
-                    binding = bindingOutParam[0];
 
-                } catch(Exception ex) {
-                    System.out.println("Error loading property: " + ex.getMessage());
-                    ex.printStackTrace();
-                }
-            
-            } else {
-                
-                // OneToOne || ManyToOne
-                try {
-                    final javax.swing.DefaultComboBoxModel comboBoxModel = new javax.swing.DefaultComboBoxModel();
-                    final JComboBox combo = new JComboBox(comboBoxModel);
-                    final Class optionClass = memberClass;
+        
+        // relations editors
+        if(comp == null) {
+            if(memberClass.getAnnotation(javax.persistence.Entity.class) != null) {
+                if(isCollection) {
+                    // OneToMany || ManyToMany
+                    try {
+                        System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
+                        JComponentDataBinding bindingOutParam[] = new JComponentDataBinding[1];
+                        comp = getCollectionEditor(property, memberClass, false, bindingOutParam);
+                        binding = bindingOutParam[0];
 
-                    // define combobox prototype dimensions
-                    EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, true);
-                    combo.setMinimumSize(new java.awt.Dimension(50,26));  // it was too wided
-                    combo.setTransferHandler(entityTransferHandler);
-                    combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");
-                    for(int i = 0; i < 10; i++) combo.addItem(null);
-
-                    combo.addPopupMenuListener(new PopupMenuListener() {
-                        public void popupMenuCanceled(PopupMenuEvent e) { }
-                        public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
-                        public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                            // Lazy load of drop-down list items:
-                            if(combo.getClientProperty("lazyModel") == null) 
-                            {
-                                try {
-                                    combo.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                                    Object selectedItem = comboBoxModel.getSelectedItem();
-                                    comboBoxModel.removeAllElements();
-                                    comboBoxModel.addElement(null);
-                                    System.out.println("Searching items!!!");
-                                    for(Object option : JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), optionClass).toArray()) {
-                                        comboBoxModel.addElement(option);
-                                    }
-                                    comboBoxModel.setSelectedItem(selectedItem);
-                                
-                                    combo.putClientProperty("lazyModel", comboBoxModel);
-                                    // combo.hidePopup();
-                                    // combo.showPopup();
-
-                                    // combo.getUI().setPopupVisible( combo, true );
-                                    
-                                } finally {
-                                    combo.putClientProperty("lazyModel", null);
-                                    combo.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                                }
-                            }
-                            
-                        }
-                    });
-
-                    comp = combo;
-                    compGetter = comp.getClass().getMethod("getSelectedItem");
-
-                    Object value = property.getValue();
-                    if(value != null) {
-                        combo.addItem(value);
-                        combo.setSelectedItem(value);
-                    } else {
-                        combo.setSelectedIndex(0);
+                    } catch(Exception ex) {
+                        System.out.println("Error loading property: " + ex.getMessage());
+                        ex.printStackTrace();
                     }
-                    
-                } catch(Exception ex) {
-                    System.out.println("Error loading property: " + ex.getMessage());
-                    ex.printStackTrace();
+
+                } else {
+
+                    // OneToOne || ManyToOne
+                    try {
+                        final javax.swing.DefaultComboBoxModel comboBoxModel = new javax.swing.DefaultComboBoxModel();
+                        final JComboBox combo = new JComboBox(comboBoxModel);
+                        final Class optionClass = memberClass;
+
+                        // define combobox prototype dimensions
+                        EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, true);
+                        combo.setMinimumSize(new java.awt.Dimension(50,26));  // it was too wided
+                        combo.setTransferHandler(entityTransferHandler);
+                        combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");
+                        for(int i = 0; i < 10; i++) combo.addItem(null);
+
+                        combo.addPopupMenuListener(new PopupMenuListener() {
+                            public void popupMenuCanceled(PopupMenuEvent e) { }
+                            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
+                            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                                // Lazy load of drop-down list items:
+                                if(combo.getClientProperty("lazyModel") == null) 
+                                {
+                                    try {
+                                        combo.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                                        Object selectedItem = comboBoxModel.getSelectedItem();
+                                        comboBoxModel.removeAllElements();
+                                        comboBoxModel.addElement(null);
+                                        System.out.println("Searching items!!!");
+                                        for(Object option : JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), optionClass).toArray()) {
+                                            comboBoxModel.addElement(option);
+                                        }
+                                        comboBoxModel.setSelectedItem(selectedItem);
+
+                                        combo.putClientProperty("lazyModel", comboBoxModel);
+                                        // combo.hidePopup();
+                                        // combo.showPopup();
+
+                                        // combo.getUI().setPopupVisible( combo, true );
+
+                                    } finally {
+                                        combo.putClientProperty("lazyModel", null);
+                                        combo.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                                    }
+                                }
+
+                            }
+                        });
+
+                        comp = combo;
+                        compGetter = comp.getClass().getMethod("getSelectedItem");
+
+                        Object value = property.getValue();
+                        if(value != null) {
+                            combo.addItem(value);
+                            combo.setSelectedItem(value);
+                        } else {
+                            combo.setSelectedIndex(0);
+                        }
+
+                    } catch(Exception ex) {
+                        System.out.println("Error loading property: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
+                }
+
+            } 
+        }
+
+        
+        // custom property editors
+        if(comp == null) {
+            if(property instanceof ObjectProperty) {
+                ObjectProperty objectProperty = (ObjectProperty)property;
+                org.doe4ejb3.annotation.PropertyDescriptor pd = (org.doe4ejb3.annotation.PropertyDescriptor)objectProperty.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
+                if( (pd != null) && (pd.editorClassName() != null) && (pd.editorClassName().length() > 0) ) {
+                    try {
+                        org.doe4ejb3.gui.PropertyEditorInterface propertyComponent  = (org.doe4ejb3.gui.PropertyEditorInterface)Class.forName(pd.editorClassName()).newInstance();
+                        comp = propertyComponent.getJComponent();
+
+                        Method editorGetter = propertyComponent.getClass().getMethod("getValue");
+                        Object value = property.getValue();
+                        if(value != null) propertyComponent.setValue(value);
+
+                        binding = new JComponentDataBinding(propertyComponent, editorGetter, null, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).                
+                    } catch(Exception ex) {
+                        comp = null;
+                        System.out.println("Error creating custom property editor: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }
                 }
             }
-            
-        } else {
-            
+        }
+
+        
+        // normal property editors
+        if(comp == null) {
             try {
                 editor = findEditor(memberClass);
                 System.out.println("EditorFactory: property editor for " + memberClass.getName() + "=" + editor);
-                
+
                 Component customComponent = null;
                 if( (editor != null) && (editor.supportsCustomEditor()) && ((customComponent = editor.getCustomEditor()) != null) ) {
                     if(customComponent instanceof JComponent) {
@@ -222,7 +255,7 @@ public class EditorFactory
                     if(value != null) editor.setValue(value);
 
                     binding = new JComponentDataBinding(editor, editorGetter, null, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).
-                    
+
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
                     JCheckBox checkBox = new JCheckBox();
                     comp = checkBox;
@@ -236,7 +269,7 @@ public class EditorFactory
                     if(value != null) {
                         checkBox.setSelected(value.booleanValue());
                     }
-                    
+
                 } else { // using JTextField or JTextArea depending on Column's length attribute
 
                     JTextComponent textField = null;
@@ -257,7 +290,7 @@ public class EditorFactory
                         AbstractDocument doc = (AbstractDocument)textField.getDocument();
                         doc.setDocumentFilter(new DocumentSizeFilter(maxLength));
                     }
-                    
+
                     Object value = property.getValue();
                     if(value != null) {
                         if(editor != null) {
@@ -272,7 +305,6 @@ public class EditorFactory
                 System.out.println("Error: " + ex.getMessage());
                 ex.printStackTrace();
             }
-
         }
 
             
@@ -287,6 +319,7 @@ public class EditorFactory
                 ((JComponent)comp).putClientProperty("dataBinding", binding);
             }
         }
+        
         return comp;
     }
     

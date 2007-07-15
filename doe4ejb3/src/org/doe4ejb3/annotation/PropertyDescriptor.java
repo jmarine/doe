@@ -12,10 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- *
- * @author Jordi Marine Fort
- */
+
 @Target({ElementType.METHOD, ElementType.FIELD}) 
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertyDescriptor {
@@ -25,4 +22,6 @@ public @interface PropertyDescriptor {
     String format() default "";
     boolean showInLists() default false;
     OptionDescriptor[] options() default {};
+    String editorClassName() default "";
+    boolean hidden() default false;
 }
