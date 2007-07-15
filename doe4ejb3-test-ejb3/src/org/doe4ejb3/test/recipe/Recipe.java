@@ -143,7 +143,7 @@ public class Recipe implements java.io.Serializable
         this.instructions = instructions;
     }
     
-   @PropertyDescriptor(index=7,editorClassName="org.doe4ejb3.editor.ImagePropertyEditor",displayName="Photo")
+   @PropertyDescriptor(index=7,editorClassName="org.doe4ejb3.gui.ImagePropertyEditor",displayName="Photo")
    @Lob
    @Column(name = "PHOTO", columnDefinition="BLOB")
    public byte[] getPhoto()
