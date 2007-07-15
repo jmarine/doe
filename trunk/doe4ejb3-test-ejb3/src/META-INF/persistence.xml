@@ -13,6 +13,7 @@
     </properties>
   </persistence-unit>
 
+<!--
   <persistence-unit name="Invoice" transaction-type="JTA">
     <jta-data-source>jdbc/doe4ejb3</jta-data-source>
     <class>org.doe4ejb3.test.invoice.Order</class>
@@ -24,8 +25,25 @@
       <property name="toplink.drop-ddl-jdbc-file-name" value="invoice_drop_javadb.jdbc"/>
     </properties>
   </persistence-unit>
+-->
 
-  
-
+<!--
+  <persistence-unit name="ProjectManagement" transaction-type="JTA">
+    <jta-data-source>jdbc/doe4ejb3</jta-data-source>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Department</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Projectchanges</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Navigation</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.UserGroup</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Employee</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Project</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Skill</class>
+    <properties>
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="toplink.create-ddl-jdbc-file-name" value="sap_test_create_javadb.jdbc"/>
+      <property name="toplink.drop-ddl-jdbc-file-name" value="sap_test_drop_javadb.jdbc"/>
+    </properties>
+  </persistence-unit>
+-->
   
 </persistence>
