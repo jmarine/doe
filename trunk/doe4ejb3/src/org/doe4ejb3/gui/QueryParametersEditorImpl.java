@@ -44,6 +44,7 @@ public class QueryParametersEditorImpl extends JPanel
     private final static GridBagConstraints gbcComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,4,6,4), 0,0);
     
     
+    private EntityManagerPane manager = null;
     private HashMap parameterTypes = null;
     private HashMap parameterValues = null;
     private BindingContext bindingContext = null;
@@ -52,7 +53,8 @@ public class QueryParametersEditorImpl extends JPanel
     /**
      * Creates a new instance of QueryParametersEditorImpl
      */
-    public QueryParametersEditorImpl(HashMap parameterTypes) {
+    public QueryParametersEditorImpl(EntityManagerPane manager, HashMap parameterTypes) {
+        this.manager = manager;
         this.parameterTypes = parameterTypes;
         this.parameterValues = new HashMap();
         this.bindingContext = new BindingContext();
@@ -87,7 +89,7 @@ public class QueryParametersEditorImpl extends JPanel
     private void handleParameterProperty(Property property)
     {
         int defaultLength = 20;
-        JComponent comp = EditorFactory.getPropertyEditor(property, defaultLength, TemporalType.TIMESTAMP);
+        JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, defaultLength, TemporalType.TIMESTAMP);
         if(comp != null) {
             JComponentDataBinding binding = (JComponentDataBinding)comp.getClientProperty("dataBinding");
             if(binding != null) bindingContext.addBinding(binding);

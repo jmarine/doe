@@ -44,7 +44,6 @@ public class JPAUtils
 
     private static JAXBContext jc = null;
     private static Hashtable<String, ArrayList<Class>> entityListByPU = new Hashtable<String, ArrayList<Class>>();
-    private static Hashtable puNameByEntity = new Hashtable();
     private static Hashtable<String, Class> classesByPUNameAndEntityName = new Hashtable<String, Class>();
     
     /**
@@ -53,17 +52,25 @@ public class JPAUtils
     private JPAUtils() { }
 
     
-
+    /**
+     * Resolve entity class names from EJBQL sentences
+     * (used in EJBQLUtils.parseEJBQLParameterTypes)
+     */
     public static Class getClassFromEntityName(String puName, String entityName)
     {
         String key = puName + "/" + entityName;
         return classesByPUNameAndEntityName.get(key);
     }
-    
+
+    public static String getPersistenceUnitTitle(String puName)
+    {
+        if((puName == null) || (puName.length() == 0)) puName = "Default PU";
+        return puName;
+    }
     
     public static Collection<String> getPersistenceUnits() throws Exception
     {
-        getPersistentEntities();
+        if(entityListByPU.size() == 0) loadPersistentEntities();
         return entityListByPU.keySet();
     }
     
@@ -73,7 +80,7 @@ public class JPAUtils
     }
 
     
-    private static Collection<Class> getPersistentEntities() throws Exception
+    private static Collection<Class> loadPersistentEntities() throws Exception
     {
         try {
             // GLASSFISHv2 Beta
@@ -136,14 +143,12 @@ public class JPAUtils
                 }
 
                 for( String className : pu.getClazz() ) {
-                    if(!puNameByEntity.containsKey(className)) {
                         System.out.println("> found class: " + className);
                         Class clazz = loader.loadClass(className);
                         Entity entity = (Entity)clazz.getAnnotation(javax.persistence.Entity.class);
                         if(entity != null) {
                             String puName = pu.getName();
                             if(puName == null) puName = "";
-                            puNameByEntity.put(className, puName);
                             
                             String entityName = entity.name();
                             if( (entityName == null) || (entityName.length() == 0) ) entityName = clazz.getSimpleName();
@@ -154,7 +159,6 @@ public class JPAUtils
                             entityList.add(clazz);
                             entityListByPU.put(puName, entityList);
                         }
-                    }
                 }
 
                 for ( String jarName : pu.getJarFile() ) {
@@ -179,11 +183,10 @@ public class JPAUtils
             
             Collection<Class> entityClasses = getPersistentEntitiesFromDirectory(loader, baseDirectory, "");
             for(Class clazz : entityClasses) {
-                Entity entity = (Entity)clazz.getAnnotation(javax.persistence.Entity.class);
-                String className = clazz.getName();
-                if(!puNameByEntity.containsKey(className)) {
+                    Entity entity = (Entity)clazz.getAnnotation(javax.persistence.Entity.class);
+                    String className = clazz.getName();
+
                     System.out.println("> found class: " + className);
-                    puNameByEntity.put(className, defaultPUName);
                     
                     String entityName = entity.name();
                     if( (entityName == null) || (entityName.length() == 0) ) entityName = clazz.getSimpleName();
@@ -193,7 +196,7 @@ public class JPAUtils
                     if(entityList == null) entityList = new ArrayList<Class>();
                     entityList.add(clazz);
                     entityListByPU.put(defaultPUName, entityList);
-                }
+
             }
         }
         
@@ -221,17 +224,6 @@ public class JPAUtils
     }
 
     
-    public static String getPersistentUnitNameForEntity(Class entityClass)
-    {
-        return (String)puNameByEntity.get(entityClass.getName());
-    }
-
-    public static EntityManager getEntityManager(HashMap connectionParams, Class entityClass)
-    {
-        String puName = getPersistentUnitNameForEntity(entityClass);
-        return getEntityManager(connectionParams, puName);
-    }
-    
     public static EntityManager getEntityManager(HashMap connectionParams, String puName)
     {    
         // TODO: the EntityManagerFactory should be pooled and create redefined EntityManager with specific user/password?
@@ -255,10 +247,10 @@ public class JPAUtils
         return entityName;
     }
     
-    public static List findAllEntities(HashMap connectionParams, Class entityClass)
+    public static List findAllEntities(HashMap connectionParams, String puName, Class entityClass)
     {
         String entityName = getEntityName(entityClass);
-        EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, entityClass);
+        EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, puName);
             
         System.out.println("Querying for all " + entityName);
         Query query = manager.createQuery("SELECT OBJECT(e) FROM " + entityName + " e");
@@ -276,9 +268,8 @@ public class JPAUtils
     }
 
 
-    public static List executeQuery(HashMap connectionParams, Class entityClass, String ejbql, HashMap paramValues) 
+    public static List executeQuery(HashMap connectionParams, String puName, String ejbql, HashMap paramValues) 
     {
-        String puName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
         EntityManager manager = JPAUtils.getEntityManager(connectionParams, puName);
         
         javax.persistence.Query query = manager.createQuery(ejbql);
@@ -302,12 +293,11 @@ public class JPAUtils
     }   
 
         
-    public static List executeNamedQuery(HashMap connectionParams, Class entityClass, String queryName, HashMap paramValues) 
+    public static List executeNamedQuery(HashMap connectionParams, String puName, String namedQueryName, HashMap paramValues) 
     {
-        String puName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
         EntityManager manager = JPAUtils.getEntityManager(connectionParams, puName);
         
-        javax.persistence.Query query = manager.createNamedQuery(queryName);
+        javax.persistence.Query query = manager.createNamedQuery(namedQueryName);
         if(paramValues != null) {
             for(Object paramName : paramValues.keySet()) {
                 query.setParameter((String)paramName, paramValues.get(paramName));
@@ -328,11 +318,10 @@ public class JPAUtils
     }   
     
     
-    public static Object createNewEntity(HashMap connectionParams, Object entity)
+    public static Object createNewEntity(HashMap connectionParams, String puName, Object entity)
     {
         if(entity != null) {
-            Class entityClass = entity.getClass();
-            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, entityClass);
+            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, puName);
             EntityTransaction transaction = manager.getTransaction();
             transaction.begin();
             manager.persist(entity);
@@ -346,11 +335,10 @@ public class JPAUtils
     }
 
 
-    public static Object saveEntity(HashMap connectionParams, Object entity)
+    public static Object saveEntity(HashMap connectionParams, String puName, Object entity)
     {
         if(entity != null) {
-            Class entityClass = entity.getClass();
-            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, entityClass);
+            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, puName);
             EntityTransaction transaction = manager.getTransaction();
             transaction.begin();
             entity = manager.merge(entity);
@@ -364,11 +352,10 @@ public class JPAUtils
     }
 
     
-    public static void removeEntity(HashMap connectionParams, Object entity)
+    public static void removeEntity(HashMap connectionParams, String puName, Object entity)
     {
         if(entity != null) {
-            Class entityClass = entity.getClass();
-            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, entityClass);
+            EntityManager manager = org.doe4ejb3.util.JPAUtils.getEntityManager(connectionParams, puName);
             EntityTransaction transaction = manager.getTransaction();
             transaction.begin();
             entity = manager.merge(entity);

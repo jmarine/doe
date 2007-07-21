@@ -14,7 +14,7 @@
               <Image iconType="3" name="/org/doe4ejb3/gui/resources/new.png"/>
             </Property>
             <Property name="mnemonic" type="int" value="110"/>
-            <Property name="text" type="java.lang.String" value="New"/>
+            <Property name="text" type="java.lang.String" resourceKey="newMenu.text"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemNewActionPerformed"/>
@@ -26,7 +26,7 @@
               <Image iconType="3" name="/org/doe4ejb3/gui/resources/manager.png"/>
             </Property>
             <Property name="mnemonic" type="int" value="109"/>
-            <Property name="text" type="java.lang.String" value="Manage"/>
+            <Property name="text" type="java.lang.String" resourceKey="managerMenu.text"/>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItemManagerActionPerformed"/>
@@ -49,6 +49,11 @@
                 </Property>
                 <Property name="mnemonic" type="int" value="110"/>
                 <Property name="text" type="java.lang.String" resourceKey="newMenu.text"/>
+              </Properties>
+            </Menu>
+            <Menu class="javax.swing.JMenu" name="jMenuManage">
+              <Properties>
+                <Property name="text" type="java.lang.String" resourceKey="managerMenu.text"/>
               </Properties>
             </Menu>
             <MenuItem class="javax.swing.JSeparator" name="jSeparator1">

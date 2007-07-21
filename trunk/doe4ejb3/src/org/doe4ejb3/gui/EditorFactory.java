@@ -84,20 +84,21 @@ public class EditorFactory
     /**
      * Creates a new instance of EditorFactory
      */
-    public static EntityEditorInterface getEntityEditor(Class entityClass, boolean embedded) throws ClassNotFoundException, IllegalAccessException, InstantiationException
+    public static EntityEditorInterface getEntityEditor(String puName, Class entityClass, boolean embedded) throws ClassNotFoundException, IllegalAccessException, InstantiationException
     {
         // search for @EntityDescriptor annotation in @Entity/@Embedded class.
         EntityEditorInterface entityEditor = null;
         EntityDescriptor editorAnnotation = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
         if( (editorAnnotation != null) && (editorAnnotation.editorClassName() != null) && (editorAnnotation.editorClassName().length() > 0) ) {
             entityEditor = (EntityEditorInterface)Class.forName(editorAnnotation.editorClassName()).newInstance();
+            entityEditor.setPersistenceUnit(puName);
         } else {
-            entityEditor = new EntityEditorImpl(embedded);
+            entityEditor = new EntityEditorImpl(puName, entityClass, embedded);
         }
         return entityEditor;
     }
     
-    public static JComponent getPropertyEditor(Property property, int maxLength, TemporalType defaultTemporalType)
+    public static JComponent getPropertyEditor(final String puName, Property property, int maxLength, TemporalType defaultTemporalType)
     {
         JComponent comp = null;
         Method compGetter = null;
@@ -131,7 +132,7 @@ public class EditorFactory
                     try {
                         System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
                         JComponentDataBinding bindingOutParam[] = new JComponentDataBinding[1];
-                        comp = getCollectionEditor(property, memberClass, false, bindingOutParam);
+                        comp = getCollectionEditor(puName, property, memberClass, false, bindingOutParam);
                         binding = bindingOutParam[0];
 
                     } catch(Exception ex) {
@@ -167,7 +168,7 @@ public class EditorFactory
                                         comboBoxModel.removeAllElements();
                                         comboBoxModel.addElement(null);
                                         System.out.println("Searching items!!!");
-                                        for(Object option : JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), optionClass).toArray()) {
+                                        for(Object option : JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), puName, optionClass).toArray()) {
                                             comboBoxModel.addElement(option);
                                         }
                                         comboBoxModel.setSelectedItem(selectedItem);
@@ -339,7 +340,7 @@ public class EditorFactory
      * Setup an editor for a multi-valued property 
      * TODO: allow drag and drop operations
      */
-    public static JComponent getCollectionEditor(final Property property, final Class memberClass, final boolean isManagerWindow,JComponentDataBinding bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(final String puName, final Property property, final Class memberClass, final boolean isManagerWindow,JComponentDataBinding bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
         final JTable jTable = new JTable();
         final JScrollPane scrollableItems = new JScrollPane(jTable);
         final JPanel panel = new ComposedEditorHolder(scrollableItems);
@@ -376,7 +377,7 @@ public class EditorFactory
         AbstractAction newAction = new AbstractAction("New", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
-                    JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, null);
+                    JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, memberClass, null);
                     if(!isManagerWindow) {
                         final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
                         listenerList.add(EntityListener.class, new EntityListener() {
@@ -399,7 +400,7 @@ public class EditorFactory
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                        List allValues = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), memberClass);
+                        List allValues = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), puName, memberClass);
                         Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
                         if(newItem != null) {
                             // FIXME: caution with duplicated relations and "Set" collection types.
@@ -423,7 +424,7 @@ public class EditorFactory
                     } else {
                         for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
                             if(listSelectionModel.isSelectedIndex(index)) {
-                                JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(memberClass, listModel.getElementAt(index)); 
+                                JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, memberClass, listModel.getElementAt(index)); 
                                 EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
                                 listenerList.add(EntityListener.class, new EntityListener() {
                                     public void entityChanged(EntityEvent event) {
@@ -483,7 +484,7 @@ public class EditorFactory
                                         System.out.println("EditorFactory: removing selected index: " + index);
                                         if(isManagerWindow) {  // delete command from "EntityManagerPane"
                                             Object entity = listModel.getElementAt(index);
-                                            JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), entity);                                
+                                            JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entity);                                
                                         }
                                         listModel.removeElementAt(index);
                                     }
