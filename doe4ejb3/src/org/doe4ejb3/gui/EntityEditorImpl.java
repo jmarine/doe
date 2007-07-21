@@ -40,8 +40,9 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     private final static GridBagConstraints gbcEmbeddedComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,-3, 5,-3), 0,0);
     private final static GridBagConstraints gbcGlue = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0,0);
     
-    
-    private Object entity = null;
+
+    private String  puName   = null;
+    private Object  entity   = null;
     private boolean objIsNew = false;
     private boolean embedded = false;
     private BindingContext bindingContext = new BindingContext();
@@ -50,12 +51,9 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     /**
      * Creates a new instance of EntityEditorImpl
      */
-    public EntityEditorImpl() {
-        this(false);
-    }    
-    
-    public EntityEditorImpl(boolean embedded) 
+    public EntityEditorImpl(String puName, Class entityClass, boolean embedded) 
     {
+        this.puName = puName;
         this.embedded = embedded;
         setMinimumSize(new java.awt.Dimension(550, 400));
     }
@@ -64,6 +62,11 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     {
         if(bindingContext != null) bindingContext.unbind();
         bindingContext = new BindingContext();
+    }
+    
+    public void setPersistenceUnit(String puName)
+    {
+        this.puName = puName;
     }
     
     public boolean isNew()
@@ -270,7 +273,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
             if(embedded) {
                 // TO TEST:
                 try {
-                    EntityEditorInterface ee = EditorFactory.getEntityEditor(memberClass, true);
+                    EntityEditorInterface ee = EditorFactory.getEntityEditor(puName, memberClass, true);
                     comp = (Component)ee;
 
                     compGetter = ee.getClass().getMethod("getEntity");
@@ -287,7 +290,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                 // Other editors:
                 javax.persistence.TemporalType defaultTemporalType = javax.persistence.TemporalType.TIMESTAMP;
                 if( (temporal != null) && (temporal.value() != null) ) defaultTemporalType = temporal.value();
-                comp = EditorFactory.getPropertyEditor(entityProperty, maxLength, defaultTemporalType);
+                comp = EditorFactory.getPropertyEditor(puName, entityProperty, maxLength, defaultTemporalType);
                 binding = (JComponentDataBinding)((JComponent)comp).getClientProperty("dataBinding");
                 
             }

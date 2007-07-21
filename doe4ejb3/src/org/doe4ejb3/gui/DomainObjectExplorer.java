@@ -152,6 +152,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMainMenuBar = new javax.swing.JMenuBar();
         jMenuFile = new javax.swing.JMenu();
         jMenuNew = new javax.swing.JMenu();
+        jMenuManage = new javax.swing.JMenu();
         jSeparator1 = new javax.swing.JSeparator();
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenuEdit = new javax.swing.JMenu();
@@ -165,7 +166,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
         jMenuItemNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/new.png"))); // NOI18N
         jMenuItemNew.setMnemonic('n');
-        jMenuItemNew.setText("New");
+        jMenuItemNew.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("newMenu.text")); // NOI18N
         jMenuItemNew.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemNewActionPerformed(evt);
@@ -175,7 +176,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
         jMenuItemManager.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/manager.png"))); // NOI18N
         jMenuItemManager.setMnemonic('m');
-        jMenuItemManager.setText("Manage");
+        jMenuItemManager.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
         jMenuItemManager.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemManagerActionPerformed(evt);
@@ -270,6 +271,9 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuNew.setMnemonic('n');
         jMenuNew.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("newMenu.text")); // NOI18N
         jMenuFile.add(jMenuNew);
+
+        jMenuManage.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
+        jMenuFile.add(jMenuManage);
         jMenuFile.add(jSeparator1);
 
         jMenuItemExit.setAction(application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, this).get("exit"));
@@ -387,17 +391,25 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         try {
             DomainObjectExplorer.getInstance().showStatus("");
             
-            Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
-            JComponent sourceControl = (JComponent)invoker;
-
-            System.out.println("Source control: " + sourceControl);
-            if(sourceControl instanceof JList) {
-                // Nueva entidad:
-                JList list = (JList)sourceControl; 
-                Class entityClass = (Class)list.getSelectedValue();
-                if(entityClass != null) DomainObjectExplorer.getInstance().openInternalFrameEntityManager(entityClass);
-                else throw new ApplicationException("A class must be selected");
+            // Check "File-->Manage-->Entity" class:
+            javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
+            String puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
+            Class  entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
+            
+            if(entityClass == null) {
+                JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
+                if( (sourceControl != null) && (sourceControl instanceof JList) ) {
+                    // Manage entidad:
+                    JList  list = (JList)sourceControl; 
+                    puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
+                    entityClass = (Class)list.getSelectedValue();
+                    if(entityClass == null) {
+                        throw new ApplicationException("A class must be selected");
+                    }
+                }
             }
+
+            DomainObjectExplorer.getInstance().openInternalFrameEntityManager(puName, entityClass);
             
         } catch(ApplicationException ex) {
             
@@ -418,13 +430,15 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
             // Check "File-->New-->Entity" class:
             javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
-            Class entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
+            String puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
+            Class  entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
             
             // Check contextual popup menu in left panel entity lists:
             if(entityClass == null) {
                 JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)menuItem.getParent()).getInvoker();
                 if(sourceControl instanceof JList) {
                     JList list = (JList)sourceControl; 
+                    puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
                     entityClass = (Class)list.getSelectedValue();
                     if(entityClass == null) {
                         throw new ApplicationException("A class must be selected");
@@ -432,7 +446,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             }
             
-            if(entityClass != null) DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(entityClass, null);
+            DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, null);
             
         } catch(ApplicationException ex) {
             
@@ -543,32 +557,74 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
 
 
-    public void addEntityClassActions(Class entityClass)
+    public void addEntityClassActions(String puName, Class entityClass)
     {
         String entityName = I18n.getEntityName(entityClass);
-        String puName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
         
-        JMenuItem menuItem = new JMenuItem(entityName);
-        menuItem.putClientProperty("org.doe4ejb3.entityClass", entityClass);
-        menuItem.addActionListener(new ActionListener() {
+        JMenuItem newMenuItem = new JMenuItem(entityName);
+        newMenuItem.putClientProperty("org.doe4ejb3.entityClass", entityClass);
+        newMenuItem.putClientProperty("org.doe4ejb3.persistenceUnit", puName);
+        newMenuItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
                 jMenuItemNewActionPerformed(evt);
             }
         });
 
-        newMenuItemsForEntityClasses.put(entityClass, menuItem);
-        jMenuNew.add(menuItem);
+        JMenuItem manageMenuItem = new JMenuItem(entityName);
+        manageMenuItem.putClientProperty("org.doe4ejb3.entityClass", entityClass);
+        manageMenuItem.putClientProperty("org.doe4ejb3.persistenceUnit", puName);
+        manageMenuItem.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                jMenuItemManagerActionPerformed(evt);
+            }
+        });
+        
+        
+        JMenu newMenuPU = (JMenu)newMenuItemsForPUandEntityClasses.get(puName);
+        if(newMenuPU == null) {
+            newMenuPU = new JMenu(JPAUtils.getPersistenceUnitTitle(puName));
+            jMenuNew.add(newMenuPU);
+            newMenuItemsForPUandEntityClasses.put(puName, newMenuPU);
+        }
+
+        JMenu manageMenuPU = (JMenu)manageMenuItemsForPUandEntityClasses.get(puName);
+        if(manageMenuPU == null) {
+            manageMenuPU = new JMenu(JPAUtils.getPersistenceUnitTitle(puName));
+            jMenuManage.add(manageMenuPU);
+            manageMenuItemsForPUandEntityClasses.put(puName, manageMenuPU);
+        }        
+        
+        String keyName = puName+"/"+entityClass.getName();
+        newMenuItemsForPUandEntityClasses.put(keyName, newMenuItem);
+        manageMenuItemsForPUandEntityClasses.put(keyName, manageMenuItem);
+        newMenuPU.add(newMenuItem);
+        manageMenuPU.add(manageMenuItem);
                 
         System.out.println("DomainObjectExplorer: added managed entity class: " +  entityClass.getName());
     }
     
-    public void removeEntityClass(Class entityClass)
+    public void removeEntityClass(String puName, Class entityClass)
     {
-        JMenuItem menuItem = newMenuItemsForEntityClasses.get(entityClass);
-        if(menuItem != null) {
-            jMenuNew.remove(menuItem);
+        String keyName = puName+"/"+entityClass.getName();
+
+        JMenu newMenuPU = (JMenu)newMenuItemsForPUandEntityClasses.get(puName);
+        JMenuItem newMenuItem = newMenuItemsForPUandEntityClasses.get(keyName);
+        if(newMenuItem != null) {
+            newMenuPU.remove(newMenuItem);
+        }
+        if( (newMenuPU.getSubElements() == null) || (newMenuPU.getSubElements().length == 0) ) {
+            jMenuNew.remove(newMenuPU);
         }
 
+        JMenu manageMenuPU = (JMenu)manageMenuItemsForPUandEntityClasses.get(puName);
+        JMenuItem manageMenuItem = manageMenuItemsForPUandEntityClasses.get(keyName);
+        if(manageMenuItem != null) {
+            manageMenuPU.remove(manageMenuItem);
+        }
+        if( (manageMenuPU.getSubElements() == null) || (manageMenuPU.getSubElements().length == 0) ) {
+            jMenuManage.remove(manageMenuPU);
+        }        
+        
         System.out.println("DomainObjectExplorer: removed managed entity class: " +  entityClass.getName());
     }
 
@@ -615,15 +671,17 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         {
             Collection<Class> persistenceEntities = getVisiblePersistentEntities(persistenceUnit);
             JList entityList = new JList(persistenceEntities.toArray());
+            entityList.putClientProperty("org.doe4ejb3.persistenceUnit", persistenceUnit);
             entityList.setCellRenderer(EntityClassListCellRenderer.getInstance());
             entityList.setComponentPopupMenu(jPopupMenuContextual);
             entityList.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent evt) {
                     try {
-                        JList list = (JList)evt.getSource();
-                        Class entityClass = (Class)list.getSelectedValue();
+                        JList  list = (JList)evt.getSource();
+                        String puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
+                        Class  entityClass = (Class)list.getSelectedValue();
                         if( (evt.getClickCount() > 1) && (entityClass != null) ) {
-                            openInternalFrameEntityManager(entityClass);
+                            openInternalFrameEntityManager(puName, entityClass);
                         }
                     } catch(Exception ex) {
                         showStatus("Error: " + ex.getMessage());
@@ -631,11 +689,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             });
             
-            String title = persistenceUnit;  // Outline section title
-            if(persistenceUnit.length() == 0) title = "Default PU";
+            String title = JPAUtils.getPersistenceUnitTitle(persistenceUnit);  // Outline section title
             jOutlinePanePersistenceUnits.addTab(title, new JScrollPane(entityList));
             
-            for(Class entityClass : persistenceEntities) addEntityClassActions(entityClass);
+            for(Class entityClass : persistenceEntities) addEntityClassActions(persistenceUnit, entityClass);
         }
     }
     
@@ -688,7 +745,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }
     
 
-    public void openInternalFrameEntityManager(Class entityClass) throws Exception
+    public void openInternalFrameEntityManager(String puName, Class entityClass) throws Exception
     {
         final Object key = entityClass.getName() + "Manager";
         JInternalFrame oldFrame = openedInternalFrames.get(key);
@@ -703,7 +760,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             JInternalFrame iFrame = new JInternalFrame(title, true, true, true, false );
             iFrame.setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
             iFrame.getContentPane().setLayout(new BorderLayout());
-            iFrame.getContentPane().add(new EntityManagerPane(entityClass), BorderLayout.CENTER);
+            iFrame.getContentPane().add(new EntityManagerPane(puName, entityClass), BorderLayout.CENTER);
             
             iFrame.addInternalFrameListener(new InternalFrameAdapter() {
                 public void internalFrameClosed(InternalFrameEvent evt) {
@@ -723,13 +780,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }
     
     
-    public JInternalFrame openInternalFrameEntityEditor(Class entityClass, Object entity) throws Exception
+    public JInternalFrame openInternalFrameEntityEditor(String puName, Class entityClass, Object entity) throws Exception
     {
         final Object key = (entity != null) ? entity : entityClass.getName() + "Editor";
         JInternalFrame iFrame = openedInternalFrames.get(key);
 
         if(iFrame == null) {
-            iFrame = new EntityEditorFrame(entityClass, entity);
+            iFrame = new EntityEditorFrame(puName, entityClass, entity);
             iFrame.addInternalFrameListener(new InternalFrameAdapter() {
                 public void internalFrameClosed(InternalFrameEvent evt) {
                     openedInternalFrames.remove(key);
@@ -769,6 +826,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private javax.swing.JMenuItem jMenuItemManager;
     private javax.swing.JMenuItem jMenuItemNew;
     private javax.swing.JMenuItem jMenuItemPaste;
+    private javax.swing.JMenu jMenuManage;
     private javax.swing.JMenu jMenuNew;
     private org.doe4ejb3.gui.JOutlinePane jOutlinePanePersistenceUnits;
     private javax.swing.JPopupMenu jPopupMenuContextual;
@@ -795,7 +853,8 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     /** Caches */ 
     private HashMap<Object,JInternalFrame> openedInternalFrames = new HashMap<Object,JInternalFrame>();
-    private HashMap<Class,JMenuItem> newMenuItemsForEntityClasses = new HashMap<Class,JMenuItem>();
+    private HashMap<String,JMenuItem> newMenuItemsForPUandEntityClasses = new HashMap<String,JMenuItem>();
+    private HashMap<String,JMenuItem> manageMenuItemsForPUandEntityClasses = new HashMap<String,JMenuItem>();
 
     
 

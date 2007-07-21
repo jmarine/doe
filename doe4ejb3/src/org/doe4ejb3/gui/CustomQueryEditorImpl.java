@@ -43,6 +43,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     private final static GridBagConstraints gbcComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,4,6,4), 0,0);
     
     
+    private EntityManagerPane manager = null;
     private Class entityClass = null;
     private HashMap parameterValues = null;
     private BindingContext bindingContext = null;
@@ -54,10 +55,11 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     /**
      * Creates a new instance of QueryParametersEditorImpl
      */
-    public CustomQueryEditorImpl(Class entityClass) 
+    public CustomQueryEditorImpl(EntityManagerPane manager, Class entityClass) 
     {
         // this.parameterTypes = parameterTypes;
         // this.parameterValues = new HashMap();
+        this.manager = manager;
         this.entityClass = entityClass;
         this.bindingContext = new BindingContext();
         this.propertySelectors = new ArrayList();
@@ -188,9 +190,8 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
         } else {
 
-
             HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
-            JComponent comp = EditorFactory.getPropertyEditor(property, 0, TemporalType.TIMESTAMP);
+            JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, 0, TemporalType.TIMESTAMP);
             selector.putClientProperty("editorValue", comp);
 
             editorContainer.add("Center", comp);

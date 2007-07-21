@@ -25,5 +25,6 @@ public interface EntityEditorInterface {
     
     void newEntity(Class entityClass) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
     
+    void setPersistenceUnit(String puName);
     
 }

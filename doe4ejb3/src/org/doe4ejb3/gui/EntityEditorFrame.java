@@ -23,15 +23,17 @@ import org.doe4ejb3.util.*;
 public class EntityEditorFrame extends javax.swing.JInternalFrame 
 {
 
+    private String puName = null;
     private Object entity = null;
     private Class  entityClass = null;
     private EntityEditorInterface editor = null;
     
     /** Creates new form EntityEditorFrame */
-    public EntityEditorFrame(Class entityClass, Object entity) throws Exception {
+    public EntityEditorFrame(String puName, Class entityClass, Object entity) throws Exception {
         
         initComponents();
         
+        this.puName = puName;
         this.entityClass = entityClass;
         this.entity = entity;
         DomainObjectExplorer.getInstance().showStatus("");
@@ -46,7 +48,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         putClientProperty("entityListeners", new EventListenerList());
         
         System.out.println("Preparing editor ");
-        editor = EditorFactory.getEntityEditor(entityClass, false);
+        editor = EditorFactory.getEntityEditor(puName, entityClass, false);
         if(entity == null) {
             editor.newEntity(entityClass);
             jButtonDelete.setVisible(false);
@@ -133,7 +135,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
                     EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                     setMessage(MessageFormat.format("Saving {0}.", JPAUtils.getEntityName(entityClass)));                    
                     Object oldEntity = editor.getEntity();
-                    Object newEntity = JPAUtils.saveEntity(DomainObjectExplorer.getInstance().getConnectionParams(), oldEntity);
+                    Object newEntity = JPAUtils.saveEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, oldEntity);
                     setMessage(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
                     
                     EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
@@ -177,7 +179,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
                         EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                         setMessage(MessageFormat.format("Deleting {0}.", JPAUtils.getEntityName(entityClass)));                    
                         Object entity = editor.getEntity();
-                        JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), entity);
+                        JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entity);
                         setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
 
                         EntityEvent entityEvent = new EntityEvent(this, EntityEvent.ENTITY_DELETE, entity, null);

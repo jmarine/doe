@@ -35,6 +35,7 @@ import org.doe4ejb3.util.EJBQLUtils;
 public class EntityManagerPane extends javax.swing.JPanel 
 {
     
+    private String puName = null;
     private Class entityClass = null;
     private CustomQueryEditorImpl customQueryEditor = null;
     private QueryParametersEditorImpl queryParametersPanel = null;
@@ -45,14 +46,15 @@ public class EntityManagerPane extends javax.swing.JPanel
     /**
      * Creates new form EntityManagerPane
      */
-    public EntityManagerPane(Class entityClass) {
+    public EntityManagerPane(String puName, Class entityClass) {
         initComponents();
+        this.puName = puName;
         this.entityClass = entityClass;
 
         try {
             // post initialization:
             JComponentDataBinding outBinding[] = new JComponentDataBinding[1];
-            entityListEditor = EditorFactory.getCollectionEditor(null, entityClass, true, outBinding);
+            entityListEditor = EditorFactory.getCollectionEditor(puName, null, entityClass, true, outBinding);
             listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");
             listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");
 
@@ -227,7 +229,7 @@ public class EntityManagerPane extends javax.swing.JPanel
                 {
                     if(listSelectionModel.isSelectedIndex(index)) {
                         Object entity = listModel.getElementAt(index);
-                        JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), entity);
+                        JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entity);
                         listModel.removeElementAt(index);
                     }
                 }
@@ -261,7 +263,7 @@ public class EntityManagerPane extends javax.swing.JPanel
                 throw new ApplicationException("No se ha seleccionado ningun valor.");                
             } else {
                 Object entity = listModel.getElementAt(selectedIndexToEdit);
-                DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(entityClass, entity);
+                DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, entity);
             }
             
         } catch(ApplicationException ex) {
@@ -283,7 +285,7 @@ public class EntityManagerPane extends javax.swing.JPanel
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
             Class entityClass = (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-            DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(entityClass, null);
+            DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, null);
             
         } catch(ApplicationException ex) {
             
@@ -299,8 +301,6 @@ public class EntityManagerPane extends javax.swing.JPanel
 
     
     private void jComboBoxNamedQueryItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_jComboBoxNamedQueryItemStateChanged
-        String persistenceUnitName = JPAUtils.getPersistentUnitNameForEntity(entityClass);
-        
         listModel.clear();
         jPanelQueryParams.removeAll();
 
@@ -308,7 +308,7 @@ public class EntityManagerPane extends javax.swing.JPanel
             jPanelQueryParams.setVisible(false);
             jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(5,0,0,0));
         } else if (jComboBoxNamedQuery.getSelectedIndex() == 1) {
-            customQueryEditor = new CustomQueryEditorImpl(entityClass);
+            customQueryEditor = new CustomQueryEditorImpl(this, entityClass);
             jPanelQueryParams.setLayout(new java.awt.BorderLayout());
             jPanelQueryParams.add(customQueryEditor, java.awt.BorderLayout.CENTER);
             jPanelQueryParams.setVisible(true);
@@ -325,14 +325,14 @@ public class EntityManagerPane extends javax.swing.JPanel
                 queryParametersPanel = null;
             
                 this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                HashMap ejbqlParameterTypes = EJBQLUtils.parseEJBQLParameterTypes(persistenceUnitName, ejbql);
+                HashMap ejbqlParameterTypes = EJBQLUtils.parseEJBQLParameterTypes(puName, ejbql);
                 // TODO: create controls for query parameters (depending on its type)
                 
                 if(ejbqlParameterTypes.size() == 0) {
                     jPanelQueryParams.setVisible(false);
                     jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(5,0,0,0));                    
                 } else {
-                    queryParametersPanel = new QueryParametersEditorImpl(ejbqlParameterTypes);
+                    queryParametersPanel = new QueryParametersEditorImpl(this, ejbqlParameterTypes);
                     jPanelQueryParams.setLayout(new java.awt.BorderLayout());
                     jPanelQueryParams.add(queryParametersPanel, java.awt.BorderLayout.CENTER);
                     jPanelQueryParams.setVisible(true);
@@ -371,6 +371,10 @@ public class EntityManagerPane extends javax.swing.JPanel
     // End of variables declaration//GEN-END:variables
 
 
+    public String getPersistenceUnitName()
+    {
+        return puName;
+    }
     
     @application.Action
     public application.Task searchInstances()
@@ -392,19 +396,19 @@ public class EntityManagerPane extends javax.swing.JPanel
                 EntityManagerPane.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 DomainObjectExplorer.getInstance().showStatus("Searching...");
                 if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
-                    entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass);
+                    entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entityClass);
 
                 } else if(jComboBoxNamedQuery.getSelectedIndex() == 1) {   // Custom query editor
                     String ejbql = customQueryEditor.prepareEJBQL();
                     HashMap parameterValues = customQueryEditor.prepareParameterValues();
-                    entities = JPAUtils.executeQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, ejbql, parameterValues);
+                    entities = JPAUtils.executeQuery(DomainObjectExplorer.getInstance().getConnectionParams(), puName, ejbql, parameterValues);
 
                 } else {  // NamedQuery: jComboBoxNamedQuery.getSelectedIndex() > 1
                     ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
                     NamedQuery namedQuery = (NamedQuery)listItem.getValue();
                     HashMap parameterValues = null;
                     if(queryParametersPanel != null) parameterValues = queryParametersPanel.getParameterValues();
-                    entities = JPAUtils.executeNamedQuery(DomainObjectExplorer.getInstance().getConnectionParams(), entityClass, namedQuery.name(), parameterValues);
+                    entities = JPAUtils.executeNamedQuery(DomainObjectExplorer.getInstance().getConnectionParams(), puName, namedQuery.name(), parameterValues);
                 }
 
             } finally {
