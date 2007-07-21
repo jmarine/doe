@@ -167,8 +167,15 @@ public class ConnectionManager extends javax.swing.JInternalFrame
     
     private void close()
     {
-        this.setVisible(false);
-        this.dispose(); // remove from JDesktop' windows list
+        try {
+            fireVetoableChange(IS_CLOSED_PROPERTY, Boolean.FALSE,
+                               Boolean.TRUE);
+            isClosed = true;
+            setVisible(false);
+            firePropertyChange(IS_CLOSED_PROPERTY, Boolean.FALSE,
+                               Boolean.TRUE);
+            dispose();
+        } catch (Exception pve) {}
     }
     
     
