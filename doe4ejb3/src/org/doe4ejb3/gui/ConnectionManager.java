@@ -11,7 +11,8 @@ import java.util.HashMap;
  *
  * @author  jordi
  */
-public class ConnectionManager extends javax.swing.JInternalFrame {
+public class ConnectionManager extends javax.swing.JInternalFrame
+{
     private HashMap<String,String> connectionParams = null;
     private String username = "";
     private String password = "";
