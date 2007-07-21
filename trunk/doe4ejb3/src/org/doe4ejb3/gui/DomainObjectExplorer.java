@@ -186,9 +186,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Domain Object Explorer for EJB3");
         addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
-            }
             public void windowOpened(java.awt.event.WindowEvent evt) {
                 formWindowOpened(evt);
             }
@@ -267,28 +264,22 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         getContentPane().add(jSplitPaneCentral, java.awt.BorderLayout.CENTER);
 
         jMenuFile.setMnemonic('f');
-        jMenuFile.setText("File");
+        jMenuFile.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("fileMenu.text")); // NOI18N
 
         jMenuNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/new.png"))); // NOI18N
         jMenuNew.setMnemonic('n');
-        jMenuNew.setText("New");
+        jMenuNew.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("newMenu.text")); // NOI18N
         jMenuFile.add(jMenuNew);
         jMenuFile.add(jSeparator1);
 
-        jMenuItemExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/exit.png"))); // NOI18N
+        jMenuItemExit.setAction(application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, this).get("exit"));
         jMenuItemExit.setMnemonic('x');
-        jMenuItemExit.setText("Exit");
-        jMenuItemExit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemExitActionPerformed(evt);
-            }
-        });
         jMenuFile.add(jMenuItemExit);
 
         jMainMenuBar.add(jMenuFile);
 
         jMenuEdit.setMnemonic('e');
-        jMenuEdit.setText("Edit");
+        jMenuEdit.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("editMenu.text")); // NOI18N
 
         jMenuItemCut.setAction(application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, this).get("cut"));
         jMenuItemCut.addActionListener(new java.awt.event.ActionListener() {
@@ -326,15 +317,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMainMenuBar.add(jMenuEdit);
 
         jMenuHelp.setMnemonic('h');
-        jMenuHelp.setText("Help");
+        jMenuHelp.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("helpMenu.text")); // NOI18N
 
+        jMenuItemAbout.setAction(application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, this).get("about"));
         jMenuItemAbout.setMnemonic('a');
-        jMenuItemAbout.setText("About");
-        jMenuItemAbout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemAboutActionPerformed(evt);
-            }
-        });
         jMenuHelp.add(jMenuItemAbout);
 
         jMainMenuBar.add(jMenuHelp);
@@ -467,22 +453,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         openConnectionManager();
     }//GEN-LAST:event_formWindowOpened
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        exit(); 
-    }//GEN-LAST:event_formWindowClosing
-
     // </editor-fold>
 
     
     // <editor-fold defaultstate="collapsed" desc=" Main menu events ">
-    private void jMenuItemExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemExitActionPerformed
-        exit();
-    }//GEN-LAST:event_jMenuItemExitActionPerformed
-
-
-    private void jMenuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemAboutActionPerformed
-        JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
-    }//GEN-LAST:event_jMenuItemAboutActionPerformed
 
     public void clipboardActionPerformed(JComponent focusOwner, java.awt.event.ActionEvent evt) {
         System.out.println("Clipboard action on control: " + focusOwner);
@@ -566,13 +540,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         this.jLabelStatus.setText(" " + msg);
     }
 
-    public void exit()
-    {
-        this.setVisible(false);
-        this.dispose();
-        
-        System.exit(0);
-    }
+
 
 
     public void addEntityClassActions(Class entityClass)
@@ -686,7 +654,19 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         return persistenceEntities;
     }
 
+
+    @application.Action
+    public void about() {
+        JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     
+    @application.Action
+    public void exit()
+    {
+       Application.getApplication().exit();
+    }    
+
     @application.Action    
     public void openConnectionManager()
     {
@@ -700,9 +680,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             mdiDesktopPane.centerFrame(connectionManagerFrame);
             connectionManagerFrame.setVisible(true);
             connectionManagerFrame.setSelected(true);
-        } catch(java.beans.PropertyVetoException pve) {
-            System.out.println("DOE.openConnectionManager(): Error " + pve.getMessage());
-            pve.printStackTrace();
+            
+        } catch(Exception ex) {
+            System.out.println("DOE.openConnectionManager(): Error " + ex.getMessage());
+            ex.printStackTrace();
         }
     }
     

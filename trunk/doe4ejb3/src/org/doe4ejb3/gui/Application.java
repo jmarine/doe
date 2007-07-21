@@ -7,6 +7,8 @@ package org.doe4ejb3.gui;
 import application.ApplicationContext;
 import application.SingleFrameApplication;
 import java.awt.Window;
+import java.util.EventObject;
+import javax.swing.JOptionPane;
 
 /**
  * The main class of the application.
@@ -18,6 +20,16 @@ public class Application extends SingleFrameApplication {
      */
     @Override protected void startup() {
        setMainFrame(DomainObjectExplorer.getInstance());
+       addExitListener(new ExitListener() {
+            public boolean canExit(EventObject e) {
+                int option = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), 
+                                "Do you really want to exit?", "Exit confirmation", JOptionPane.YES_NO_OPTION) ;
+                return option == JOptionPane.YES_OPTION;
+            }
+          
+            public void willExit(EventObject event) { 
+            }
+       });
        show(getMainFrame());
     }
 
