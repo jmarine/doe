@@ -49,20 +49,20 @@ public class EntityClassListCellRenderer extends DefaultListCellRenderer
         return retValue;
     }
     
-    public ImageIcon getEntityIcon(Class entity) {
-        ImageIcon imageIcon = entityIconCache.get(entity);
+    public static ImageIcon getEntityIcon(Class entityClass) {
+        ImageIcon imageIcon = entityIconCache.get(entityClass);
         if(imageIcon == null) {
-            EntityDescriptor entityDescriptor = (EntityDescriptor)entity.getAnnotation(EntityDescriptor.class);
+            EntityDescriptor entityDescriptor = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
             if( (entityDescriptor != null) && (entityDescriptor.iconPath() != null) && (entityDescriptor.iconPath().length() > 0) ) {
-                try { imageIcon = new ImageIcon(entity.getResource(entityDescriptor.iconPath())); } 
+                try { imageIcon = new ImageIcon(entityClass.getResource(entityDescriptor.iconPath())); } 
                 catch(Exception ex) { System.out.println("WARNING: there was a problem loading icon " + entityDescriptor.iconPath() + ": " + ex.getMessage()); } 
             } 
             
             if(imageIcon == null) {
-                imageIcon = new ImageIcon(this.getClass().getResource("/META-INF/images/defaultEntityIcon.gif"));
+                imageIcon = new ImageIcon(EntityClassListCellRenderer.class.getResource("/org/doe4ejb3/gui/resources/defaultEntityIcon.gif"));
             }
 
-            entityIconCache.put(entity, imageIcon);
+            entityIconCache.put(entityClass, imageIcon);
         }
         return imageIcon;
     }
