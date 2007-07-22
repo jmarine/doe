@@ -109,7 +109,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
 
         
-        setSize(950,700);
+        setPreferredSize(new Dimension(950,700));
 
         
         // TODO: advice user when no persistence entities were found.
@@ -164,24 +164,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuHelp = new javax.swing.JMenu();
         jMenuItemAbout = new javax.swing.JMenuItem();
 
-        jMenuItemNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/new.png"))); // NOI18N
+        jMenuItemNew.setAction(application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, this).get("createNewEntity"));
         jMenuItemNew.setMnemonic('n');
-        jMenuItemNew.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("newMenu.text")); // NOI18N
-        jMenuItemNew.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemNewActionPerformed(evt);
-            }
-        });
         jPopupMenuContextual.add(jMenuItemNew);
 
-        jMenuItemManager.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/manager.png"))); // NOI18N
+        jMenuItemManager.setAction(application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, this).get("manageEntityClass"));
         jMenuItemManager.setMnemonic('m');
         jMenuItemManager.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
-        jMenuItemManager.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItemManagerActionPerformed(evt);
-            }
-        });
         jPopupMenuContextual.add(jMenuItemManager);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -272,6 +261,8 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuNew.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("newMenu.text")); // NOI18N
         jMenuFile.add(jMenuNew);
 
+        jMenuManage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/manager.png"))); // NOI18N
+        jMenuManage.setMnemonic('m');
         jMenuManage.setText(application.ApplicationContext.getInstance().getResourceMap(org.doe4ejb3.gui.DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
         jMenuFile.add(jMenuManage);
         jMenuFile.add(jSeparator1);
@@ -387,80 +378,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         }
     }//GEN-LAST:event_jMenuItemClipboardActionPerformed
    
-    private void jMenuItemManagerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemManagerActionPerformed
-        try {
-            DomainObjectExplorer.getInstance().showStatus("");
-            
-            // Check "File-->Manage-->Entity" class:
-            javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
-            String puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
-            Class  entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
-            
-            if(entityClass == null) {
-                JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
-                if( (sourceControl != null) && (sourceControl instanceof JList) ) {
-                    // Manage entidad:
-                    JList  list = (JList)sourceControl; 
-                    puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
-                    entityClass = (Class)list.getSelectedValue();
-                    if(entityClass == null) {
-                        throw new ApplicationException("A class must be selected");
-                    }
-                }
-            }
-
-            DomainObjectExplorer.getInstance().openInternalFrameEntityManager(puName, entityClass);
-            
-        } catch(ApplicationException ex) {
-            
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            
-        } catch(Exception ex) {
-            
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            
-        }
-        
-    }//GEN-LAST:event_jMenuItemManagerActionPerformed
-
-    private void jMenuItemNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemNewActionPerformed
-        try {
-            DomainObjectExplorer.getInstance().showStatus("");
-
-            // Check "File-->New-->Entity" class:
-            javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
-            String puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
-            Class  entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
-            
-            // Check contextual popup menu in left panel entity lists:
-            if(entityClass == null) {
-                JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)menuItem.getParent()).getInvoker();
-                if(sourceControl instanceof JList) {
-                    JList list = (JList)sourceControl; 
-                    puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
-                    entityClass = (Class)list.getSelectedValue();
-                    if(entityClass == null) {
-                        throw new ApplicationException("A class must be selected");
-                    }
-                }
-            }
-            
-            DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, null);
-            
-        } catch(ApplicationException ex) {
-            
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            
-        } catch(Exception ex) {
-            
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            ex.printStackTrace();
-            
-        }
-
-    }//GEN-LAST:event_jMenuItemNewActionPerformed
-
 
     // <editor-fold defaultstate="collapsed" desc=" Window events ">
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
@@ -562,22 +479,16 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         String entityName = I18n.getEntityName(entityClass);
         
         JMenuItem newMenuItem = new JMenuItem(entityName);
+        newMenuItem.setAction(application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, this).get("createNewEntity"));
+        newMenuItem.setText(entityName);
         newMenuItem.putClientProperty("org.doe4ejb3.entityClass", entityClass);
         newMenuItem.putClientProperty("org.doe4ejb3.persistenceUnit", puName);
-        newMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                jMenuItemNewActionPerformed(evt);
-            }
-        });
 
         JMenuItem manageMenuItem = new JMenuItem(entityName);
+        manageMenuItem.setAction(application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, this).get("manageEntityClass"));
+        manageMenuItem.setText(entityName);
         manageMenuItem.putClientProperty("org.doe4ejb3.entityClass", entityClass);
         manageMenuItem.putClientProperty("org.doe4ejb3.persistenceUnit", puName);
-        manageMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent evt) {
-                jMenuItemManagerActionPerformed(evt);
-            }
-        });
         
         
         JMenu newMenuPU = (JMenu)newMenuItemsForPUandEntityClasses.get(puName);
@@ -743,6 +654,83 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             ex.printStackTrace();
         }
     }
+    
+    
+    @application.Action
+    public void manageEntityClass(ActionEvent evt) {
+        try {
+            DomainObjectExplorer.getInstance().showStatus("");
+            
+            // Check "File-->Manage-->Entity" class:
+            javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
+            String puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
+            Class  entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
+            
+            if(entityClass == null) {
+                JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
+                if( (sourceControl != null) && (sourceControl instanceof JList) ) {
+                    // Manage entidad:
+                    JList  list = (JList)sourceControl; 
+                    puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
+                    entityClass = (Class)list.getSelectedValue();
+                    if(entityClass == null) {
+                        throw new ApplicationException("A class must be selected");
+                    }
+                }
+            }
+
+            DomainObjectExplorer.getInstance().openInternalFrameEntityManager(puName, entityClass);
+            
+        } catch(ApplicationException ex) {
+            
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            
+        } catch(Exception ex) {
+            
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+            
+        }
+    }
+    
+
+    @application.Action
+    public void createNewEntity(ActionEvent evt) {
+        try {
+            DomainObjectExplorer.getInstance().showStatus("");
+
+            // Check "File-->New-->Entity" class:
+            javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
+            String puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
+            Class  entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
+            
+            // Check contextual popup menu in left panel entity lists:
+            if(entityClass == null) {
+                JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)menuItem.getParent()).getInvoker();
+                if(sourceControl instanceof JList) {
+                    JList list = (JList)sourceControl; 
+                    puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
+                    entityClass = (Class)list.getSelectedValue();
+                    if(entityClass == null) {
+                        throw new ApplicationException("A class must be selected");
+                    }
+                }
+            }
+            
+            DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, null);
+            
+        } catch(ApplicationException ex) {
+            
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            
+        } catch(Exception ex) {
+            
+            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
+            
+        }
+    }
+
     
 
     public void openInternalFrameEntityManager(String puName, Class entityClass) throws Exception
