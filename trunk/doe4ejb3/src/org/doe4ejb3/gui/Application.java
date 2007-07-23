@@ -4,7 +4,6 @@
 
 package org.doe4ejb3.gui;
 
-import application.ApplicationContext;
 import application.SingleFrameApplication;
 import java.awt.Window;
 import java.util.EventObject;
@@ -46,7 +45,7 @@ public class Application extends SingleFrameApplication {
      * @return the instance of DomainObjectExplorer
      */
     public static Application getApplication() {
-        return (Application) ApplicationContext.getInstance().getApplication();
+        return Application.getInstance(Application.class);
     }
 
     /**
