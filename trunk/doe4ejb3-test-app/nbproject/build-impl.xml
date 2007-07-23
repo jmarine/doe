@@ -14,9 +14,10 @@ is divided into following sections:
   - cleanup
 
 -->
-<project name="doe4ejb3-test-app-impl" default="build" basedir=".." xmlns:ear2="http://www.netbeans.org/ns/j2ee-earproject/2">
+<project xmlns:ear2="http://www.netbeans.org/ns/j2ee-earproject/2" basedir=".." default="build" name="doe4ejb3-test-app-impl">
+    <import file="extendArchiveGF.xml"/>
     <import file="ant-deploy.xml"/>
-    <target name="default" depends="dist" description="Build whole project."/>
+    <target depends="dist" description="Build whole project." name="default"/>
     <!-- 
     INITIALIZATION SECTION 
     -->
@@ -24,19 +25,19 @@ is divided into following sections:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target name="init-private" depends="pre-init">
+    <target depends="pre-init" name="init-private">
         <property file="nbproject/private/private.properties"/>
     </target>
-    <target name="init-userdir" depends="pre-init,init-private">
-        <property name="user.properties.file" location="${netbeans.user}/build.properties"/>
+    <target depends="pre-init,init-private" name="init-userdir">
+        <property location="${netbeans.user}/build.properties" name="user.properties.file"/>
     </target>
-    <target name="init-user" depends="pre-init,init-private,init-userdir">
+    <target depends="pre-init,init-private,init-userdir" name="init-user">
         <property file="${user.properties.file}"/>
     </target>
-    <target name="init-project" depends="pre-init,init-private,init-userdir,init-user">
+    <target depends="pre-init,init-private,init-userdir,init-user" name="init-project">
         <property file="nbproject/project.properties"/>
     </target>
-    <target name="do-init" depends="pre-init,init-private,init-userdir,init-user,init-project">
+    <target depends="pre-init,init-private,init-userdir,init-user,init-project" name="do-init">
         <!-- The two properties below are usually overridden -->
         <!-- by the active platform. Just a fallback. -->
         <property name="default.javac.source" value="1.4"/>
@@ -47,11 +48,13 @@ is divided into following sections:
         <condition property="do.display.browser">
             <and>
                 <istrue value="${display.browser}"/>
-                <contains string="${client.module.uri}" substring=".war"/>
+                <not>
+                    <isset property="app.client"/>
+                </not>
             </and>
         </condition>
-        <available property="has.custom.manifest" file="${meta.inf}/MANIFEST.MF"/>
-        <condition property="j2ee.appclient.mainclass.tool.param" value="-mainclass ${main.class}" else="">
+        <available file="${meta.inf}/MANIFEST.MF" property="has.custom.manifest"/>
+        <condition else="" property="j2ee.appclient.mainclass.tool.param" value="-mainclass ${main.class}">
             <and>
                 <isset property="main.class"/>
                 <not>
@@ -59,7 +62,7 @@ is divided into following sections:
                 </not>
             </and>
         </condition>
-        <condition property="j2ee.appclient.jvmoptions.param" value="${j2ee.appclient.jvmoptions}" else="">
+        <condition else="" property="j2ee.appclient.jvmoptions.param" value="${j2ee.appclient.jvmoptions}">
             <and>
                 <isset property="j2ee.appclient.jvmoptions"/>
                 <not>
@@ -67,7 +70,7 @@ is divided into following sections:
                 </not>
             </and>
         </condition>
-        <condition property="application.args.param" value="${application.args}" else="">
+        <condition else="" property="application.args.param" value="${application.args}">
             <and>
                 <isset property="application.args"/>
                 <not>
@@ -86,63 +89,62 @@ is divided into following sections:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target name="init-check" depends="pre-init,init-private,init-userdir,init-user,init-project,do-init">
+    <target depends="pre-init,init-private,init-userdir,init-user,init-project,do-init" name="init-check">
         <fail unless="build.dir">Must set build.dir</fail>
         <fail unless="build.generated.dir">Must set build.generated.dir</fail>
         <fail unless="dist.dir">Must set dist.dir</fail>
         <fail unless="build.classes.excludes">Must set build.classes.excludes</fail>
         <fail unless="dist.jar">Must set dist.jar</fail>
     </target>
-    <target name="init" depends="pre-init,init-private,init-userdir,init-user,init-project,do-init,post-init,init-check"/>
+    <target depends="pre-init,init-private,init-userdir,init-user,init-project,do-init,post-init,init-check" name="init"/>
     <!--
     COMPILATION SECTION
     -->
-    <target name="deps-jar" depends="init" unless="no.deps">
-        <ant target="jar" inheritall="false" antfile="${project.doe4ejb3-test-ejb3}/build.xml">
-            <property name="dist.ear.dir" location="${build.dir}"/>
+    <target depends="init" name="deps-jar" unless="no.deps">
+        <ant antfile="${project.doe4ejb3-test-ejb3}/build.xml" inheritall="false" target="jar">
+            <property location="${build.dir}" name="dist.ear.dir"/>
         </ant>
     </target>
-    <target name="deps-j2ee-archive" depends="init" unless="no.deps">
-        <ant target="dist-ear" inheritall="false" antfile="${project.doe4ejb3-app-client}/build.xml">
-            <property name="dist.ear.dir" location="${build.dir}"/>
+    <target depends="init" name="deps-j2ee-archive" unless="no.deps">
+        <ant antfile="${project.doe4ejb3-app-client}/build.xml" inheritall="false" target="dist-ear">
+            <property location="${build.dir}" name="dist.ear.dir"/>
         </ant>
     </target>
-    <target name="pre-pre-compile" depends="init,deps-jar,deps-j2ee-archive"/>
+    <target depends="init,deps-jar,deps-j2ee-archive" name="pre-pre-compile"/>
     <target name="pre-compile">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target name="do-compile" depends="init,deps-jar,pre-pre-compile,pre-compile">
+    <target depends="init,deps-jar,pre-pre-compile,pre-compile" name="do-compile">
         <copy todir="${build.dir}/META-INF">
             <fileset dir="${meta.inf}"/>
         </copy>
         <copy file="${reference.doe4ejb3-app-client.j2ee-module-car}" todir="${build.dir}//"/>
         <copy file="${reference.doe4ejb3-test-ejb3.jar}" todir="${build.dir}//"/>
-        <copy file="${file.reference.postgresql-8.2-504.jdbc4.jar}" todir="${build.dir}//"/>
     </target>
     <target name="post-compile">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target name="compile" depends="init,deps-jar,pre-pre-compile,pre-compile,do-compile,post-compile" description="Compile project."/>
+    <target depends="init,deps-jar,pre-pre-compile,pre-compile,do-compile,post-compile" description="Compile project." name="compile"/>
     <!--
     DIST BUILDING SECTION
     -->
-    <target name="pre-dist">
+    <target depends="-extend-archive" name="pre-dist">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target name="do-dist-without-manifest" depends="init,compile,pre-dist" unless="has.custom.manifest">
-        <dirname property="dist.jar.dir" file="${dist.jar}"/>
+    <target depends="init,compile,pre-dist" name="do-dist-without-manifest" unless="has.custom.manifest">
+        <dirname file="${dist.jar}" property="dist.jar.dir"/>
         <mkdir dir="${dist.jar.dir}"/>
-        <jar jarfile="${dist.jar}" compress="${jar.compress}">
+        <jar compress="${jar.compress}" jarfile="${dist.jar}">
             <fileset dir="${build.dir}"/>
         </jar>
     </target>
-    <target name="do-dist-with-manifest" depends="init,compile,pre-dist" if="has.custom.manifest">
-        <dirname property="dist.jar.dir" file="${dist.jar}"/>
+    <target depends="init,compile,pre-dist" if="has.custom.manifest" name="do-dist-with-manifest">
+        <dirname file="${dist.jar}" property="dist.jar.dir"/>
         <mkdir dir="${dist.jar.dir}"/>
-        <jar jarfile="${dist.jar}" compress="${jar.compress}" manifest="${meta.inf}/MANIFEST.MF">
+        <jar compress="${jar.compress}" jarfile="${dist.jar}" manifest="${meta.inf}/MANIFEST.MF">
             <fileset dir="${build.dir}"/>
         </jar>
     </target>
@@ -150,11 +152,11 @@ is divided into following sections:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target name="dist" depends="init,compile,pre-dist,do-dist-without-manifest,do-dist-with-manifest,post-dist" description="Build distribution (JAR)."/>
+    <target depends="init,compile,pre-dist,do-dist-without-manifest,do-dist-with-manifest,post-dist" description="Build distribution (JAR)." name="dist"/>
     <!--
     EXECUTION SECTION
     -->
-    <target name="run" depends="run-deploy,run-display-browser,run-ac" description="Deploy to server."/>
+    <target depends="run-deploy,run-display-browser,run-ac" description="Deploy to server." name="run"/>
     <target name="pre-run-deploy">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
@@ -173,26 +175,26 @@ is divided into following sections:
     </target>
     <target name="-run-deploy-am" unless="no.deps">
         <!-- Task to deploy to the Access Manager runtime. -->
-        <ant target="-run-deploy-am" inheritall="false" antfile="${project.doe4ejb3-app-client}/build.xml"/>
+        <ant antfile="${project.doe4ejb3-app-client}/build.xml" inheritall="false" target="-run-deploy-am"/>
     </target>
-    <target name="run-deploy" depends="dist,pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,post-run-deploy"/>
-    <target name="-run-deploy-nb" if="netbeans.home">
-        <nbdeploy debugmode="false" forceRedeploy="${forceRedeploy}" clientUrlPart="${client.urlPart}" clientModuleUri="${client.module.uri}"/>
+    <target depends="dist,pre-run-deploy,-pre-nbmodule-run-deploy,-run-deploy-nb,-init-deploy-ant,-deploy-ant,-run-deploy-am,-post-nbmodule-run-deploy,post-run-deploy" name="run-deploy"/>
+    <target if="netbeans.home" name="-run-deploy-nb">
+        <nbdeploy clientModuleUri="${client.module.uri}" clientUrlPart="${client.urlPart}" debugmode="false" forceRedeploy="${forceRedeploy}"/>
     </target>
     <target name="-init-deploy-ant" unless="netbeans.home">
         <property name="deploy.ant.archive" value="${dist.jar}"/>
         <property name="deploy.ant.resource.dir" value="${resource.dir}"/>
         <property name="deploy.ant.enabled" value="true"/>
     </target>
-    <target name="run-undeploy" depends="dist,-run-undeploy-nb,-init-deploy-ant,-undeploy-ant"/>
-    <target name="-run-undeploy-nb" if="netbeans.home">
+    <target depends="dist,-run-undeploy-nb,-init-deploy-ant,-undeploy-ant" name="run-undeploy"/>
+    <target if="netbeans.home" name="-run-undeploy-nb">
         <fail message="Undeploy is not supported from within the IDE"/>
     </target>
-    <target name="verify" depends="dist">
+    <target depends="dist" name="verify">
         <nbverify file="${dist.jar}"/>
     </target>
-    <target name="run-display-browser" depends="run-deploy,-init-display-browser,-display-browser-nb,-display-browser-cl"/>
-    <target name="-init-display-browser" if="do.display.browser">
+    <target depends="run-deploy,-init-display-browser,-display-browser-nb,-display-browser-cl" name="run-display-browser"/>
+    <target if="do.display.browser" name="-init-display-browser">
         <condition property="do.display.browser.nb">
             <isset property="netbeans.home"/>
         </condition>
@@ -203,14 +205,14 @@ is divided into following sections:
             </and>
         </condition>
     </target>
-    <target name="-display-browser-nb" if="do.display.browser.nb">
+    <target if="do.display.browser.nb" name="-display-browser-nb">
         <nbbrowse url="${client.url}"/>
     </target>
-    <target name="-get-browser" if="do.display.browser.cl" unless="browser">
+    <target if="do.display.browser.cl" name="-get-browser" unless="browser">
         <condition property="browser" value="rundll32">
             <os family="windows"/>
         </condition>
-        <condition property="browser.args" value="url.dll,FileProtocolHandler" else="">
+        <condition else="" property="browser.args" value="url.dll,FileProtocolHandler">
             <os family="windows"/>
         </condition>
         <condition property="browser" value="/usr/bin/open">
@@ -245,7 +247,7 @@ is divided into following sections:
             <available file="/opt/csw/bin/mozilla"/>
         </condition>
     </target>
-    <target name="-display-browser-cl" depends="-get-browser" if="do.display.browser.cl">
+    <target depends="-get-browser" if="do.display.browser.cl" name="-display-browser-cl">
         <fail unless="browser">
             Browser not found, cannot launch the deployed application. Try to set the BROWSER environment variable.
         </fail>
@@ -255,12 +257,12 @@ is divided into following sections:
             <arg line="${browser.args} ${browse.url}"/>
         </exec>
     </target>
-    <target name="run-ac" depends="init" if="app.client">
+    <target depends="init" if="app.client" name="run-ac">
         <antcall target="run-${app.client}"/>
     </target>
-    <target name="run-doe4ejb3-app-client" depends="-tool-doe4ejb3-app-client,-java-doe4ejb3-app-client"/>
-    <target name="-tool-doe4ejb3-app-client" unless="j2ee.clientName" if="j2ee.appclient.mainclass.args" depends="-as-retrieve-option-workaround">
-        <java fork="true" classname="${j2ee.appclient.tool.mainclass}">
+    <target depends="-tool-doe4ejb3-app-client,-java-doe4ejb3-app-client" name="run-doe4ejb3-app-client"/>
+    <target depends="-as-retrieve-option-workaround" if="j2ee.appclient.mainclass.args" name="-tool-doe4ejb3-app-client" unless="j2ee.clientName">
+        <java classname="${j2ee.appclient.tool.mainclass}" fork="true">
             <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
             <jvmarg line="${j2ee.appclient.jvmoptions.param}"/>
             <arg line="${j2ee.appclient.tool.args}"/>
@@ -272,12 +274,12 @@ is divided into following sections:
             </classpath>
             <syspropertyset>
                 <propertyref prefix="run-sys-prop."/>
-                <mapper type="glob" from="run-sys-prop.*" to="*"/>
+                <mapper from="run-sys-prop.*" to="*" type="glob"/>
             </syspropertyset>
         </java>
     </target>
-    <target name="-java-doe4ejb3-app-client" if="j2ee.clientName" unless="j2ee.appclient.mainclass.args">
-        <java fork="true" classname="${main.class}">
+    <target if="j2ee.clientName" name="-java-doe4ejb3-app-client" unless="j2ee.appclient.mainclass.args">
+        <java classname="${main.class}" fork="true">
             <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
             <jvmarg line="-Dj2ee.clientName=${app.client}"/>
             <jvmarg line="${j2ee.appclient.jvmoptions.param}"/>
@@ -287,11 +289,11 @@ is divided into following sections:
             </classpath>
             <syspropertyset>
                 <propertyref prefix="run-sys-prop."/>
-                <mapper type="glob" from="run-sys-prop.*" to="*"/>
+                <mapper from="run-sys-prop.*" to="*" type="glob"/>
             </syspropertyset>
         </java>
     </target>
-    <target name="-as-retrieve-option-workaround" if="j2ee.appclient.mainclass.args" unless="j2ee.clientName">
+    <target if="j2ee.appclient.mainclass.args" name="-as-retrieve-option-workaround" unless="j2ee.clientName">
         <property name="client.jar" value="${dist.dir}/doe4ejb3-test-appClient.jar"/>
         <sleep seconds="3"/>
         <copy file="${wa.copy.client.jar.from}/doe4ejb3-test-app/doe4ejb3-test-appClient.jar" todir="${dist.dir}"/>
@@ -299,13 +301,13 @@ is divided into following sections:
     <!--
     DEBUGGING SECTION
     -->
-    <target name="debug" depends="run-debug,run-display-browser,run-debug-appclient" description="Deploy to server."/>
-    <target name="run-debug" description="Debug project in IDE." depends="dist" if="netbeans.home" unless="app.client">
-        <nbdeploy debugmode="true" clientUrlPart="${client.urlPart}" clientModuleUri="${client.module.uri}"/>
+    <target depends="run-debug,run-display-browser,run-debug-appclient" description="Deploy to server." name="debug"/>
+    <target depends="dist" description="Debug project in IDE." if="netbeans.home" name="run-debug" unless="app.client">
+        <nbdeploy clientModuleUri="${client.module.uri}" clientUrlPart="${client.urlPart}" debugmode="true"/>
         <antcall target="connect-debugger"/>
     </target>
     <target name="connect-debugger" unless="is.debugged">
-        <nbjpdaconnect name="${name}" host="${jpda.host}" address="${jpda.address}" transport="${jpda.transport}">
+        <nbjpdaconnect address="${jpda.address}" host="${jpda.host}" name="${name}" transport="${jpda.transport}">
             <classpath>
                 <path path="${debug.classpath}"/>
             </classpath>
@@ -324,19 +326,19 @@ is divided into following sections:
                 <contains string="${version-output}" substring="java version &quot;1.3"/>
             </or>
         </condition>
-        <condition property="debug-args-line" value="-Xdebug -Xnoagent -Djava.compiler=none" else="-Xdebug">
+        <condition else="-Xdebug" property="debug-args-line" value="-Xdebug -Xnoagent -Djava.compiler=none">
             <istrue value="${have-jdk-older-than-1.4}"/>
         </condition>
     </target>
-    <target name="run-debug-appclient" depends="init,-init-debug-args" if="can.debug.appclient">
+    <target depends="init,-init-debug-args" if="can.debug.appclient" name="run-debug-appclient">
         <macrodef name="debug-appclient" uri="http://www.netbeans.org/ns/j2ee-earproject/2">
             <attribute name="mainclass"/>
-            <attribute name="classpath" default="${debug.classpath}"/>
+            <attribute default="${debug.classpath}" name="classpath"/>
             <element name="customize" optional="true"/>
-            <attribute name="args" default="${application.args.param}"/>
+            <attribute default="${application.args.param}" name="args"/>
             <sequential>
                 <parallel>
-                    <java fork="true" classname="@{mainclass}">
+                    <java classname="@{mainclass}" fork="true">
                         <jvmarg line="${j2ee.appclient.tool.jvmoptions}"/>
                         <jvmarg line="${debug-args-line}"/>
                         <jvmarg value="-Xrunjdwp:transport=${jpda.transport},server=y,address=${jpda.address},suspend=y"/>
@@ -348,11 +350,11 @@ is divided into following sections:
                         </classpath>
                         <syspropertyset>
                             <propertyref prefix="run-sys-prop."/>
-                            <mapper type="glob" from="run-sys-prop.*" to="*"/>
+                            <mapper from="run-sys-prop.*" to="*" type="glob"/>
                         </syspropertyset>
                         <customize/>
                     </java>
-                    <nbjpdaconnect name="${name}" host="${jpda.host}" address="${jpda.address}" transport="${jpda.transport}">
+                    <nbjpdaconnect address="${jpda.address}" host="${jpda.host}" name="${name}" transport="${jpda.transport}">
                         <classpath>
                             <path path="${j2ee.platform.classpath}:${j2ee.appclient.tool.runtime}"/>
                             <path path="@{classpath}"/>
@@ -364,28 +366,28 @@ is divided into following sections:
                 </parallel>
             </sequential>
         </macrodef>
-        <nbdeploy debugmode="false" clientUrlPart="${client.urlPart}" clientModuleUri="${client.module.uri}"/>
+        <nbdeploy clientModuleUri="${client.module.uri}" clientUrlPart="${client.urlPart}" debugmode="false"/>
         <antcall target="debug-${app.client}"/>
     </target>
-    <target name="debug-doe4ejb3-app-client" depends="-debug-tool-doe4ejb3-app-client,-debug-java-doe4ejb3-app-client"/>
-    <target name="-debug-tool-doe4ejb3-app-client" unless="j2ee.clientName" if="j2ee.appclient.mainclass.args" depends="init,-as-retrieve-option-workaround">
-        <ear2:debug-appclient mainclass="${j2ee.appclient.tool.mainclass}" args="-client ${client.jar} ${j2ee.appclient.tool.args} ${j2ee.appclient.mainclass.tool.param} ${application.args.param}"/>
+    <target depends="-debug-tool-doe4ejb3-app-client,-debug-java-doe4ejb3-app-client" name="debug-doe4ejb3-app-client"/>
+    <target depends="init,-as-retrieve-option-workaround" if="j2ee.appclient.mainclass.args" name="-debug-tool-doe4ejb3-app-client" unless="j2ee.clientName">
+        <ear2:debug-appclient args="-client ${client.jar} ${j2ee.appclient.tool.args} ${j2ee.appclient.mainclass.tool.param} ${application.args.param}" mainclass="${j2ee.appclient.tool.mainclass}"/>
     </target>
-    <target name="-debug-java-doe4ejb3-app-client" if="j2ee.clientName" unless="j2ee.appclient.mainclass.args">
-        <ear2:debug-appclient mainclass="${main.class}" args="${application.args.param}" classpath="${jar.content.additional}"/>
+    <target if="j2ee.clientName" name="-debug-java-doe4ejb3-app-client" unless="j2ee.appclient.mainclass.args">
+        <ear2:debug-appclient args="${application.args.param}" classpath="${jar.content.additional}" mainclass="${main.class}"/>
     </target>
     <!--
     CLEANUP SECTION
     -->
-    <target name="deps-clean" depends="init" unless="no.deps">
-        <ant target="clean-ear" inheritall="false" antfile="${project.doe4ejb3-app-client}/build.xml">
-            <property name="dist.ear.dir" location="${build.dir}"/>
+    <target depends="init" name="deps-clean" unless="no.deps">
+        <ant antfile="${project.doe4ejb3-app-client}/build.xml" inheritall="false" target="clean-ear">
+            <property location="${build.dir}" name="dist.ear.dir"/>
         </ant>
-        <ant target="clean" inheritall="false" antfile="${project.doe4ejb3-test-ejb3}/build.xml">
-            <property name="dist.ear.dir" location="${build.dir}"/>
+        <ant antfile="${project.doe4ejb3-test-ejb3}/build.xml" inheritall="false" target="clean">
+            <property location="${build.dir}" name="dist.ear.dir"/>
         </ant>
     </target>
-    <target name="do-clean" depends="init">
+    <target depends="init" name="do-clean">
         <delete dir="${build.dir}"/>
         <delete dir="${dist.dir}"/>
         <delete dir="${build.dir}"/>
@@ -394,5 +396,5 @@ is divided into following sections:
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
-    <target name="clean" depends="init,deps-clean,do-clean,post-clean" description="Clean build products."/>
+    <target depends="init,deps-clean,do-clean,post-clean" description="Clean build products." name="clean"/>
 </project>

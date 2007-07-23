@@ -2,6 +2,11 @@
 <project xmlns="http://www.netbeans.org/ns/project/1">
     <type>org.netbeans.modules.j2ee.clientproject</type>
     <configuration>
+        <buildExtensions xmlns="http://www.netbeans.org/ns/ant-build-extender/1">
+            <extension file="extendArchiveGF.xml" id="gfarchiveextend">
+                <dependency dependsOn="-extend-archive" target="-pre-dist"/>
+            </extension>
+        </buildExtensions>
         <data xmlns="http://www.netbeans.org/ns/car-project/1">
             <name>doe4ejb3-app-client</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
