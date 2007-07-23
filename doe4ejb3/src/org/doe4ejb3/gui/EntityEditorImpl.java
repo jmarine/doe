@@ -51,6 +51,11 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     /**
      * Creates a new instance of EntityEditorImpl
      */
+    public EntityEditorImpl() 
+    {
+        this(null, null, false);
+    }
+    
     public EntityEditorImpl(String puName, Class entityClass, boolean embedded) 
     {
         this.puName = puName;
