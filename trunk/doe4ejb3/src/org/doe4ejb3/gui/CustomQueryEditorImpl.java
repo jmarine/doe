@@ -7,7 +7,6 @@
 
 package org.doe4ejb3.gui;
 
-import org.doe4ejb3.binding.JComponentDataBinding;
 import java.beans.*;
 import java.lang.reflect.*;
 import java.lang.annotation.*;
@@ -82,7 +81,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             count++;
             JComboBox operator = (JComboBox)selector.getClientProperty("operator");
             if( (selector.getSelectedIndex() > 0) && (operator.getSelectedIndex() > 0) ) {
-                JComponentDataBinding binding = (JComponentDataBinding)selector.getClientProperty("dataBinding");
+                Object binding = selector.getClientProperty("dataBinding");
                 try {
                     HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
                     String parameterName = property.getName() + count;
@@ -163,7 +162,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         repaint();
     }
 
-
+    
     public void itemStateChanged(java.awt.event.ItemEvent event) 
     {
         JComboBox selector = (JComboBox)event.getSource();
@@ -171,11 +170,10 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         JPanel editorContainer = (JPanel)selector.getClientProperty("editorContainer");
 
         // clear previous bindings/editors
-        JComponentDataBinding oldBinding = (JComponentDataBinding)selector.getClientProperty("dataBinding");
+        Object oldBinding = selector.getClientProperty("dataBinding");
         if(oldBinding != null) 
         {
-            oldBinding.unbind();
-            bindingContext.removeBinding(oldBinding);
+            unbind(oldBinding);
             selector.putClientProperty("dataBinding", null);
         }
         editorContainer.removeAll();
@@ -200,10 +198,9 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                 operator.setSelectedIndex(1);
             }
 
-            JComponentDataBinding binding = (JComponentDataBinding)comp.getClientProperty("dataBinding");
+            Object binding = comp.getClientProperty("dataBinding");
             if(binding != null) {
-                bindingContext.addBinding(binding);
-                binding.bind();
+                bind(binding);
                 selector.putClientProperty("dataBinding", binding);
             }
 
@@ -261,5 +258,28 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         
         return properties;
     }
-   
+
+
+    // JSR 295 migration:
+    private void bind(Object binding)
+    {
+        if(binding != null) {
+            bindingContext.addBinding(binding);
+            if(binding instanceof javax.beans.binding.Binding) ((javax.beans.binding.Binding)binding).bind();
+            else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).bind();
+            else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
+        }
+    }
+    
+    private void unbind(Object binding)
+    {
+        if(binding != null) {
+            if(binding instanceof javax.beans.binding.Binding) ((javax.beans.binding.Binding)binding).unbind();
+            else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).unbind();
+            else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
+            bindingContext.removeBinding(binding);
+        }
+    }
+
+    
 }

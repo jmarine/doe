@@ -10,6 +10,7 @@ package org.doe4ejb3.beans;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyEditorManager;
 import java.lang.reflect.Constructor;
@@ -22,7 +23,7 @@ import javax.swing.SpinnerDateModel;
 import javax.persistence.TemporalType;
 
 
-public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport 
+public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport implements PropertyChangeListener
 {
 
     private java.util.Date polymorphicTemporalTypeValue;
@@ -37,6 +38,7 @@ public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport
             this.polymorphicTemporalTypeValue = (java.util.Date)constructor.newInstance(0);
             this.simpleDateFormat = null;
             this.spinner = new JSpinner();
+            this.spinner.addPropertyChangeListener(this);  // if TemporalTypeEditorSupport is derived from PropertyEditorSupport, it is done automagically by EditorFactory (to bind edited properties back to entity object via JSR 295)
             this.spinner.putClientProperty("fixedSize", "true");
             if(temporalClass.isAssignableFrom(java.sql.Date.class)) {
                 this.spinner.setModel(new SpinnerDateModel());
@@ -59,15 +61,14 @@ public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport
     }
     
     
-
     public void setAsText(String text) throws java.lang.IllegalArgumentException {
         try { 
             if(simpleDateFormat != null) {
-                spinner.setValue(simpleDateFormat.parse(text)); 
+                setValue(simpleDateFormat.parse(text)); 
             } else {
                 Method valueOfMethod = polymorphicTemporalTypeValue.getClass().getMethod("valueOf", String.class);
                 java.util.Date tmp = (java.util.Date)valueOfMethod.invoke(null, text);
-                spinner.setValue(tmp);
+                setValue(tmp);
             }
         } catch(Exception ex) { 
             throw new IllegalArgumentException(ex.getMessage(), ex); 
@@ -76,7 +77,9 @@ public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport
     
     public void setValue(Object value) {
         try {
+            if(value == null) value = new java.util.Date();
             spinner.setValue((java.util.Date)value);
+            firePropertyChange();
         } catch(Exception ex) {
             System.out.println("TemporalTypeEditorSupport.setValue: Error: " + ex.getMessage());
             ex.printStackTrace();
@@ -114,6 +117,13 @@ public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport
         PropertyEditorManager.registerEditor(java.sql.Date.class, CustomSqlDateEditor.class);
         PropertyEditorManager.registerEditor(java.sql.Time.class, CustomSqlTimeEditor.class);
         PropertyEditorManager.registerEditor(java.sql.Timestamp.class, CustomSqlTimestampEditor.class);
+    }
+
+    
+    public void propertyChange(PropertyChangeEvent evt) {
+        if("value".equals(evt.getPropertyName())) {
+            firePropertyChange();
+        }
     }
 
     

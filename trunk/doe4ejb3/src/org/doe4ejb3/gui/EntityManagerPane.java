@@ -7,7 +7,6 @@
 
 package org.doe4ejb3.gui;
 
-import org.doe4ejb3.binding.JComponentDataBinding;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.lang.annotation.Annotation;
@@ -19,11 +18,9 @@ import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-import javax.swing.JTable;
 import javax.swing.DefaultListModel;
 import javax.swing.ListSelectionModel;
 
-import javax.persistence.Query;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
@@ -53,7 +50,7 @@ public class EntityManagerPane extends javax.swing.JPanel
 
         try {
             // post initialization:
-            JComponentDataBinding outBinding[] = new JComponentDataBinding[1];
+            Object outBinding[] = new Object[1];
             entityListEditor = EditorFactory.getCollectionEditor(puName, null, entityClass, true, outBinding);
             listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");
             listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");

@@ -8,7 +8,6 @@
 package org.doe4ejb3.gui;
 
 import java.awt.Image;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -18,7 +17,7 @@ import java.io.FileOutputStream;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-        
+
 
 public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4ejb3.gui.PropertyEditorInterface
 {
@@ -68,21 +67,25 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
 
         add(jPanelButtons, java.awt.BorderLayout.SOUTH);
     }// </editor-fold>//GEN-END:initComponents
-    
+
     
     public void setValue(Object value) throws Exception
     {
-        if(value != null) {
-            byte tmpData[] = (byte[])value;
-            jLabelIcon.setIcon(createImageIcon(tmpData));
-            imageRawData = tmpData;
-            jButtonSave.setEnabled(true);
-            jButtonClear.setEnabled(true);
-        } else {
-            imageRawData = null;
-            jLabelIcon.setIcon(null);
-            jButtonSave.setEnabled(false);
-            jButtonClear.setEnabled(false);
+        byte oldImageRawData[] = imageRawData;
+        if(value != oldImageRawData) {
+            if(value != null) {
+                byte tmpData[] = (byte[])value;
+                jLabelIcon.setIcon(createImageIcon(tmpData));
+                imageRawData = tmpData;
+                jButtonSave.setEnabled(true);
+                jButtonClear.setEnabled(true);
+            } else {
+                imageRawData = null;
+                jLabelIcon.setIcon(null);
+                jButtonSave.setEnabled(false);
+                jButtonClear.setEnabled(false);
+            }
+            firePropertyChange("value", oldImageRawData, imageRawData);
         }
     }
 
@@ -287,5 +290,6 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
         {
             setMessage("Error: " + cause.getMessage());
         }
-    }    
+    }
+
 }
