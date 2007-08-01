@@ -7,29 +7,19 @@
 
 package org.doe4ejb3.gui;
 
-import org.doe4ejb3.binding.JComponentDataBinding;
 import java.beans.*;
 import java.lang.reflect.*;
 import java.lang.annotation.*;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 
 import javax.swing.*;
 
 import javax.persistence.TemporalType;
-import javax.persistence.Entity;
 
 import org.doe4ejb3.binding.*;
-import org.doe4ejb3.util.JPAUtils;
-import org.doe4ejb3.util.ReflectionUtils;
 
 /**
  *
@@ -91,7 +81,7 @@ public class QueryParametersEditorImpl extends JPanel
         int defaultLength = 20;
         JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, defaultLength, TemporalType.TIMESTAMP);
         if(comp != null) {
-            JComponentDataBinding binding = (JComponentDataBinding)comp.getClientProperty("dataBinding");
+            Object binding = comp.getClientProperty("dataBinding");
             if(binding != null) bindingContext.addBinding(binding);
 
             add(new JLabel(capitalize(I18n.getLiteral(property.getName())) + ":"), gbcLabel);

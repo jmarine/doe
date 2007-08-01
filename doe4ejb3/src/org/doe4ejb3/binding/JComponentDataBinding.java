@@ -18,8 +18,11 @@ import java.util.HashSet;
 import org.doe4ejb3.util.ReflectionUtils;
 
 
-public class JComponentDataBinding extends Binding
+public class JComponentDataBinding
 {
+    private boolean active;
+    private javax.beans.binding.Binding.UpdateStrategy updateStrategy;
+    
     private Object  componentUI;
     private Method  componentDataGetter;
     private PropertyEditor editor;
@@ -28,18 +31,25 @@ public class JComponentDataBinding extends Binding
     
     public JComponentDataBinding(Object componentUI, Method componentDataGetter, PropertyEditor editor, Property entityProperty) 
     {
+        this.active = false; 
         this.componentUI = componentUI;
         this.componentDataGetter = componentDataGetter;
         this.editor = editor;
         this.entityProperty = entityProperty;
-        setUpdateStrategy(UpdateStrategy.READ_ONCE);
+        setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
     }
     
+
+    public void bind()
+    {
+        if(active) throw new IllegalStateException("Binding is already active");
+        active = true;
+    }
+        
     
-    @Override
     void commitChanges() throws IllegalStateException, IllegalAccessException, InvocationTargetException
     {
-        super.commitChanges();
+        if(!active) throw new IllegalStateException("Binding is not active");
                 
         try {
         
@@ -75,6 +85,22 @@ public class JComponentDataBinding extends Binding
             ex.printStackTrace();
             // throw ex;  // FIXME: SHOULD REALLY FAIL
         }
+    }
+
+    public void unbind()
+    {
+        if(!active) throw new IllegalStateException("Binding was not active");
+        active = false;
+    }
+    
+    public void setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy strategy)
+    {
+        this.updateStrategy = strategy;
+    }
+    
+    public javax.beans.binding.Binding.UpdateStrategy getUpdateStrategy() 
+    {
+        return updateStrategy;
     }
     
 }

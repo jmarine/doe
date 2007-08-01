@@ -7,7 +7,6 @@
 
 package org.doe4ejb3.gui;
 
-import org.doe4ejb3.binding.JComponentDataBinding;
 import java.beans.*;
 import java.lang.reflect.*;
 import java.lang.annotation.*;
@@ -190,7 +189,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         Object relationType = null;
         GridBagConstraints gbc = gbcComponent;
         Component comp = null;
-        JComponentDataBinding binding = null;
+        Object binding = null;
         java.beans.PropertyEditor editor = null;
         org.doe4ejb3.annotation.PropertyDescriptor propertyDescriptor = null;
         
@@ -296,7 +295,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                 javax.persistence.TemporalType defaultTemporalType = javax.persistence.TemporalType.TIMESTAMP;
                 if( (temporal != null) && (temporal.value() != null) ) defaultTemporalType = temporal.value();
                 comp = EditorFactory.getPropertyEditor(puName, entityProperty, maxLength, defaultTemporalType);
-                binding = (JComponentDataBinding)((JComponent)comp).getClientProperty("dataBinding");
+                binding = ((JComponent)comp).getClientProperty("dataBinding");
                 
             }
 
@@ -311,7 +310,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                     }
                 } else {
                     if(binding == null) {
-                        binding = new JComponentDataBinding(comp, compGetter, editor, entityProperty);
+                        binding = new org.doe4ejb3.binding.JComponentDataBinding(comp, compGetter, editor, entityProperty);
                     }
                     if( (comp != null) && (comp instanceof JComponent) ) {
                         ((JComponent)comp).putClientProperty("dataBinding", binding);
