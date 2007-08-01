@@ -51,6 +51,9 @@ public class Recipe implements java.io.Serializable
     private Date date;
     
     private byte photo[];
+    
+    private boolean published;
+
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -149,6 +152,18 @@ public class Recipe implements java.io.Serializable
    public byte[] getPhoto()
    {
         return this.photo;
+   }
+   
+   @PropertyDescriptor(index=8)
+   @Column(name="PUBLISHED", nullable=true)
+   public boolean getPublished() 
+   {
+        return published;
+   }
+
+   public void setPublished(boolean published) 
+   {
+        this.published = published;
    }
 
    public void setPhoto(byte photo[])
