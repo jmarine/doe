@@ -57,7 +57,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
             editor.setEntity(entity);
             jButtonDelete.setVisible(true);
             jButtonPrint.setVisible(true);
-            ActionMap actionMap = application.Application.getInstance(Application.class).getContext().getActionMap(entityClass, editor.getEntity());
+            ActionMap actionMap = application.Application.getInstance(Application.class).getContext().getActionMap(entityClass, entity);
             if( (actionMap != null) && (actionMap.keys() != null) ) {
                 for(Object action : actionMap.keys()) {
                     System.out.println("Action found: " + action);
