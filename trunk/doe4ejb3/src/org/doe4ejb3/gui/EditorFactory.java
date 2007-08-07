@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import javax.beans.binding.BindingConverter;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -226,11 +227,12 @@ public class EditorFactory
                         if(value != null) propertyComponent.setValue(value);
                         binding = new JComponentDataBinding(propertyComponent, editorGetter, null, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).                
                     
-                        // New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
-                        // System.out.println("WARNING: jsr295 binding of PropertyDescriptor with editorClassName  (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
-                        // javax.beans.binding.Binding stdBinding = new javax.beans.binding.Binding(property, "${value}", propertyComponent, "value");
-                        // stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
-                        // binding = stdBinding;
+                        /** New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
+                        System.out.println("WARNING: jsr295 binding of PropertyDescriptor with editorClassName  (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
+                        javax.beans.binding.Binding stdBinding = new javax.beans.binding.Binding(property, "${value}", propertyComponent, "value");
+                        stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
+                        binding = stdBinding;
+                        */
                         
                     } catch(Exception ex) {
                         comp = null;
@@ -265,25 +267,28 @@ public class EditorFactory
                     if(value != null) editor.setValue(value);
                     binding = new JComponentDataBinding(editor, editorGetter, null, property);  // the 3 parameter is null to get real value from "editor.getValue" method (no conversion to string representation).
 
-                    //FIXME:// New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
-                    //FIXME:// Warning: the target has been configured with a PropertyEditor, and it should fire property changes to actually bind the edited values back to entity object
-                    //FIXME:// (so it rather never works, because modifications are made with the custom editor and the propertychange events aren't normally propagated to PropertyEditor listeners)
-                    //FIXME:final java.beans.PropertyEditor editorFinal = editor;
-                    //FIXME:comp.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-                    //FIXME:   public void propertyChange(PropertyChangeEvent evt) {
-                    //FIXME:        // ¿should the real value be filtered with evt.getPropertyName()?
-                    //FIXME:        if(editorFinal instanceof PropertyEditorSupport) {
-                    //FIXME:            ((PropertyEditorSupport)editorFinal).firePropertyChange();
-                    //FIXME:        } else {
-                    //FIXME:            System.out.println("WARNING: jsr295 binding of non PropertyEditorSupport: remember to propagate UI changes from custom editor to PropertyEditor listeners");
-                    //FIXME:        }
-                    //FIXME:   }
-                    //FIXME:});
-                    //FIXME:
-                    //FIXME:System.out.println("WARNING: jsr295 binding of PropertyEditor with custom control (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
-                    //FIXME:javax.beans.binding.Binding stdBinding = new javax.beans.binding.Binding(property, "${value}", editor, "value");
-                    //FIXME:stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
-                    //FIXME:binding = stdBinding;
+                    /** 
+                     * FIXME: New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
+                     * Warning: the target has been configured with a PropertyEditor, and it should fire property changes to actually bind the edited values back to entity object
+                     * (so it rather never works, because modifications are made with the custom editor and the propertychange events aren't normally propagated to PropertyEditor listeners)
+                     *
+                    final java.beans.PropertyEditor editorFinal = editor;
+                    comp.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+                       public void propertyChange(PropertyChangeEvent evt) {
+                            // ¿should the real value be filtered with evt.getPropertyName()?
+                            if(editorFinal instanceof PropertyEditorSupport) {
+                                ((PropertyEditorSupport)editorFinal).firePropertyChange();
+                            } else {
+                                System.out.println("WARNING: jsr295 binding of non PropertyEditorSupport: remember to propagate UI changes from custom editor to PropertyEditor listeners");
+                            }
+                       }
+                    });
+                    
+                    System.out.println("WARNING: jsr295 binding of PropertyEditor with custom control (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
+                    javax.beans.binding.Binding stdBinding = new javax.beans.binding.Binding(property, "${value}", editor, "value");
+                    stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
+                    binding = stdBinding;
+                    */
 
 
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
@@ -293,6 +298,7 @@ public class EditorFactory
                     //Original binding (with setup of initial value):
                     comp.putClientProperty("fixedSize", "true");
                     compGetter = checkBox.getClass().getMethod("isSelected");
+                    binding = new JComponentDataBinding(comp, compGetter, editor, property);
 
                     Object booleanObject = property.getValue();
                     Boolean value = (Boolean)booleanObject;
@@ -300,12 +306,13 @@ public class EditorFactory
                         checkBox.setSelected(value.booleanValue());
                     }
                     
-                    //New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
-                    //System.out.println("WARNING: jsr295 binding of boolean property (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");                    
-                    //javax.beans.binding.Binding stdBinding = new javax.beans.binding.Binding(property, "${value}", checkBox, "selected");
-                    //stdBinding.setNullSourceValue(false);
-                    //stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
-                    //binding = stdBinding;
+                    /** New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
+                    System.out.println("WARNING: jsr295 binding of boolean property (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");                    
+                    javax.beans.binding.Binding stdBinding = new javax.beans.binding.Binding(property, "${value}", checkBox, "selected");
+                    stdBinding.setNullSourceValue(false);
+                    stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
+                    binding = stdBinding;
+                    */
 
                 } else { // using JTextField or JTextArea depending on Column's length attribute
 
@@ -318,7 +325,6 @@ public class EditorFactory
                     } else {
                         textField = new javax.swing.JTextPane();
                         compGetter = textField.getClass().getMethod("getText");
-                        binding = new JComponentDataBinding(textField, compGetter, editor, property);                        
                         comp = new JScrollPane(textField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
                         comp.setPreferredSize(new java.awt.Dimension(400, 80));
                     }
@@ -328,6 +334,8 @@ public class EditorFactory
                         doc.setDocumentFilter(new DocumentSizeFilter(maxLength));
                     }
 
+                    // Original binding (with setup of initial value):
+                    binding = new JComponentDataBinding(textField, compGetter, editor, property);                        
                     Object value = property.getValue();
                     if(value != null) {
                         if(editor != null) {
@@ -337,6 +345,38 @@ public class EditorFactory
                             textField.setText(value.toString());
                         }
                     }
+                    
+                    /** New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
+                    System.out.println("WARNING: jsr295 binding of text property (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");                    
+                    javax.beans.binding.Binding stdBinding = new javax.beans.binding.Binding(property, "${value}", textField, "text");
+                    stdBinding.setNullSourceValue("");
+                    stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
+                    binding = stdBinding;
+                    
+                    BindingConverter converter = null;
+                    if( (stdBinding != null) && (editor != null) ) {
+                        final java.beans.PropertyEditor editorFinal = editor;
+                        System.out.println("Creating binding converter for property: " + property.getName());
+                        converter = new BindingConverter() {
+                            public Object sourceToTarget(Object arg0) {
+                                System.out.println("**** SOURCE TO TARGET: obj=" + arg0);
+                                editorFinal.setValue(arg0);
+                                System.out.println("**** SOURCE TO TARGET: text=" + editorFinal.getAsText());
+                                return editorFinal.getAsText();
+                            }
+
+                            @Override
+                            public Object targetToSource(Object arg0) {
+                                System.out.println("**** TARGET TO SOURCE : text=" + arg0);
+                                editorFinal.setAsText(arg0.toString());
+                                System.out.println("**** TARGET TO SOURCE : value=" + editorFinal.getValue());
+                                return editorFinal.getValue();
+                            }
+                        };
+                        stdBinding.setConverter(converter);
+                    }
+                    */
+                    
                 }
             } catch(Exception ex) {
                 System.out.println("Error: " + ex.getMessage());
@@ -477,7 +517,7 @@ public class EditorFactory
                                                 index = listModel.indexOf(event.getOldEntity());
                                                 System.out.println("EditorFactory: index found =  " + index);
                                                 if(index != -1) listModel.setElementAt(event.getNewEntity(), index);
-                                                else listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
+                                                else if(listModel.size() > 0) listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
                                                 break;
                                                 
                                             case EntityEvent.ENTITY_DELETE:
@@ -485,7 +525,7 @@ public class EditorFactory
                                                 index = listModel.indexOf(event.getOldEntity());
                                                 System.out.println("EditorFactory: index found =  " + index);
                                                 if(index != -1) listModel.removeElementAt(index);
-                                                else listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
+                                                else if(listModel.size() > 0) listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
                                                 break;
                                             
                                             default:
