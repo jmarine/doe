@@ -302,20 +302,32 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
             
             if(comp != null) {
                 if(generatedValue && (!objIsNew)) {
+
+                    if(binding != null) {
+                        if(binding instanceof javax.beans.binding.Binding) {
+                            javax.beans.binding.Binding stdBinding = (javax.beans.binding.Binding)binding;
+                            stdBinding.bind();    // load initial value of property to UI,
+                            stdBinding.unbind();  // but don't commit changes to entity object
+                        }
+                    }
+                    
                     if(comp instanceof JScrollPane) {
                         JScrollPane scroll = (JScrollPane)comp;
                         scroll.getViewport().getView().setEnabled(false);
                     } else {
                         comp.setEnabled(false);
                     }
+                    
                 } else {
                     if(binding == null) {
                         binding = new org.doe4ejb3.binding.JComponentDataBinding(comp, compGetter, editor, entityProperty);
                     }
+                    
+                    bindingContext.addBinding(binding);
                     if( (comp != null) && (comp instanceof JComponent) ) {
                         ((JComponent)comp).putClientProperty("dataBinding", binding);
                     }
-                    bindingContext.addBinding(binding);
+
                 }
             }
 
