@@ -147,15 +147,16 @@ public class EditorFactory
                     // OneToOne || ManyToOne
                     try {
                         final javax.swing.DefaultComboBoxModel comboBoxModel = new javax.swing.DefaultComboBoxModel();
-                        final JComboBox combo = new JComboBox(comboBoxModel);
                         final Class optionClass = memberClass;
+                        final JComboBox combo = new JComboBoxJSR295(comboBoxModel);
 
                         // define combobox prototype dimensions
                         EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, true);
                         combo.setMinimumSize(new java.awt.Dimension(50,26));  // it was too wided
                         combo.setTransferHandler(entityTransferHandler);
-                        combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");
-                        for(int i = 0; i < 10; i++) combo.addItem(null);
+                        combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");  // define width dimension
+                        for(int i = 0; i < 10; i++) combo.addItem(null);  // define height dimension
+                        comp = combo;
 
                         combo.addPopupMenuListener(new PopupMenuListener() {
                             public void popupMenuCanceled(PopupMenuEvent e) { }
@@ -190,8 +191,9 @@ public class EditorFactory
                             }
                         });
 
-                        comp = combo;
+                        // Original binding (with setup of initial value):
                         compGetter = comp.getClass().getMethod("getSelectedItem");
+                        binding = new JComponentDataBinding(comp, compGetter, null, property);
 
                         Object value = property.getValue();
                         if(value != null) {
@@ -200,6 +202,16 @@ public class EditorFactory
                         } else {
                             combo.setSelectedIndex(0);
                         }
+
+                        
+                        /** New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
+                        System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JComboBox  (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
+                        Object value = property.getValue();
+                        if(value != null) combo.addItem(value);
+                        javax.beans.binding.Binding stdBinding = new javax.beans.binding.Binding(property, "${value}", combo, "selectedItem");
+                        stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
+                        binding = stdBinding;
+                        */
 
                     } catch(Exception ex) {
                         System.out.println("Error loading property: " + ex.getMessage());
