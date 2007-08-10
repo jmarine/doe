@@ -57,7 +57,7 @@ public class JComponentDataBinding
             
             Class memberClass = entityProperty.getType();
             boolean convertToCollection = java.util.Collection.class.isAssignableFrom(memberClass);
-            if( (convertToCollection) && (value.getClass().isArray()) ) {  // Code has been already moved to ObjectProperty.setValue method
+            if( (convertToCollection) && (value.getClass().isArray()) ) {  // Code has already been copied to ObjectProperty.setValue method
                 Class collectionClass = memberClass;
 
                 // ParameterizedType paramType = (ParameterizedType)memberType;
