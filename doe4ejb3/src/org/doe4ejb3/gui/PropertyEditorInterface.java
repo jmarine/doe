@@ -18,6 +18,12 @@ public interface PropertyEditorInterface
      */
     JComponent getJComponent();
 
+    /**
+     * Dimension of component
+     */
+    void setDimension(java.awt.Dimension dim);
+
+    
     /** 
      * Set value in the editor UI of the property
      * Important: value changes should be notified to registered PropertyChangeListeners 
