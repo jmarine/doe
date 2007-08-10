@@ -28,6 +28,7 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
     private ArrayList<Member> columnMembers;
     private ArrayList<org.doe4ejb3.annotation.PropertyDescriptor> columnPropertyDescriptors;
     private EventListenerList listenerList;
+    private java.beans.PropertyChangeSupport changeSupport;
     
     public ObjectPropertyTableModel(Class itemClass, DefaultListModel listModel) throws Exception
     {
@@ -38,6 +39,7 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
         this.columnMembers = new ArrayList<Member>();
         this.columnPropertyDescriptors = new ArrayList<org.doe4ejb3.annotation.PropertyDescriptor>();
         this.listenerList = new EventListenerList();
+        this.changeSupport = null;
 
         // TODO: order by index
         System.out.println("ObjectPropertyDescriptorTableModel: Scan columns...");
@@ -120,6 +122,29 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
     public boolean isCellEditable(int rowIndex, int columnIndex) {
         return false;
     }
+    
+    
+    public Object[] getValues()
+    {
+        return listModel.toArray();
+    }
+
+
+    public void setValues(Object values)
+    {
+        listModel.clear();
+        if(values != null) {
+            if(values instanceof java.util.Collection) {
+                values = ((java.util.Collection)values).toArray();
+            }
+            
+            // listModel.copyInto((Object[])values);
+            for(Object o : (Object[])values) {
+                listModel.addElement(o);
+            }
+        }
+    }
+    
 
     public Object getValueAt(int rowIndex, int columnIndex) {
         Object obj = listModel.getElementAt(rowIndex);
@@ -139,8 +164,10 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
         }
     }
 
+    // this method is not really used in the application
     public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        // not needed
+        ListDataEvent e = new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, rowIndex,rowIndex);
+        fireChangeEvents(e);
     }
 
     /**
@@ -179,6 +206,10 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
     
     private void fireChangeEvents(ListDataEvent e)
     {
+        // Change notification for JSR 295 bindings:
+        firePropertyChange("values", null, getValues());
+
+        // Change notification for JTable listeners:
         int tableModelEventType = TableModelEvent.UPDATE;
         switch(e.getType()) {
             case ListDataEvent.INTERVAL_ADDED: tableModelEventType = TableModelEvent.INSERT; break;
@@ -197,4 +228,28 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
             }
         }
     }
+    
+    public synchronized void addPropertyChangeListener(java.beans.PropertyChangeListener listener) 
+    {
+        if (listener == null) {
+            return;
+        }
+        if (changeSupport == null) {
+            changeSupport = new java.beans.PropertyChangeSupport(this);
+        }
+        changeSupport.addPropertyChangeListener(listener);        
+    }
+
+    public synchronized void removePropertyChangeListener(java.beans.PropertyChangeListener listener)
+    {
+        if (listener != null && changeSupport != null) {
+            changeSupport.removePropertyChangeListener(listener);
+        }
+    }
+    
+    protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) 
+    {
+        if(changeSupport != null) changeSupport.firePropertyChange(propertyName, oldValue, newValue);
+    }
+    
 }
