@@ -103,7 +103,6 @@ public class EditorFactory
     public static JComponent getPropertyEditor(final String puName, Property property, int maxLength, TemporalType defaultTemporalType)
     {
         JComponent comp = null;
-        Method compGetter = null;
         java.beans.PropertyEditor editor = null;        
         Object binding = null;
         
@@ -192,7 +191,7 @@ public class EditorFactory
                         });
 
                         // Original binding (with setup of initial value):
-                        compGetter = comp.getClass().getMethod("getSelectedItem");
+                        Method compGetter = comp.getClass().getMethod("getSelectedItem");
                         binding = new JComponentDataBinding(comp, compGetter, null, property);
 
                         Object value = property.getValue();
@@ -232,6 +231,11 @@ public class EditorFactory
                     try {
                         org.doe4ejb3.gui.PropertyEditorInterface propertyComponent  = (org.doe4ejb3.gui.PropertyEditorInterface)Class.forName(pd.editorClassName()).newInstance();
                         comp = propertyComponent.getJComponent();
+                        if(pd.width() != 0 && pd.height() != 0) {
+                            propertyComponent.setDimension(new java.awt.Dimension(pd.width(), pd.height()));
+                            comp.putClientProperty("fixedSize", "true");
+                        }
+                        
 
                         //Original binding (with setup of initial value):
                         Method editorGetter = propertyComponent.getClass().getMethod("getValue");
@@ -306,10 +310,10 @@ public class EditorFactory
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
                     JCheckBox checkBox = new JCheckBox();
                     comp = checkBox;
-                    
-                    //Original binding (with setup of initial value):
                     comp.putClientProperty("fixedSize", "true");
-                    compGetter = checkBox.getClass().getMethod("isSelected");
+
+                    //Original binding (with setup of initial value):
+                    Method compGetter = checkBox.getClass().getMethod("isSelected");
                     binding = new JComponentDataBinding(comp, compGetter, editor, property);
 
                     Object booleanObject = property.getValue();
@@ -329,6 +333,7 @@ public class EditorFactory
                 } else { // using JTextField or JTextArea depending on Column's length attribute
 
                     JTextComponent textField = null;
+                    Method compGetter = null;
                     if( (maxLength >= 0) && (maxLength < 100) ) {
                         textField = (maxLength > 0) ? new JTextField(maxLength) : new JTextField();
                         compGetter = textField.getClass().getMethod("getText");
@@ -397,18 +402,11 @@ public class EditorFactory
         }
 
             
-        if(comp != null) {
-            if(binding == null) {
-                binding = new JComponentDataBinding(comp, compGetter, editor, property);
-            }
-
+        if( (comp != null) && (binding != null) ) {
+            comp.putClientProperty("dataBinding", binding);
             if(binding instanceof javax.beans.binding.Binding) {
                 javax.beans.binding.Binding stdBinding = (javax.beans.binding.Binding)binding;
                 stdBinding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
-            }
-
-            if( (comp != null) && (comp instanceof JComponent) ) {
-                comp.putClientProperty("dataBinding", binding);
             }
         }
         
@@ -446,7 +444,7 @@ public class EditorFactory
         panel.putClientProperty("listSelectionModel", listSelectionModel);
         
         if(property != null) {
-            // configure data binding
+            // Original binding (with setup of initial value):
             Method modelGetter = listModel.getClass().getMethod("toArray");
             JComponentDataBinding binding = new JComponentDataBinding(listModel, modelGetter, null, property);
             binding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
@@ -462,6 +460,14 @@ public class EditorFactory
                     listModel.addElement(valueToSelect);
                 }
             }
+            
+            /* New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
+            System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JTable (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
+            javax.beans.binding.Binding binding = new javax.beans.binding.Binding(property, "${value}", objectPropertyTableModel, "values");
+            binding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
+            bindingOutParam[0] = binding;
+            */
+            
         }
 
         // configure actions:
