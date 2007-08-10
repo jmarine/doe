@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import java.awt.Dimension;
 import java.awt.Image;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -46,7 +47,10 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
 
         setLayout(new java.awt.BorderLayout());
 
-        jScrollPane.setPreferredSize(new java.awt.Dimension(200, 180));
+        jScrollPane.setPreferredSize(new java.awt.Dimension(300, 175));
+
+        jLabelIcon.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        jLabelIcon.setVerticalAlignment(javax.swing.SwingConstants.TOP);
         jScrollPane.setViewportView(jLabelIcon);
 
         add(jScrollPane, java.awt.BorderLayout.CENTER);
@@ -98,6 +102,13 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
         return this;
     }
 
+    public void setDimension(Dimension dim) {
+        if(dim.width != 0 && dim.height != 0) {
+            this.remove(jScrollPane);
+            this.add(jScrollPane, java.awt.BorderLayout.WEST);
+            jScrollPane.setPreferredSize(dim);
+        }
+    }
     
     private ImageIcon createImageIcon(byte imageRawData[]) throws Exception
     {

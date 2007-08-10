@@ -24,4 +24,6 @@ public @interface PropertyDescriptor {
     OptionDescriptor[] options() default {};
     String editorClassName() default "";
     boolean hidden() default false;
+    int width() default 0;
+    int height() default 0;
 }
