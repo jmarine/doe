@@ -78,12 +78,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         // Replace left component with jOutlinePane
         jSplitPaneCentral.setLeftComponent(jOutlinePanePersistenceUnits);
         
-        
         // replace JDesktopPane with a better  MDI container
         mdiDesktopPane = new MDIDesktopPane();
         jScrollDesktopPane.setViewportView(mdiDesktopPane);
         jSplitPaneCentral.setRightComponent(jScrollDesktopPane);
         jMainMenuBar.add(new WindowMenu(mdiDesktopPane), 2);
+
+        jSplitPaneCentral.setDividerLocation(200);
         
         
         // status bar initialization
