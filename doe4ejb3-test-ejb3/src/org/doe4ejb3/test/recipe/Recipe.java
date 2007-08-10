@@ -16,8 +16,6 @@ import application.Action;
 
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -26,9 +24,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
@@ -54,6 +50,8 @@ public class Recipe implements java.io.Serializable
     
     private boolean published;
 
+    private Category category;
+
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -62,7 +60,7 @@ public class Recipe implements java.io.Serializable
         return id;
     }
 
-    public void setId(Integer id)
+    protected void setId(Integer id)
     {
         this.id = id;
     }
@@ -103,7 +101,6 @@ public class Recipe implements java.io.Serializable
         this.date = date;
     }
 
-    private Category category;
 
     @ManyToOne
     @PropertyDescriptor(index=4)
@@ -120,7 +117,7 @@ public class Recipe implements java.io.Serializable
     private Set<Ingredient> ingredients = new HashSet<Ingredient>();
 
     @PropertyDescriptor(index=5)
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = { CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE })  // don't delete ingredients used in other recipes
     //@Collection(child = true)
     public Set<Ingredient> getIngredients()
     {
@@ -146,31 +143,32 @@ public class Recipe implements java.io.Serializable
         this.instructions = instructions;
     }
     
-   @PropertyDescriptor(index=7,editorClassName="org.doe4ejb3.gui.ImagePropertyEditor",displayName="Photo")
-   @Lob
-   @Column(name = "PHOTO", columnDefinition="BLOB")
-   public byte[] getPhoto()
-   {
+    @PropertyDescriptor(index=7,editorClassName="org.doe4ejb3.gui.ImagePropertyEditor",displayName="Photo", width=300, height=175)
+    @Lob
+    @Column(name = "PHOTO", columnDefinition="BLOB")
+    public byte[] getPhoto()
+    {
         return this.photo;
-   }
+    }
    
-   @PropertyDescriptor(index=8)
-   @Column(name="PUBLISHED", nullable=true)
-   public boolean getPublished() 
-   {
+    @PropertyDescriptor(index=8)
+    @Column(name="PUBLISHED", nullable=true)
+    public boolean getPublished() 
+    {
         return published;
-   }
+    }
 
-   public void setPublished(boolean published) 
-   {
+    public void setPublished(boolean published) 
+    {
         this.published = published;
-   }
+    }
 
-   public void setPhoto(byte photo[])
-   {
+    public void setPhoto(byte photo[])
+    {
         this.photo = photo;
-   }    
+    }    
     
+    @Override
     public String toString()
     {
         return title;
