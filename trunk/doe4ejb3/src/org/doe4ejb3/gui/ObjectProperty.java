@@ -35,7 +35,6 @@ public class ObjectProperty implements Property
     private PropertyDescriptor propertyDescriptor;
 
     private Class  memberClass;
-    private Type   memberType;
     
     private Annotation annotations[];
     
@@ -45,6 +44,7 @@ public class ObjectProperty implements Property
     {
         this.obj = obj;
         this.field = field;
+        this.memberClass = field.getType();
         this.propertyName = decapitalize(field.getName());
     }
 
@@ -52,6 +52,7 @@ public class ObjectProperty implements Property
     {
         this.obj = obj;
         this.propertyDescriptor = propertyDescriptor;
+        this.memberClass = propertyDescriptor.getPropertyType();
         this.propertyName = decapitalize(propertyDescriptor.getName());
         
         try { 
@@ -183,9 +184,26 @@ public class ObjectProperty implements Property
         return retval;
     }
 
-    
+
     public void setValue(Object value) throws IllegalAccessException, InvocationTargetException
     {
+        boolean convertToCollection = java.util.Collection.class.isAssignableFrom(memberClass);
+        if( (convertToCollection) && (value.getClass().isArray()) ) {
+                Class collectionClass = memberClass;
+
+                // ParameterizedType paramType = (ParameterizedType)memberType;
+                // memberClass = (Class)(paramType.getActualTypeArguments()[0]);            
+
+                // FIXME: Create generic collection for "collectionClass"?
+                java.util.Collection<Object> list = (java.util.Set.class.isAssignableFrom(memberClass))? new java.util.HashSet<Object>() : new java.util.ArrayList<Object>();
+                for(int index = 0; index < java.lang.reflect.Array.getLength(value); index++) {
+                    list.add(java.lang.reflect.Array.get(value, index));
+                }
+
+                // FIXME: Is this cast really needed?
+                value = collectionClass.cast(list);
+        }
+        
         if( (propertyDescriptor != null) && (propertyDescriptor.getWriteMethod() != null) ) {
             System.out.println("> Setting " + propertyName + " (type: " + propertyDescriptor.getPropertyType().getName() + ") with value = " + value);
             if(value != null) System.out.println("- Value type: " + value.getClass().getName());
