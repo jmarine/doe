@@ -57,22 +57,23 @@ public class JComponentDataBinding
             
             Class memberClass = entityProperty.getType();
             boolean convertToCollection = java.util.Collection.class.isAssignableFrom(memberClass);
-            if( (convertToCollection) && (value.getClass().isArray()) ) {
+            if( (convertToCollection) && (value.getClass().isArray()) ) {  // Code has been already moved to ObjectProperty.setValue method
                 Class collectionClass = memberClass;
 
                 // ParameterizedType paramType = (ParameterizedType)memberType;
                 // memberClass = (Class)(paramType.getActualTypeArguments()[0]);            
 
                 // FIXME: Create generic collection for "collectionClass"?
-                java.util.Collection list = (java.util.Set.class.isAssignableFrom(memberClass))? new HashSet() : new java.util.ArrayList();
+                java.util.Collection<Object> list = (java.util.Set.class.isAssignableFrom(memberClass))? new HashSet<Object>() : new java.util.ArrayList<Object>();
                 for(int index = 0; index < Array.getLength(value); index++) {
                     list.add(Array.get(value, index));
                 }
 
                 // FIXME: Is this cast really needed?
                 value = collectionClass.cast(list);
-
-            } else if(editor != null) {
+            } 
+            else 
+            if(editor != null) {
                 System.out.println("- Converting value with editor " + editor);
                 editor.setAsText(value.toString());  // string representation
                 value = editor.getValue();           // convert to editor's real type
