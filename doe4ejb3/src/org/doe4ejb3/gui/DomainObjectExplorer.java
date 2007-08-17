@@ -602,7 +602,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         }
     }
     
-    public Collection<Class> getVisiblePersistentEntities(String persistenceUnit) throws Exception
+    public static Collection<Class> getVisiblePersistentEntities(String persistenceUnit) throws Exception
     {
         Collection<Class> persistenceEntities = org.doe4ejb3.util.JPAUtils.getPersistentEntities(persistenceUnit);
         Iterator<Class> iter = persistenceEntities.iterator();

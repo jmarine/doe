@@ -267,7 +267,17 @@ public class EditorFactory
                 System.out.println("EditorFactory: property editor for " + memberClass.getName() + "=" + editor);
 
                 Component customComponent = null;
-                if( (editor != null) && (editor.supportsCustomEditor()) && ((customComponent = editor.getCustomEditor()) != null) ) {
+                try {
+                    if( (editor != null) && (editor.supportsCustomEditor()) ) {
+                        // Note: Netbeans' customized editors need the "attachEnv" method call (otherwise, they generate a NullPointerException)
+                        customComponent = editor.getCustomEditor();
+                    }
+                } catch(Exception ex) {
+                    System.out.println("WARNING: " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+                
+                if(customComponent != null) {
                     if(customComponent instanceof JComponent) {
                         comp = (JComponent)customComponent;
                     } else {
