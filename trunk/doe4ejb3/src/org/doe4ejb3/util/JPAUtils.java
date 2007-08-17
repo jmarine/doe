@@ -143,10 +143,10 @@ public class JPAUtils
                 }
 
                 for( String className : pu.getClazz() ) {
-                        System.out.println("> found class: " + className);
                         Class clazz = loader.loadClass(className);
                         Entity entity = (Entity)clazz.getAnnotation(javax.persistence.Entity.class);
                         if(entity != null) {
+                            System.out.println("> found entity class: " + className);
                             String puName = pu.getName();
                             if(puName == null) puName = "";
                             
