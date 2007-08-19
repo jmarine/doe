@@ -274,7 +274,7 @@ public class EditorFactory
                     }
                 } catch(Exception ex) {
                     System.out.println("WARNING: " + ex.getMessage());
-                    ex.printStackTrace();
+                    //ex.printStackTrace();
                 }
                 
                 if(customComponent != null) {
