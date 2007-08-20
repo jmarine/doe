@@ -86,17 +86,17 @@ public class EditorFactory
     /**
      * Creates a new instance of EditorFactory
      */
-    public static EntityEditorInterface getEntityEditor(String puName, Class entityClass, boolean embedded) throws ClassNotFoundException, IllegalAccessException, InstantiationException
+    public static EntityEditorInterface getEntityEditor(String puName, Class entityClass) throws ClassNotFoundException, IllegalAccessException, InstantiationException
     {
         // search for @EntityDescriptor annotation in @Entity/@Embedded class.
         EntityEditorInterface entityEditor = null;
         EntityDescriptor editorAnnotation = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
         if( (editorAnnotation != null) && (editorAnnotation.editorClassName() != null) && (editorAnnotation.editorClassName().length() > 0) ) {
             entityEditor = (EntityEditorInterface)Class.forName(editorAnnotation.editorClassName()).newInstance();
-            entityEditor.setPersistenceUnit(puName);
         } else {
-            entityEditor = new EntityEditorImpl(puName, entityClass, embedded);
+            entityEditor = new EntityEditorImpl();
         }
+        entityEditor.setPersistenceUnitName(puName);
         return entityEditor;
     }
     

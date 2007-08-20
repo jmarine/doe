@@ -1,5 +1,5 @@
 /**
- * OrderAttributeComparator.java
+ * PropertyOrderComparator.java
  *
  * Created on 29 July 2006, 21:39
  * @author Jordi Marine Fort
@@ -12,22 +12,19 @@ import java.lang.annotation.Annotation;
 
 import java.util.Comparator;
 import org.doe4ejb3.annotation.PropertyDescriptor;
+import org.doe4ejb3.gui.ObjectProperty;
 import org.doe4ejb3.util.ReflectionUtils;
 
-/**
- *
- * @author Jordi Marine Fort
- */
-public class PropertyOrderComparator implements Comparator {
+
+public class PropertyOrderComparator implements Comparator<ObjectProperty>
+{
     
     /** Creates a new instance of OrderAttributeComparator */
-    public PropertyOrderComparator() {
-    }
+    public PropertyOrderComparator() { }
 
-    public int compare(Object o1, Object o2) {
-        ObjectProperty p1 = (ObjectProperty)o1;
-        ObjectProperty p2 = (ObjectProperty)o2;
-        
+
+    public int compare(ObjectProperty p1, ObjectProperty p2) 
+    {
         boolean m1IsIdentity = p1.hasAnnotation(javax.persistence.Id.class);
         boolean m2IsIdentity = p2.hasAnnotation(javax.persistence.Id.class);
         
