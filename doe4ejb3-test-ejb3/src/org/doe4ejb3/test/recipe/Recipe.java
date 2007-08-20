@@ -177,7 +177,7 @@ public class Recipe implements java.io.Serializable
     @Action
     public void cookIt()
     {
-        System.out.println("Not implemented");
+        System.out.println("CookIt action is not implemented");
     }
 
 }
