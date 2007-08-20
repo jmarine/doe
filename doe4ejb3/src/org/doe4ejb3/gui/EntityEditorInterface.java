@@ -8,23 +8,42 @@
 package org.doe4ejb3.gui;
 
 import java.lang.reflect.InvocationTargetException;
+import javax.swing.JComponent;
 
 
-/**
- * Entity editors must also be a java.awt.Component
- *
- * @author Jordi Marine Fort
- */
-public interface EntityEditorInterface {
-
-    boolean isNew();
-
-    Object getEntity() throws IllegalAccessException, InvocationTargetException;
+public interface EntityEditorInterface 
+{
+    /**
+     * Injected persistence unit name
+     * (may be useful to get related entities with JPAUtils).
+     */
+    void setPersistenceUnitName(String puName);
     
+    
+    /**
+     * Get the UI provided by the EntityEditorInterface
+     */
+    public JComponent getJComponent();
+
+
+    /**
+     * To edit an existing object
+     */
     void setEntity(Object obj);
-    
+
+    /**
+     * To edit a new object 
+     */    
     void newEntity(Class entityClass) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
-    
-    void setPersistenceUnit(String puName);
+
+    /**
+     * Get the edited object
+     */
+    Object getEntity() throws IllegalAccessException, InvocationTargetException;
+
+    /**
+     * Returns true when editing a new object, o false when editing an existing object.
+     */
+    boolean isNew();
     
 }

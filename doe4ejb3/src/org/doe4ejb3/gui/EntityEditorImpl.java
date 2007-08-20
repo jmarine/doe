@@ -43,7 +43,6 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     private String  puName   = null;
     private Object  entity   = null;
     private boolean objIsNew = false;
-    private boolean embedded = false;
     private BindingContext bindingContext = new BindingContext();
     
     
@@ -52,26 +51,33 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
      */
     public EntityEditorImpl() 
     {
-        this(null, null, false);
-    }
-    
-    public EntityEditorImpl(String puName, Class entityClass, boolean embedded) 
-    {
-        this.puName = puName;
-        this.embedded = embedded;
         setMinimumSize(new java.awt.Dimension(550, 400));
     }
 
-    public void clearBindings()
+
+    public JComponent getJComponent() 
+    {
+        return this;
+    }
+
+
+    public void setPersistenceUnitName(String puName)
+    {
+        this.puName = puName;
+    }
+
+    public String getPersistenceUnitName()
+    {
+        return this.puName;
+    }
+    
+    
+    protected void clearBindings()
     {
         if(bindingContext != null) bindingContext.unbind();
         bindingContext = new BindingContext();
     }
-    
-    public void setPersistenceUnit(String puName)
-    {
-        this.puName = puName;
-    }
+
     
     public boolean isNew()
     {
@@ -88,7 +94,6 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     {
         Constructor init = entityClass.getConstructor();
         this.entity = init.newInstance();
-        System.out.println("newInstance: entity = " + entity);
         setEntity(entity, true);
     }
     
@@ -98,7 +103,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     }
     
 
-    private void setEntity(Object entity, boolean objIsNew)
+    protected void setEntity(Object entity, boolean objIsNew)
     {
         System.out.println("Entity: " + entity + ", isNew=" + objIsNew);
         
@@ -108,24 +113,10 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         clearBindings();
         removeAll();
         setLayout(new GridBagLayout());
-
-        Class entityClass = entity.getClass();
-
         
-        if(embedded) {
-            setBorder(javax.swing.BorderFactory.createTitledBorder(I18n.getEntityName(entityClass)));
-        } 
-        /*
-        else {
-            JLabel title = new JLabel(I18n.getEntityName(entityClass));
-            title.setFont(title.getFont().deriveFont(16.0f));
-            add(title, gbcTitle);
-        }
-        */
-
-
         ArrayList<ObjectProperty> properties = new ArrayList<ObjectProperty>();
         try {
+            Class entityClass = entity.getClass();
             BeanInfo bi = Introspector.getBeanInfo(entityClass);
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                 // TODO: inherited properties?
@@ -277,15 +268,18 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
             if(embedded) {
                 // TO TEST:
                 try {
-                    EntityEditorInterface ee = EditorFactory.getEntityEditor(puName, memberClass, true);
-                    comp = (Component)ee;
+                    EntityEditorInterface entityEditor = EditorFactory.getEntityEditor(puName, memberClass);
+                    JComponent entityEditorUI = entityEditor.getJComponent();
+                    entityEditorUI.setBorder(javax.swing.BorderFactory.createTitledBorder(I18n.getEntityName(memberClass)));
+                    comp = entityEditorUI;
 
-                    compGetter = ee.getClass().getMethod("getEntity");
+                    compGetter = entityEditor.getClass().getMethod("getEntity");
                     Object value = entityProperty.getValue();
-                    if(value != null) ee.setEntity(value);
-                    else ee.newEntity(memberClass);
+                    if(value != null) entityEditor.setEntity(value);
+                    else entityEditor.newEntity(memberClass);
                     
                 } catch(Exception ex) {
+                    System.out.println("Error: " + ex.getMessage());
                     ex.printStackTrace();
                 }
                 
@@ -523,5 +517,6 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     RepaintManager currentManager = RepaintManager.currentManager(c);
     currentManager.setDoubleBufferingEnabled(true);
   }
+
  
 }

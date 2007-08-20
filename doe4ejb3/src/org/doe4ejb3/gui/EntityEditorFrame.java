@@ -22,11 +22,11 @@ import org.doe4ejb3.util.*;
 
 public class EntityEditorFrame extends javax.swing.JInternalFrame 
 {
-
-    private String puName = null;
-    private Object entity = null;
-    private Class  entityClass = null;
+    private String  puName = null;
+    private Object  entity = null;
+    private Class   entityClass = null;
     private EntityEditorInterface editor = null;
+    private int defaultActionsCount = 0;
     
     /** Creates new form EntityEditorFrame */
     public EntityEditorFrame(String puName, Class entityClass, Object entity) throws Exception {
@@ -35,26 +35,48 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         
         this.puName = puName;
         this.entityClass = entityClass;
-        this.entity = entity;
+        this.defaultActionsCount = jButtonsPanel.getComponentCount();
+        
         DomainObjectExplorer.getInstance().showStatus("");
-        String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass);
-        if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
-        else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
-        setTitle(title);
         
         System.out.println("Creating internal frame");
-        
         setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
         putClientProperty("entityListeners", new EventListenerList());
         
         System.out.println("Preparing editor ");
-        editor = EditorFactory.getEntityEditor(puName, entityClass, false);
+        editor = EditorFactory.getEntityEditor(puName, entityClass);
+        setEntity(entity);
+        
+        JScrollPane scrollPaneForEditor = new JAutoScrollPaneOnComponentFocus(editor.getJComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.getContentPane().add(scrollPaneForEditor, BorderLayout.CENTER);
+        this.pack();
+
+    }
+    
+    private void setEntity(Object entity) throws Exception 
+    {
+        this.entity = entity;
+        String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass);
+        if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
+        else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
+        setTitle(title);
+
         if(entity == null) {
             editor.newEntity(entityClass);
+        } else {
+            editor.setEntity(entity);
+        }
+
+        updateActions();
+    }
+    
+    private void updateActions()
+    {
+        clearCustomActions();
+        if(entity == null) {
             jButtonDelete.setVisible(false);
             jButtonPrint.setVisible(false);
         } else {
-            editor.setEntity(entity);
             jButtonDelete.setVisible(true);
             jButtonPrint.setVisible(true);
             ActionMap actionMap = application.Application.getInstance(Application.class).getContext().getActionMap(entityClass, entity);
@@ -62,14 +84,18 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
                 for(Object action : actionMap.keys()) {
                     System.out.println("Action found: " + action);
                     JButton btnAction = new JButton(actionMap.get(action));
-                    jButtonsPanel.add(btnAction, 3);
+                    jButtonsPanel.add(btnAction, defaultActionsCount-1);  // before "Close" button
                 }
             }
         }
-
-        JScrollPane scrollPaneForEditor = new JAutoScrollPaneOnComponentFocus((java.awt.Container)editor, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        this.getContentPane().add(scrollPaneForEditor, BorderLayout.CENTER);
-        this.pack();
+    }
+    
+    private void clearCustomActions()
+    {
+        while(jButtonsPanel.getComponentCount() > defaultActionsCount) 
+        {
+            jButtonsPanel.remove(defaultActionsCount-1);  // before "Close" button
+        }
     }
     
     /** This method is called from within the constructor to
@@ -86,6 +112,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
                 return new Insets(0,7,7,7);
             }
         };
+        jButtonAccept = new javax.swing.JButton();
         jButtonSave = new javax.swing.JButton();
         jButtonDelete = new javax.swing.JButton();
         jButtonPrint = new javax.swing.JButton();
@@ -101,8 +128,11 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
 
         jButtonsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
+        jButtonAccept.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("accept"));
+        jButtonAccept.setMnemonic('a');
+        jButtonsPanel.add(jButtonAccept);
+
         jButtonSave.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("save"));
-        jButtonSave.setMnemonic('s');
         jButtonsPanel.add(jButtonSave);
 
         jButtonDelete.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("delete"));
@@ -122,43 +152,19 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
+    @application.Action
+    public application.Task accept() 
+    {
+        return new SaveTask(Application.getApplication(), true);
+    }
+    
     
     @application.Action
     public application.Task save() 
     {
-        return new application.Task<Void, Void>(Application.getApplication())
-        {
-            @Override 
-            protected Void doInBackground() 
-            {
-                try {
-                    EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    setMessage(MessageFormat.format("Saving {0}.", JPAUtils.getEntityName(entityClass)));                    
-                    Object oldEntity = editor.getEntity();
-                    Object newEntity = JPAUtils.saveEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, oldEntity);
-                    setMessage(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
-                    
-                    EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
-                    EventListenerList listenerList = (EventListenerList)EntityEditorFrame.this.getClientProperty("entityListeners");
-                    Object[] listeners = listenerList.getListenerList();
-                    for (int i = listeners.length-2; i>=0; i-=2) {
-                        if (listeners[i]==EntityListener.class) {
-                            System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
-                            ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
-                        }
-                    }
-                    
-                    EntityEditorFrame.this.dispose();
-                } catch(Exception ex) {
-                    setMessage(MessageFormat.format("Error saving {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
-                    ex.printStackTrace();
-                } finally {
-                    EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                }
-                return null;
-            }
-        };
+        return new SaveTask(Application.getApplication(), false);
     }
+    
 
     @application.Action
     public application.Task delete() 
@@ -167,83 +173,46 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         if(confirm != JOptionPane.OK_OPTION) {                
             return null;
         } else {
-            // Create deletion task:
-            return new application.Task<Void, Void>(Application.getApplication())
-            {
-                @Override 
-                protected Void doInBackground() 
-                {        
-                    try {
-                        EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                        setMessage(MessageFormat.format("Deleting {0}.", JPAUtils.getEntityName(entityClass)));                    
-                        Object entity = editor.getEntity();
-                        JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entity);
-                        setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
-
-                        EntityEvent entityEvent = new EntityEvent(this, EntityEvent.ENTITY_DELETE, entity, null);
-                        EventListenerList listenerList = (EventListenerList)EntityEditorFrame.this.getClientProperty("entityListeners");
-                        Object[] listeners = listenerList.getListenerList();
-                        for (int i = listeners.length-2; i>=0; i-=2) {
-                            if (listeners[i]==EntityListener.class) {
-                                System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
-                                ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
-                            }
-                        }
-
-                        EntityEditorFrame.this.dispose();
-                    } catch(Exception ex) {
-                        setMessage(MessageFormat.format("Error deleting {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
-                        ex.printStackTrace();
-                    } finally {
-                        EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-                    }
-
-                    return null;
-                }
-            };
+            return new DeleteTask(Application.getApplication());
         }
-                
     }
+    
 
     @application.Action
-    public application.Task print() {
-        return new application.Task<Void, Void>(Application.getApplication())
-        {
-            @Override 
-            protected Void doInBackground() 
-            {        
-                boolean printJobSubmited = false;
-                setMessage(MessageFormat.format("Printing {0}.", JPAUtils.getEntityName(entityClass)));                    
-                try {
-                    if(editor instanceof Printable) {
-                        PrinterJob printJob = PrinterJob.getPrinterJob();
-                        printJob.setPrintable((Printable)editor);
-                        if(printJob.printDialog()) {
-                            printJob.print();
-                            printJobSubmited = true;
-                        }
-                    } else {
-                        printJobSubmited = PrintUtils.printComponent((Component)editor);
-                    }
-                    if(printJobSubmited) setMessage("Printing job has been submited");
-                    else setMessage("Printing job has been cancelled");
-                } catch(PrinterException pe) {
-                    setMessage("Printing error: " + pe.getMessage());
-                    System.out.println("Printing error: " + pe.getMessage());
-                    pe.printStackTrace();
-                }                    
-                
-                return null;
-            }
-        };
+    public void print() 
+    {
+        // Don't run in background (UI refresh problems).
+        PrinterJob printJob = PrinterJob.getPrinterJob();
+        if(editor instanceof Printable) {
+            printJob.setPrintable((Printable)editor);
+        } else if(editor.getJComponent() instanceof Printable) {
+            printJob.setPrintable((Printable)editor.getJComponent());
+        } else {
+            printJob.setPrintable(PrintUtils.createPrintableComponent(editor.getJComponent()));
+        }
+        
+        if(printJob.printDialog()) {        
+            try {
+                DomainObjectExplorer.getInstance().showStatus(MessageFormat.format("Printing {0}.", JPAUtils.getEntityName(entityClass)));
+                printJob.print();
+                DomainObjectExplorer.getInstance().showStatus("Printing job has been submited");
+            } catch(PrinterException pe) {
+                DomainObjectExplorer.getInstance().showStatus("Printing error: " + pe.getMessage());
+                System.out.println("Printing error: " + pe.getMessage());
+                pe.printStackTrace();
+            }                    
+        }
     }
+    
 
     @application.Action
     public void close() {
         this.dispose();
     }
 
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonAccept;
     private javax.swing.JButton jButtonClose;
     private javax.swing.JButton jButtonDelete;
     private javax.swing.JButton jButtonPrint;
@@ -251,5 +220,91 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
     private javax.swing.JPanel jButtonsPanel;
     private javax.swing.JScrollPane jScrollPane;
     // End of variables declaration//GEN-END:variables
+
+    
+    class SaveTask extends application.Task<Void, Void>
+    {
+        private boolean close = false;
+        
+        SaveTask(application.Application app, boolean close)
+        {
+            super(app);
+            this.close = close;
+        }
+        
+        @Override 
+        protected Void doInBackground() 
+        {
+            try {
+                EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                setMessage(MessageFormat.format("Saving {0}.", JPAUtils.getEntityName(entityClass)));                    
+                Object oldEntity = editor.getEntity();
+                Object newEntity = JPAUtils.saveEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, oldEntity);
+                setMessage(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
+
+                EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
+                EventListenerList listenerList = (EventListenerList)EntityEditorFrame.this.getClientProperty("entityListeners");
+                Object[] listeners = listenerList.getListenerList();
+                for (int i = listeners.length-2; i>=0; i-=2) {
+                    if (listeners[i]==EntityListener.class) {
+                        System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
+                        ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
+                    }
+                }
+
+                if(close) {
+                    EntityEditorFrame.this.dispose();
+                } else {
+                    // FIXME: DOE's window manager allows to open created entities in other windows
+                    EntityEditorFrame.this.setEntity(newEntity);
+                }
+            } catch(Exception ex) {
+                setMessage(MessageFormat.format("Error saving {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
+                ex.printStackTrace();
+            } finally {
+                EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+            return null;
+        }
+    }
+    
+    class DeleteTask extends application.Task<Void, Void>
+    {
+        DeleteTask(application.Application app)
+        {
+            super(app);
+        }
+
+        @Override 
+        protected Void doInBackground() 
+        {        
+            try {
+                EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                setMessage(MessageFormat.format("Deleting {0}.", JPAUtils.getEntityName(entityClass)));                    
+                Object entity = editor.getEntity();
+                JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entity);
+                setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
+
+                EntityEvent entityEvent = new EntityEvent(this, EntityEvent.ENTITY_DELETE, entity, null);
+                EventListenerList listenerList = (EventListenerList)EntityEditorFrame.this.getClientProperty("entityListeners");
+                Object[] listeners = listenerList.getListenerList();
+                for (int i = listeners.length-2; i>=0; i-=2) {
+                    if (listeners[i]==EntityListener.class) {
+                        System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
+                        ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
+                    }
+                }
+
+                EntityEditorFrame.this.dispose();
+            } catch(Exception ex) {
+                setMessage(MessageFormat.format("Error deleting {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
+                ex.printStackTrace();
+            } finally {
+                EntityEditorFrame.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+            }
+
+            return null;
+        }
+    }
     
 }

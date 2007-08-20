@@ -21,6 +21,11 @@ public class PrintUtils implements Printable {
       return tool.print();
   }
   
+  public static PrintUtils createPrintableComponent(Component c) {
+      PrintUtils tool = new PrintUtils(c);
+      return tool;
+  }  
+  
   protected PrintUtils(Component componentToBePrinted) {
     this.componentToBePrinted = componentToBePrinted;
   }

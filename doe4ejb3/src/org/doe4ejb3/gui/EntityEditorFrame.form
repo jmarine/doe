@@ -49,12 +49,19 @@
         <Property name="alignment" type="int" value="0"/>
       </Layout>
       <SubComponents>
+        <Component class="javax.swing.JButton" name="jButtonAccept">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+              <action class="org.doe4ejb3.gui.EntityEditorFrame" id="accept"/>
+            </Property>
+            <Property name="mnemonic" type="int" value="97"/>
+          </Properties>
+        </Component>
         <Component class="javax.swing.JButton" name="jButtonSave">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="org.doe4ejb3.gui.EntityEditorFrame" id="save"/>
             </Property>
-            <Property name="mnemonic" type="int" value="115"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonDelete">
