@@ -7,29 +7,24 @@
 
 package org.doe4ejb3.gui;
 
-import java.beans.*;
-import java.lang.reflect.*;
-import java.lang.annotation.*;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.lang.reflect.Method;
+import java.awt.BorderLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 
-import javax.swing.*;
-
-import javax.persistence.TemporalType;
-import javax.persistence.Entity;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
 
 import org.doe4ejb3.binding.*;
 import org.doe4ejb3.util.JPAUtils;
-import org.doe4ejb3.util.ReflectionUtils;
-import org.doe4ejb3.gui.HashKeyProperty;
 
 
 public class CustomQueryEditorImpl extends JPanel implements java.awt.event.ItemListener
@@ -56,77 +51,14 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
      */
     public CustomQueryEditorImpl(EntityManagerPane manager, Class entityClass) 
     {
-        // this.parameterTypes = parameterTypes;
-        // this.parameterValues = new HashMap();
         this.manager = manager;
         this.entityClass = entityClass;
         this.bindingContext = new BindingContext();
-        this.propertySelectors = new ArrayList();
+        this.propertySelectors = new ArrayList<JComboBox>();
         initComponents();
     }    
     
     
-    public String prepareEJBQL()
-    {
-        int count = 0;
-        this.parameterValues = new HashMap();
-        
-        bindingContext.commitUncommittedValues();
-        
-        String entityName = JPAUtils.getEntityName(entityClass);        
-        StringBuffer sb = new StringBuffer("SELECT OBJECT(e) FROM " + entityName + " e");
-        StringBuffer where = new StringBuffer();
-
-        for(JComboBox selector : propertySelectors) {
-            count++;
-            JComboBox operator = (JComboBox)selector.getClientProperty("operator");
-            if( (selector.getSelectedIndex() > 0) && (operator.getSelectedIndex() > 0) ) {
-                Object binding = selector.getClientProperty("dataBinding");
-                try {
-                    HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
-                    String parameterName = property.getName() + count;
-                    //bindingContext.commitUncommittedValues();
-
-                    if(where.length() > 0) where.append(" " + filterTypeComboBox.getSelectedItem() + " ");
-                    if(operator.getSelectedItem().toString().indexOf("MEMBER") == -1) {
-                        // normal operands order
-                        where.append("e."); where.append(property.getName()); where.append(" ");
-                        where.append(operator.getSelectedItem()); where.append(" ");
-                        where.append(":" + parameterName);
-                    } else {
-                        // inverse operands order
-                        where.append(":" + parameterName); where.append(" ");
-                        where.append(operator.getSelectedItem()); where.append(" ");
-                        where.append("e."); where.append(property.getName()); 
-                    }
-                    parameterValues.put(parameterName, property.getValue());
-
-                    System.out.println("DEBUG: Parameter " + parameterName + " = " + property.getValue());
-                } catch(Exception ex) {
-                    System.out.println("CustomQueryEditorImpl.prepareEJBQL: Error executing binding (" + binding + "): " + ex.getMessage());
-                    System.err.println("CustomQueryEditorImpl.prepareEJBQL: Error executing binding (" + binding + "): " + ex.getMessage());
-                    ex.printStackTrace();
-                }
-                
-            }
-        }
-        
-        if(where.length() > 0) {
-            sb.append(" WHERE ");
-            sb.append(where);
-        }
-        
-        System.out.println("DEBUG: Custom EJBQL = " + sb.toString() );
-        return sb.toString();
-    }
-
-    
-    public HashMap prepareParameterValues() throws IllegalAccessException, InvocationTargetException
-    {
-        return parameterValues;
-    }
-    
-
     private void initComponents()
     {
         setLayout(new BorderLayout());
@@ -139,6 +71,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         add("Center", conditionPanel);
         addPropertySelector();
     }
+
     
     private void addPropertySelector()
     {
@@ -189,7 +122,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         } else {
 
             HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
-            JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, 0, TemporalType.TIMESTAMP);
+            JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, 0);
             selector.putClientProperty("editorValue", comp);
 
             editorContainer.add("Center", comp);
@@ -206,7 +139,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
         }
         
-        // Add new condition that may be needed
+        // Add a new condition (when may be needed)
         boolean emptyPropertySelector = false;
         for(JComboBox combo : propertySelectors) {
             if(combo.getSelectedIndex() == 0) {
@@ -222,6 +155,28 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         
     }
 
+    
+    private void bind(Object binding)
+    {
+        if(binding != null) {
+            bindingContext.addBinding(binding);
+            if(binding instanceof javax.beans.binding.Binding) ((javax.beans.binding.Binding)binding).bind();
+            else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).bind();
+            else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
+        }
+    }
+    
+    
+    private void unbind(Object binding)
+    {
+        if(binding != null) {
+            if(binding instanceof javax.beans.binding.Binding) ((javax.beans.binding.Binding)binding).unbind();
+            else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).unbind();
+            else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
+            bindingContext.removeBinding(binding);
+        }
+    }
+
 
     private String capitalize(String name)
     {
@@ -229,17 +184,21 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     }
     
     
-    public Insets getInsets() {
+    @Override
+    public Insets getInsets() 
+    {
         return borderInsets;
     }
 
-    public static ArrayList<HashKeyProperty> getProperties(Class entityClass) {
+    
+    private ArrayList<HashKeyProperty> getProperties(Class entityClass) 
+    {
         HashMap map = new HashMap();
         ArrayList<HashKeyProperty> properties = new ArrayList<HashKeyProperty>();
         try {
             BeanInfo bi = Introspector.getBeanInfo(entityClass);
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
-                // TODO: inherited properties?
+                // FIXME: inherited properties are included?
                 if(pd.getName().equals("class")) continue;
                 HashKeyProperty entityProperty = new HashKeyProperty(map, pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
                 if(!properties.contains(entityProperty)) properties.add(entityProperty);
@@ -260,26 +219,66 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     }
 
 
-    // JSR 295 migration:
-    private void bind(Object binding)
-    {
-        if(binding != null) {
-            bindingContext.addBinding(binding);
-            if(binding instanceof javax.beans.binding.Binding) ((javax.beans.binding.Binding)binding).bind();
-            else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).bind();
-            else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
-        }
-    }
     
-    private void unbind(Object binding)
+    public String getEJBQL()
     {
-        if(binding != null) {
-            if(binding instanceof javax.beans.binding.Binding) ((javax.beans.binding.Binding)binding).unbind();
-            else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).unbind();
-            else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
-            bindingContext.removeBinding(binding);
+        bindingContext.commitUncommittedValues();
+        
+        String entityName = JPAUtils.getEntityName(entityClass);        
+        StringBuffer ejbql = new StringBuffer("SELECT OBJECT(e) FROM " + entityName + " e");
+        StringBuffer where = new StringBuffer();
+        parameterValues = new HashMap();
+
+        int count = 0;
+        for(JComboBox selector : propertySelectors) {
+            count++;
+            JComboBox operator = (JComboBox)selector.getClientProperty("operator");
+            if( (selector.getSelectedIndex() > 0) && (operator.getSelectedIndex() > 0) ) {
+                Object binding = selector.getClientProperty("dataBinding");
+                try {
+                    HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
+                    String parameterName = property.getName() + count;
+                    //bindingContext.commitUncommittedValues();
+
+                    if(where.length() > 0) where.append(" " + filterTypeComboBox.getSelectedItem() + " ");  // AND / OR
+                    if(operator.getSelectedItem().toString().indexOf("MEMBER") == -1) {
+                        // normal operands order
+                        where.append("e."); where.append(property.getName()); where.append(" ");
+                        where.append(operator.getSelectedItem()); where.append(" ");
+                        where.append(":" + parameterName);
+                    } else {
+                        // inverse operands order
+                        where.append(":" + parameterName); where.append(" ");
+                        where.append(operator.getSelectedItem()); where.append(" ");
+                        where.append("e."); where.append(property.getName()); 
+                    }
+                    parameterValues.put(parameterName, property.getValue());
+
+                    System.out.println("DEBUG: Parameter " + parameterName + " = " + property.getValue());
+                } catch(Exception ex) {
+                    System.out.println("CustomQueryEditorImpl.getEJBQL: Error executing binding (" + binding + "): " + ex.getMessage());
+                    System.err.println("CustomQueryEditorImpl.getEJBQL: Error executing binding (" + binding + "): " + ex.getMessage());
+                    ex.printStackTrace();
+                }
+                
+            }
         }
+        
+        if(where.length() > 0) {
+            ejbql.append(" WHERE ");
+            ejbql.append(where);
+        }
+        
+        String retval = ejbql.toString();
+        System.out.println("DEBUG: Custom EJBQL = " + retval);
+        return retval;
     }
 
+    
+    public HashMap getParameterValues() throws IllegalAccessException, InvocationTargetException
+    {
+        if(parameterValues == null) getEJBQL();
+        return parameterValues;
+    }    
     
 }

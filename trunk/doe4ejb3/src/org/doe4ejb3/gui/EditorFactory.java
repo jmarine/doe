@@ -11,64 +11,41 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyEditorSupport;
-
-import java.lang.reflect.Member;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.lang.reflect.Method;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
-
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import javax.beans.binding.BindingConverter;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JComboBox;
-import javax.swing.JFormattedTextField;
 import javax.swing.JInternalFrame;
-import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
-import javax.swing.SpinnerDateModel;
 import javax.swing.DefaultListModel;
 import javax.swing.TransferHandler;
-import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
-import javax.swing.event.TableModelEvent;
-import javax.swing.event.TableModelListener;
 import javax.swing.event.EventListenerList;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
-import javax.swing.text.MaskFormatter;
-
-import javax.persistence.TemporalType;
 
 import org.doe4ejb3.event.ClipboardAction;
 import org.doe4ejb3.event.EntityEvent;
@@ -76,6 +53,7 @@ import org.doe4ejb3.event.EntityListener;
 import org.doe4ejb3.event.EntityTransferHandler;
 import org.doe4ejb3.exception.ApplicationException;
 import org.doe4ejb3.annotation.EntityDescriptor;
+import org.doe4ejb3.beans.TemporalTypeEditorSupport;
 import org.doe4ejb3.binding.JComponentDataBinding;
 import org.doe4ejb3.util.JPAUtils;
 
@@ -100,11 +78,13 @@ public class EditorFactory
         return entityEditor;
     }
     
-    public static JComponent getPropertyEditor(final String puName, Property property, int maxLength, TemporalType defaultTemporalType)
+    public static JComponent getPropertyEditor(final String puName, Property property, int maxLength)
     {
         JComponent comp = null;
         java.beans.PropertyEditor editor = null;        
         Object binding = null;
+
+        TemporalTypeEditorSupport.registerTemporalTypeEditors();
         
         boolean isCollection = false;
         Class memberClass = null;
@@ -121,9 +101,6 @@ public class EditorFactory
         } catch(Exception ex) {
             throw new RuntimeException("Property type error: " + ex.getMessage());
         }
-        
-        org.doe4ejb3.beans.TemporalTypeEditorSupport.registerTemporalTypeEditors();
-
         
         // relations editors
         if(comp == null) {
@@ -155,8 +132,70 @@ public class EditorFactory
                         combo.setTransferHandler(entityTransferHandler);
                         combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");  // define width dimension
                         for(int i = 0; i < 10; i++) combo.addItem(null);  // define height dimension
-                        comp = combo;
 
+                        // define some actions and listeners:
+                        final AbstractAction editItemAction = new AbstractAction("Edit", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/edit.png"))) {
+                            public void actionPerformed(ActionEvent evt)  {
+                                try { 
+                                    if(combo.getSelectedIndex() >= 0) {
+                                        Object entity = comboBoxModel.getSelectedItem();
+                                        JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, optionClass, entity);
+                                        final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                                        listenerList.add(EntityListener.class, new EntityListener() {
+                                            public void entityChanged(EntityEvent event) {
+                                                int oldPos = comboBoxModel.getIndexOf(event.getOldEntity());
+                                                boolean selected = (oldPos == combo.getSelectedIndex());                                                        
+                                                if(oldPos > 0) {
+                                                    if(event.getEventType() == EntityEvent.ENTITY_DELETE) {
+                                                        comboBoxModel.removeElementAt(oldPos);
+                                                        if(selected) combo.setSelectedIndex(0);
+                                                    } else if(event.getEventType() == EntityEvent.ENTITY_UPDATE) {
+                                                        comboBoxModel.removeElementAt(oldPos);
+                                                        comboBoxModel.insertElementAt(event.getNewEntity(), oldPos);
+                                                        if(selected) combo.setSelectedIndex(oldPos);
+                                                    }
+                                                }
+                                            }
+                                        });
+                                    }
+        
+                                } catch(ApplicationException ex) { 
+                                    JOptionPane.showInternalMessageDialog(combo, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                } catch(Exception ex) { 
+                                    JOptionPane.showInternalMessageDialog(combo, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                }
+                            }
+                        };         
+
+                        AbstractAction newItemAction = new AbstractAction("New", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
+                            public void actionPerformed(ActionEvent evt)  {
+                                try { 
+                                    JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, optionClass, null);
+                                    final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                                    listenerList.add(EntityListener.class, new EntityListener() {
+                                        public void entityChanged(EntityEvent event) {
+                                            if(event.getEventType() == EntityEvent.ENTITY_INSERT) {
+                                                comboBoxModel.addElement(event.getNewEntity());
+                                                comboBoxModel.setSelectedItem(event.getNewEntity());
+                                            }
+                                        }
+                                    });
+        
+                                } catch(ApplicationException ex) { 
+                                    JOptionPane.showInternalMessageDialog(combo, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                } catch(Exception ex) { 
+                                    JOptionPane.showInternalMessageDialog(combo, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                }
+                            }
+                        };
+
+                        combo.addItemListener(new ItemListener() {
+                            public void itemStateChanged(ItemEvent e) {
+                                boolean newState = (combo.getSelectedIndex() > 0);
+                                editItemAction.setEnabled(newState);
+                            }
+                        });
+                        
                         combo.addPopupMenuListener(new PopupMenuListener() {
                             public void popupMenuCanceled(PopupMenuEvent e) { }
                             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
@@ -189,10 +228,29 @@ public class EditorFactory
 
                             }
                         });
+                        
+
+                        // define UI:
+                        JButton jButtonNew = new JButton(newItemAction);
+                        jButtonNew.setHideActionText(true);
+                        JButton jButtonEdit = new JButton(editItemAction);
+                        jButtonEdit.setHideActionText(true);
+
+                        JPanel jButtonsPanel = new JPanel();
+                        jButtonsPanel.setLayout(new java.awt.FlowLayout(FlowLayout.LEFT, 0, 0));
+                        jButtonsPanel.add(jButtonEdit);
+                        jButtonsPanel.add(jButtonNew);
+                        
+                        JPanel panel = new JPanel();
+                        panel.setLayout(new BorderLayout());
+                        panel.add(combo, BorderLayout.CENTER);
+                        panel.add(jButtonsPanel, BorderLayout.EAST);
+                        comp = panel;
+
 
                         // Original binding (with setup of initial value):
-                        Method compGetter = comp.getClass().getMethod("getSelectedItem");
-                        binding = new JComponentDataBinding(comp, compGetter, null, property);
+                        Method compGetter = combo.getClass().getMethod("getSelectedItem");
+                        binding = new JComponentDataBinding(combo, compGetter, null, property);
 
                         Object value = property.getValue();
                         if(value != null) {
@@ -295,7 +353,7 @@ public class EditorFactory
 
                     /** 
                      * FIXME: New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
-                     * Warning: the target has been configured with a PropertyEditor, and it should fire property changes to actually bind the edited values back to entity object
+                     * Warning: the target has been configured with a PropertyEditor, that should fire property changes to actually bind the edited values back to entity object
                      * (so it rather never works, because modifications are made with the custom editor and the propertychange events aren't normally propagated to PropertyEditor listeners)
                      *
                     final java.beans.PropertyEditor editorFinal = editor;

@@ -286,9 +286,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
             } else {
                 
                 // Other editors:
-                javax.persistence.TemporalType defaultTemporalType = javax.persistence.TemporalType.TIMESTAMP;
-                if( (temporal != null) && (temporal.value() != null) ) defaultTemporalType = temporal.value();
-                comp = EditorFactory.getPropertyEditor(puName, entityProperty, maxLength, defaultTemporalType);
+                comp = EditorFactory.getPropertyEditor(puName, entityProperty, maxLength);
                 binding = ((JComponent)comp).getClientProperty("dataBinding");
                 
             }
@@ -409,7 +407,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
   }
     
   public int print(Graphics g, PageFormat pf, int pageIndex) {
-    // TODO: SMALL COMPONENT SHOULDN'T BE CUTTED IN TWO PAGES
+    // TODO: SMALL COMPONENTS SHOULDN'T BE CUTTED IN TWO PAGES
     // TODO: COMPOSITE EDITORS SHOULD EXTRACT PROPERTY VALUES/TABLES
       
     int response = NO_SUCH_PAGE;
