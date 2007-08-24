@@ -134,6 +134,28 @@ public class EditorFactory
                         for(int i = 0; i < 10; i++) combo.addItem(null);  // define height dimension
 
                         // define some actions and listeners:
+                        final EntityListener relationshipListener = new EntityListener() {
+                            public void entityChanged(EntityEvent event) {
+                                if(event.getEventType() == EntityEvent.ENTITY_INSERT) {
+                                     comboBoxModel.addElement(event.getNewEntity());
+                                     comboBoxModel.setSelectedItem(event.getNewEntity());
+                                } else {
+                                    int oldPos = comboBoxModel.getIndexOf(event.getOldEntity());
+                                    boolean wasSelected = (oldPos == combo.getSelectedIndex());                                                        
+                                    if(oldPos > 0) {
+                                        if(event.getEventType() == EntityEvent.ENTITY_DELETE) {
+                                            comboBoxModel.removeElementAt(oldPos);
+                                            if(wasSelected) combo.setSelectedIndex(0);
+                                        } else if(event.getEventType() == EntityEvent.ENTITY_UPDATE) {
+                                            comboBoxModel.removeElementAt(oldPos);
+                                            comboBoxModel.insertElementAt(event.getNewEntity(), oldPos);
+                                            if(wasSelected) combo.setSelectedIndex(oldPos);
+                                        }
+                                    }
+                                }
+                            }
+                        };
+                            
                         final AbstractAction editItemAction = new AbstractAction("Edit", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/edit.png"))) {
                             public void actionPerformed(ActionEvent evt)  {
                                 try { 
@@ -141,24 +163,8 @@ public class EditorFactory
                                         Object entity = comboBoxModel.getSelectedItem();
                                         JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, optionClass, entity);
                                         final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
-                                        listenerList.add(EntityListener.class, new EntityListener() {
-                                            public void entityChanged(EntityEvent event) {
-                                                int oldPos = comboBoxModel.getIndexOf(event.getOldEntity());
-                                                boolean selected = (oldPos == combo.getSelectedIndex());                                                        
-                                                if(oldPos > 0) {
-                                                    if(event.getEventType() == EntityEvent.ENTITY_DELETE) {
-                                                        comboBoxModel.removeElementAt(oldPos);
-                                                        if(selected) combo.setSelectedIndex(0);
-                                                    } else if(event.getEventType() == EntityEvent.ENTITY_UPDATE) {
-                                                        comboBoxModel.removeElementAt(oldPos);
-                                                        comboBoxModel.insertElementAt(event.getNewEntity(), oldPos);
-                                                        if(selected) combo.setSelectedIndex(oldPos);
-                                                    }
-                                                }
-                                            }
-                                        });
+                                        listenerList.add(EntityListener.class, relationshipListener);
                                     }
-        
                                 } catch(ApplicationException ex) { 
                                     JOptionPane.showInternalMessageDialog(combo, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 } catch(Exception ex) { 
@@ -172,15 +178,7 @@ public class EditorFactory
                                 try { 
                                     JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, optionClass, null);
                                     final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
-                                    listenerList.add(EntityListener.class, new EntityListener() {
-                                        public void entityChanged(EntityEvent event) {
-                                            if(event.getEventType() == EntityEvent.ENTITY_INSERT) {
-                                                comboBoxModel.addElement(event.getNewEntity());
-                                                comboBoxModel.setSelectedItem(event.getNewEntity());
-                                            }
-                                        }
-                                    });
-        
+                                    listenerList.add(EntityListener.class, relationshipListener);
                                 } catch(ApplicationException ex) { 
                                     JOptionPane.showInternalMessageDialog(combo, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 } catch(Exception ex) { 
