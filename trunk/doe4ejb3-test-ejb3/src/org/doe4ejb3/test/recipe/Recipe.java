@@ -10,6 +10,8 @@
  * software distributed under the License is distributed on an "AS IS" BASIS, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
  * See the License for the specific language governing permissions and limitations under the License.
+ * 
+ * Modified by Jordi Mariné Fort (24/8/2007)
  */
 package org.doe4ejb3.test.recipe;
 import application.Action;
@@ -51,6 +53,11 @@ public class Recipe implements java.io.Serializable
     private boolean published;
 
     private Category category;
+    
+    private String instructions;
+    
+    private Set<Ingredient> ingredients = new HashSet<Ingredient>();
+    
 
 
     @Id
@@ -88,6 +95,7 @@ public class Recipe implements java.io.Serializable
     {
         this.description = description;
     }
+    
 
     @PropertyDescriptor(index=3,format="MM/dd/yyyy",displayName="First Cooked On")
     @Temporal(value=TemporalType.DATE)
@@ -114,7 +122,6 @@ public class Recipe implements java.io.Serializable
         this.category = category;
     }
 
-    private Set<Ingredient> ingredients = new HashSet<Ingredient>();
 
     @PropertyDescriptor(index=5)
     @OneToMany(cascade = { CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE })  // don't delete ingredients used in other recipes
@@ -129,7 +136,6 @@ public class Recipe implements java.io.Serializable
         this.ingredients = ingredients;
     }
     
-    private String instructions;
 
     @PropertyDescriptor(index=6)
     @Column(name="INSTRUCTIONS", length=4000)
