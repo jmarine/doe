@@ -1,6 +1,11 @@
 /*
  * EntityEditorInterface.java
  *
+ * To display EJB3 entity details within a customized UI,
+ * you have to develop a class that implement the "org.doe4ejb3.gui.EntityEditorInterface",
+ * and configure the EJB3 entity class with EntityDescriptor annotation
+ * (setting the editorClassName attribute with the name of the developed class that builds the new UI)
+ * 
  * Created on 18 August 2006, 20:23
  * @author Jordi Marine Fort
  */
@@ -15,7 +20,7 @@ public interface EntityEditorInterface
 {
     /**
      * Injected persistence unit name
-     * (may be useful to get related entities with JPAUtils).
+     * (it might be useful to get related entities with JPAUtils).
      */
     void setPersistenceUnitName(String puName);
     
