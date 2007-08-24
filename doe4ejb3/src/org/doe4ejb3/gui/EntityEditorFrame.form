@@ -54,7 +54,6 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="org.doe4ejb3.gui.EntityEditorFrame" id="accept"/>
             </Property>
-            <Property name="mnemonic" type="int" value="97"/>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSave">

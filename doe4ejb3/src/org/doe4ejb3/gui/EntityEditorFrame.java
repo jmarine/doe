@@ -49,8 +49,8 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         
         JScrollPane scrollPaneForEditor = new JAutoScrollPaneOnComponentFocus(editor.getJComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.getContentPane().add(scrollPaneForEditor, BorderLayout.CENTER);
-        this.pack();
 
+        this.pack();
     }
     
     private void setEntity(Object entity) throws Exception 
@@ -129,7 +129,6 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         jButtonsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
         jButtonAccept.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("accept"));
-        jButtonAccept.setMnemonic('a');
         jButtonsPanel.add(jButtonAccept);
 
         jButtonSave.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("save"));
@@ -156,6 +155,25 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
     public application.Task accept() 
     {
         return new SaveTask(Application.getApplication(), true);
+    }
+
+    private class AcceptTask extends application.Task<Object, Void> {
+        AcceptTask() {
+            // Runs on the EDT.  Copy GUI state that
+            // doInBackground() depends on from parameters
+            // to AcceptTask fields, here.
+            super(application.Application.getInstance(org.doe4ejb3.gui.Application.class));
+        }
+        @Override protected Object doInBackground() {
+            // Your Task's code here.  This method runs
+            // on a background thread, so don't reference
+            // the Swing GUI from here.
+            return null;  // return your result
+        }
+        @Override protected void succeeded(Object result) {
+            // Runs on the EDT.  Update the GUI based on
+            // the result computed by doInBackground().
+        }
     }
     
     
