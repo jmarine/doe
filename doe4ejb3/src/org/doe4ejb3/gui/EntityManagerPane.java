@@ -389,8 +389,8 @@ public class EntityManagerPane extends javax.swing.JPanel
                         entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entityClass);
 
                     } else if(jComboBoxNamedQuery.getSelectedIndex() == 1) {   // Custom query editor
-                        String ejbql = customQueryEditor.prepareEJBQL();
-                        HashMap parameterValues = customQueryEditor.prepareParameterValues();
+                        String ejbql = customQueryEditor.getEJBQL();
+                        HashMap parameterValues = customQueryEditor.getParameterValues();
                         entities = JPAUtils.executeQuery(DomainObjectExplorer.getInstance().getConnectionParams(), puName, ejbql, parameterValues);
 
                     } else {  // NamedQuery: jComboBoxNamedQuery.getSelectedIndex() > 1

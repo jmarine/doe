@@ -7,27 +7,21 @@
 
 package org.doe4ejb3.gui;
 
-import java.beans.*;
-import java.lang.reflect.*;
-import java.lang.annotation.*;
-
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
-import javax.persistence.TemporalType;
+import org.doe4ejb3.binding.BindingContext;
 
-import org.doe4ejb3.binding.*;
 
-/**
- *
- * @author Jordi Marine Fort
- */
 public class QueryParametersEditorImpl extends JPanel  
 {
-
     private final static Insets borderInsets = new Insets(4,2,4,2);
 
     private final static GridBagConstraints gbcLabel = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,4,2,4), 0,0);
@@ -43,7 +37,8 @@ public class QueryParametersEditorImpl extends JPanel
     /**
      * Creates a new instance of QueryParametersEditorImpl
      */
-    public QueryParametersEditorImpl(EntityManagerPane manager, HashMap parameterTypes) {
+    public QueryParametersEditorImpl(EntityManagerPane manager, HashMap parameterTypes) 
+    {
         this.manager = manager;
         this.parameterTypes = parameterTypes;
         this.parameterValues = new HashMap();
@@ -73,13 +68,11 @@ public class QueryParametersEditorImpl extends JPanel
         bindingContext.bind();
     }
 
-
-
     
     private void handleParameterProperty(Property property)
     {
         int defaultLength = 20;
-        JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, defaultLength, TemporalType.TIMESTAMP);
+        JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, defaultLength);
         if(comp != null) {
             Object binding = comp.getClientProperty("dataBinding");
             if(binding != null) bindingContext.addBinding(binding);
@@ -96,6 +89,7 @@ public class QueryParametersEditorImpl extends JPanel
     }
     
     
+    @Override
     public Insets getInsets() {
         return borderInsets;
     }
