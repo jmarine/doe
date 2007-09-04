@@ -1,4 +1,4 @@
-/*
+/**
  * EntityEditorImpl.java
  *
  * Created on June 6, 2006, 5:45 PM
@@ -15,19 +15,16 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.print.*;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.ResourceBundle;
 import javax.swing.*;
 
-import org.doe4ejb3.binding.*;
-import org.doe4ejb3.util.JPAUtils;
-import org.doe4ejb3.util.ReflectionUtils;
+import org.doe4ejb3.annotation.EntityDescriptor;
+import org.doe4ejb3.binding.BindingContext;
 
 
-public class EntityEditorImpl extends JPanel implements EntityEditorInterface, Printable
+public class EntityEditorImpl extends JPanel implements EntityEditorInterface, EditorLayoutInterface, Printable
 {
 
     private final static Insets borderInsets = new Insets(20,10,20,10);
@@ -37,6 +34,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     private final static GridBagConstraints gbcComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5,5,5,5), 0,0);
     private final static GridBagConstraints gbcFixedSizeComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,5,5,5), 0,0);
     private final static GridBagConstraints gbcEmbeddedComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,-3, 5,-3), 0,0);
+    private final static GridBagConstraints gbcCustomLayout = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,5, 5,5), 0,0);
+    private final static GridBagConstraints gbcEmptyLabelForEmbeddedAndCustomLayoutPrinting = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0,0);
     private final static GridBagConstraints gbcGlue = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0,0);
     
 
@@ -44,6 +43,12 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     private Object  entity   = null;
     private boolean objIsNew = false;
     private BindingContext bindingContext = new BindingContext();
+    private EntityDescriptor entityDescriptor = null;
+    private JComponent customLayout = null;
+    private String layoutPath = "";
+    private EditorLayoutInterface parentLayout = null;
+    private boolean validUI = false;
+    private boolean layoutResourceSearched = false;
     
     
     /**
@@ -54,10 +59,14 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         setMinimumSize(new java.awt.Dimension(550, 400));
     }
 
+    private void setValidUI(boolean valid)
+    {
+        this.validUI = valid;
+    }
 
     public JComponent getJComponent() 
     {
-        return this;
+        return (validUI) ? this : null;
     }
 
 
@@ -70,6 +79,125 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
     {
         return this.puName;
     }
+    
+    public void setEntityDescriptor(EntityDescriptor descriptor)
+    {
+        this.entityDescriptor = descriptor;
+    }
+
+    public EntityDescriptor getEntityDescriptor()
+    {
+        return this.entityDescriptor;
+    }
+    
+    public void setLayoutPath(EditorLayoutInterface parentLayout, String layoutPath)
+    {
+        this.parentLayout = parentLayout;
+        this.layoutPath = layoutPath;
+    }
+
+    public String getLayoutPath()
+    {
+        return this.layoutPath;
+    }    
+    
+    public EditorLayoutInterface getParentLayout()
+    {
+        return this.parentLayout;
+    }
+    
+    public JComponent getCustomEditorLayout()
+    {
+        if( (customLayout == null) && (!layoutResourceSearched) ) {
+            layoutResourceSearched = true;
+            if( (entityDescriptor != null) && (!entityDescriptor.layoutClassName().equalsIgnoreCase("default")) ) {
+                // Custom layout class loader
+                try { 
+                    customLayout = (JComponent)Class.forName(entityDescriptor.layoutClassName()).newInstance(); 
+                } catch(Exception ex) { 
+                    System.out.println("EntityEditorImpl.getLayout: Error loading editor class: " + ex.getMessage());
+                    ex.printStackTrace(); 
+                }
+            } else  {
+                // Abeille form loader
+                java.io.InputStream resourceStream = null;
+                try {
+                    Class entityClass = entity.getClass();
+                    resourceStream = entityClass.getClassLoader().getResourceAsStream(entityClass.getName().replace('.', '/') + ".jfrm");
+                    if(resourceStream != null) customLayout = new com.jeta.forms.components.panel.FormPanel(resourceStream);  
+                } catch(Exception ex) {
+                    System.out.println("EntityEditorImpl.getLayout: Error loading editor layout: " + ex.getMessage());
+                    ex.printStackTrace();                    
+                } finally {
+                    if(resourceStream != null) {
+                        try { resourceStream.close(); }
+                        catch(Exception ex) { }
+                    }
+                }
+            }
+        }
+        return customLayout;
+    }
+    
+    private boolean containedInCustomEditorLayout()
+    {
+        return (getCustomEditorLayout() != null) ||
+               ( (parentLayout != null) && (parentLayout.getCustomEditorLayout() != null) && (parentLayout.getComponentFromEditorLayout(JPanel.class, getLayoutPath()) == null));
+    }
+
+    public JComponent getComponentFromEditorLayout(Class componentType, String componentName)
+    {
+        JComponent retval = null;
+        if(componentName.startsWith(".")) componentName = componentName.substring(1);
+        
+        if(parentLayout != null) {
+            if(parentLayout.getComponentFromEditorLayout(JPanel.class, getLayoutPath()) != null) return null;
+            retval = parentLayout.getComponentFromEditorLayout(componentType, getLayoutPath() + "." + componentName);
+            if(retval != null) return retval;
+        }
+
+        JComponent layout = getCustomEditorLayout();
+        if(layout == null) return null;
+
+        if(layout instanceof com.jeta.forms.components.panel.FormPanel) {
+            com.jeta.forms.components.panel.FormPanel abeilleFormPanel = (com.jeta.forms.components.panel.FormPanel)layout;
+            Object tmp = abeilleFormPanel.getComponentByName(componentName);
+            retval = (JComponent)tmp;
+        } else {        
+            componentName = componentName.replace('.', '_').toLowerCase();
+            
+            Class layoutClass = layout.getClass();
+            try { 
+                Field field1 = layoutClass.getDeclaredField(componentName);
+                if( (componentType.isAssignableFrom(field1.getType())) 
+                    || (JPanel.class.isAssignableFrom(componentType)) ) {
+                    retval = (JComponent)field1.get(layout);
+                }
+            } catch(Exception ex) {
+                System.out.println("EntityEditorImpl: Error getting editor from custom layout: " + ex.getMessage());
+                ex.printStackTrace();
+            }
+
+
+            if(retval == null) {
+                for(Field field2 : layout.getClass().getDeclaredFields()) {
+                    String fieldName = field2.getName().toLowerCase();
+                    if( (fieldName.indexOf(componentName) != -1) 
+                            && ( (componentType.isAssignableFrom(field2.getType())) 
+                                || (JPanel.class.isAssignableFrom(componentType)) ) ) {
+                        try {
+                            retval = (JComponent)field2.get(layout);
+                            break;
+                        } catch(Exception ex) {
+                            System.out.println("EntityEditorImpl: Error getting editor from custom layout: " + ex.getMessage());
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        return retval;
+    }    
     
     
     protected void clearBindings()
@@ -144,6 +272,11 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         }
         
 
+        if(getCustomEditorLayout() != null) {
+            add(new JLabel(""), gbcEmptyLabelForEmbeddedAndCustomLayoutPrinting);  // easy printing
+            add(getCustomEditorLayout(), gbcCustomLayout);
+            setValidUI(true);
+        }
         add(Box.createVerticalGlue(), gbcGlue);
         
         bindingContext.bind();
@@ -186,6 +319,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
         
         Method compGetter = null;
         int maxLength = 255;
+        boolean isNewComponent = false;
+        JComponent container = null;
 
         System.out.println("Begin: process property annotation");
         for(int i = 0; (annotations != null) && (i < annotations.length); i++) 
@@ -198,7 +333,12 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                 propertyDescriptor = (org.doe4ejb3.annotation.PropertyDescriptor)a;
             }
             
-            if(a instanceof javax.persistence.GeneratedValue) 
+            if(a instanceof javax.persistence.Id) 
+            {
+                persistent = true;
+                if(!objIsNew) generatedValue = true;
+            }               
+            else if(a instanceof javax.persistence.GeneratedValue) 
             {
                 persistent = true;
                 generatedValue = true;
@@ -221,7 +361,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
             }
             else if(a instanceof javax.persistence.JoinColumn) 
             {
-                // FIXME: Relation annotations supose that are persistent,
+                // FIXME: suposing that relation annotations  are persistent,
                 // but should not be enabled.
                 javax.persistence.JoinColumn column = (javax.persistence.JoinColumn)a;
                 String columnName = column.name();
@@ -232,6 +372,14 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                 } else if((!column.updatable()) && (!objIsNew) ) {
                     generatedValue = true;
                 }
+            }
+            else if(a instanceof javax.persistence.PrimaryKeyJoinColumn) 
+            {
+                // FIXME: suposing that relation annotations  are persistent,
+                // but should not be enabled.
+                javax.persistence.PrimaryKeyJoinColumn column = (javax.persistence.PrimaryKeyJoinColumn)a;
+                String columnName = column.name();
+                if(columnName != null) name = columnName;
             }
             else if(a instanceof javax.persistence.Temporal) 
             {
@@ -251,7 +399,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
             }
             else if(a instanceof javax.persistence.Version) 
             {
-                // TODO? Hide "version" fields
+                // "version" fields will be hidden for new entities (like GeneratedValues)
                 persistent = true;      
                 generatedValue = true;
                 maxLength = 0;
@@ -268,15 +416,38 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
             if(embedded) {
                 // TO TEST:
                 try {
-                    EntityEditorInterface entityEditor = EditorFactory.getEntityEditor(puName, memberClass);
-                    JComponent entityEditorUI = entityEditor.getJComponent();
-                    entityEditorUI.setBorder(javax.swing.BorderFactory.createTitledBorder(I18n.getEntityName(memberClass)));
-                    comp = entityEditorUI;
-
+                    container = this.getComponentFromEditorLayout(JPanel.class, entityProperty.getName());  // search a JPanel holder for the relation and navigation commands.
+                    
+                    EntityEditorInterface entityEditor = EditorFactory.getEntityEditor(this, puName, memberClass, getLayoutPath() + "." + entityProperty.getName());
                     compGetter = entityEditor.getClass().getMethod("getEntity");
+                    binding = new org.doe4ejb3.binding.JComponentDataBinding(entityEditor, compGetter, editor, entityProperty);
+                    
                     Object value = entityProperty.getValue();
                     if(value != null) entityEditor.setEntity(value);
                     else entityEditor.newEntity(memberClass);
+                    
+                    // TODO: migrate to jsr295 beans binding
+                    
+                    JComponent entityEditorUI = entityEditor.getJComponent();
+                    if(entityEditorUI == null) {
+                        isNewComponent = false;
+                        comp = null;
+                    } else {
+                        if(container == null) {
+                            entityEditorUI.setBorder(javax.swing.BorderFactory.createTitledBorder(I18n.getEntityName(memberClass)));
+                            comp = entityEditorUI;
+                            isNewComponent = true;
+                        } else {
+                            container.setLayout(new BorderLayout());
+                            container.setMinimumSize(entityEditorUI.getMinimumSize());
+                            container.setPreferredSize(entityEditorUI.getPreferredSize());
+                            container.add(entityEditorUI, BorderLayout.CENTER);
+                            container.putClientProperty("layout", this);
+                            comp = container;
+                            isNewComponent = false;
+                        }
+                    }
+                    
                     
                 } catch(Exception ex) {
                     System.out.println("Error: " + ex.getMessage());
@@ -285,16 +456,18 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                 
             } else {
                 
-                // Other editors:
-                comp = EditorFactory.getPropertyEditor(puName, entityProperty, maxLength);
+                // Find the best editor for the property:
+                comp = EditorFactory.getPropertyEditor(this, puName, entityProperty, maxLength);
                 binding = ((JComponent)comp).getClientProperty("dataBinding");
+                isNewComponent = ((JComponent)comp).getClientProperty("layout") == null;
                 
             }
 
-            
-            if(comp != null) {
-                if(generatedValue && (!objIsNew)) {
 
+            // ignore new components in customEditorLayouts
+            if(!(isNewComponent && containedInCustomEditorLayout())) {
+                if(generatedValue && (!objIsNew)) {
+                    // disable binding of generated values:
                     if(binding != null) {
                         if(binding instanceof javax.beans.binding.Binding) {
                             javax.beans.binding.Binding stdBinding = (javax.beans.binding.Binding)binding;
@@ -302,57 +475,61 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                             stdBinding.unbind();  // but don't commit changes to entity object
                         }
                     }
-                    
-                    if(comp instanceof JScrollPane) {
-                        JScrollPane scroll = (JScrollPane)comp;
-                        scroll.getViewport().getView().setEnabled(false);
-                    } else {
-                        comp.setEnabled(false);
+
+                    if(comp != null) {
+                        if(comp instanceof JScrollPane) {
+                            JScrollPane scroll = (JScrollPane)comp;
+                            scroll.getViewport().getView().setEnabled(false);
+                        } else {
+                            comp.setEnabled(false);
+                        }
                     }
-                    
+
                 } else {
-                    if(binding == null) {
-                        binding = new org.doe4ejb3.binding.JComponentDataBinding(comp, compGetter, editor, entityProperty);
-                    }
-                    
+
                     bindingContext.addBinding(binding);
                     if( (comp != null) && (comp instanceof JComponent) ) {
                         ((JComponent)comp).putClientProperty("dataBinding", binding);
                     }
 
                 }
-            }
 
-            if(comp != null) {
-                if(!embedded) {
-                    String labelText = I18n.getLiteral(name.toUpperCase());
-                    if( (propertyDescriptor != null) && (propertyDescriptor.displayName() != null) && (propertyDescriptor.displayName().length() > 0) )
-                    {
-                        labelText = propertyDescriptor.displayName();
-                        if( (propertyDescriptor.resourceBundle() != null) && (propertyDescriptor.resourceBundle().length() > 0) )
+                // include new components in layout:
+                if( (comp != null) && (isNewComponent) && (!containedInCustomEditorLayout()) ) {
+                    if(embedded) {
+                        add(new JLabel(""), gbcEmptyLabelForEmbeddedAndCustomLayoutPrinting);  // easy printing
+                        add(comp, gbcEmbeddedComponent);
+                        setValidUI(true);
+                    } else {
+                        String labelText = I18n.getLiteral(name.toUpperCase());
+                        if( (propertyDescriptor != null) && (propertyDescriptor.displayName() != null) && (propertyDescriptor.displayName().length() > 0) )
                         {
-                            try {
-                                ResourceBundle bundle = ResourceBundle.getBundle(propertyDescriptor.resourceBundle());
-                                String i18nLabelText = bundle.getString(labelText);
-                                if( (i18nLabelText != null) && (i18nLabelText.length() > 0) ) labelText = i18nLabelText;
-                            } catch(Exception ex) {
-                                System.out.println("EntityEditorImpl: Error loading bundle" + propertyDescriptor.resourceBundle());
+                            labelText = propertyDescriptor.displayName();
+                            if( (propertyDescriptor.resourceBundle() != null) && (propertyDescriptor.resourceBundle().length() > 0) )
+                            {
+                                try {
+                                    ResourceBundle bundle = ResourceBundle.getBundle(propertyDescriptor.resourceBundle());
+                                    String i18nLabelText = bundle.getString(labelText);
+                                    if( (i18nLabelText != null) && (i18nLabelText.length() > 0) ) labelText = i18nLabelText;
+                                } catch(Exception ex) {
+                                    System.out.println("EntityEditorImpl: Error loading bundle" + propertyDescriptor.resourceBundle());
+                                }
                             }
                         }
-                    }
 
-                    if( (comp instanceof JComponent) 
-                            && (((JComponent)comp).getClientProperty("fixedSize") != null) ) {
-                        gbc = gbcFixedSizeComponent;
+                        if( (comp instanceof JComponent) 
+                                && (((JComponent)comp).getClientProperty("fixedSize") != null) ) {
+                            gbc = gbcFixedSizeComponent;
+                        }
+
+                        add(new JLabel(labelText), gbcLabel);
+                        add(comp, gbc);
+                        setValidUI(true);
                     }
-                    
-                    add(new JLabel(labelText), gbcLabel);
-                    add(comp, gbc);
-                    
-                } else {
-                    add(comp, gbcEmbeddedComponent);
                 }
+            
             }
+
         }
         
     }
@@ -389,10 +566,10 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
       int headerHeight = 0;
       int componentHeight = 0;
       if( comp != null) {
-          if(comp instanceof ComposedEditorHolder)
+          if(comp instanceof JComponent)
           {
-              ComposedEditorHolder composedEditor = (ComposedEditorHolder)comp;
-              comp = composedEditor.getComponentWithValues();
+              Component tmp = (Component)((JComponent)comp).getClientProperty("printableContent");
+              if(tmp != null) comp = tmp;
           }
           if(comp instanceof JScrollPane) {
               JScrollPane scrollPane = (JScrollPane)comp;
@@ -459,10 +636,10 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, P
                 Component header = null;
                 double offset = (double)comp.getX();
 
-                if(comp instanceof ComposedEditorHolder)
+                if(comp instanceof JComponent)
                 {
-                    ComposedEditorHolder composedEditor = (ComposedEditorHolder)comp;
-                    comp = composedEditor.getComponentWithValues();
+                    Component tmp = (Component)((JComponent)comp).getClientProperty("printableContent");
+                    if(tmp != null) comp = tmp;
                 }
                 if(comp instanceof JScrollPane) {
                     JScrollPane scrollPane = (JScrollPane)comp;

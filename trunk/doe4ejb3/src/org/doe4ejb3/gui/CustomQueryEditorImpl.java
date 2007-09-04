@@ -27,7 +27,7 @@ import org.doe4ejb3.binding.*;
 import org.doe4ejb3.util.JPAUtils;
 
 
-public class CustomQueryEditorImpl extends JPanel implements java.awt.event.ItemListener
+public class CustomQueryEditorImpl extends JPanel implements java.awt.event.ItemListener, EditorLayoutInterface
 {
 
     private final static Insets borderInsets = new Insets(4,2,4,2);
@@ -122,7 +122,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         } else {
 
             HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
-            JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, 0);
+            JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), property, 0);
             selector.putClientProperty("editorValue", comp);
 
             editorContainer.add("Center", comp);
@@ -279,6 +279,16 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     {
         if(parameterValues == null) getEJBQL();
         return parameterValues;
-    }    
+    }
+
+
+    
+    public JComponent getCustomEditorLayout() {
+        return null;
+    }
+    
+    public JComponent getComponentFromEditorLayout(Class componentType, String componentName) {
+        return null;
+    }
     
 }

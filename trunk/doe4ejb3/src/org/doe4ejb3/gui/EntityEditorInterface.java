@@ -15,6 +15,9 @@ package org.doe4ejb3.gui;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JComponent;
 
+import org.doe4ejb3.annotation.EntityDescriptor;
+
+
 
 public interface EntityEditorInterface 
 {
@@ -23,6 +26,20 @@ public interface EntityEditorInterface
      * (it might be useful to get related entities with JPAUtils).
      */
     void setPersistenceUnitName(String puName);
+
+    
+    /**
+     * Injected EntityDescriptor
+     * (it might be useful for binding components).
+     */
+    void setEntityDescriptor(EntityDescriptor descriptor);
+    
+    
+    /**
+     * Injected parent path for embedded editors
+     * (to differentiate customized layout places for 2 similar objects embedded in the same model)
+     */
+    void setLayoutPath(EditorLayoutInterface parentLayout, String childLayoutPath);
     
     
     /**

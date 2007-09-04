@@ -6,10 +6,12 @@
  */
 package org.doe4ejb3.gui;
 
+import javax.swing.DefaultComboBoxModel;
+
 
 public class JComboBoxJSR295 extends javax.swing.JComboBox 
 {
-    public JComboBoxJSR295(javax.swing.ComboBoxModel model) 
+    public JComboBoxJSR295(DefaultComboBoxModel model) 
     {
         super(model);
     }

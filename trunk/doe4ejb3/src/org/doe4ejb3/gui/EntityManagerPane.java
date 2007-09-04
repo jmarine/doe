@@ -29,7 +29,7 @@ import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.EJBQLUtils;
 
 
-public class EntityManagerPane extends javax.swing.JPanel 
+public class EntityManagerPane extends javax.swing.JPanel implements EditorLayoutInterface
 {
     
     private String puName = null;
@@ -51,7 +51,7 @@ public class EntityManagerPane extends javax.swing.JPanel
         try {
             // post initialization:
             Object outBinding[] = new Object[1];
-            entityListEditor = EditorFactory.getCollectionEditor(puName, null, entityClass, true, outBinding);
+            entityListEditor = EditorFactory.getCollectionEditor(this, puName, null, entityClass, true, outBinding);
             listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");
             listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");
 
@@ -91,6 +91,7 @@ public class EntityManagerPane extends javax.swing.JPanel
             
         } catch(Exception ex) {
             JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
+            ex.printStackTrace();
         }
         
     }
@@ -450,6 +451,20 @@ public class EntityManagerPane extends javax.swing.JPanel
                 cause.printStackTrace();
             }         
         };
+    }
+
+    
+    public JComponent getCustomEditorLayout() {
+        return null;
+    }
+    
+    public JComponent getComponentFromEditorLayout(Class componentType, String componentName) {
+        if(componentName.equalsIgnoreCase("params")) {
+            return jPanelQueryParams;
+        } else if(componentName.equalsIgnoreCase("results")) {
+            return jPanelResults;
+        }
+        return null;
     }
 
 }

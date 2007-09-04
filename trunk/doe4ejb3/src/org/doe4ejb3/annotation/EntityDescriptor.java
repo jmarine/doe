@@ -23,7 +23,15 @@ public @interface EntityDescriptor
      * The class must have to implement the interface EntityEditorInterface.
      */
     String editorClassName() default "org.doe4ejb3.gui.EntityEditorImpl";
+    
+    
+    /**
+     * To use an external layout
+     * (ie: EntityEditorImpl will create an instance of the specified class, and will bind JComponent fields with entity attributes)
+     */
+    String layoutClassName() default "default";
 
+    
     /**
      * To hide the EJB3 entity bean from menús and navigator panel.
      * (entities are only visible when used as child relations).

@@ -44,7 +44,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         putClientProperty("entityListeners", new EventListenerList());
         
         System.out.println("Preparing editor ");
-        editor = EditorFactory.getEntityEditor(puName, entityClass);
+        editor = EditorFactory.getEntityEditor(null, puName, entityClass, "");
         setEntity(entity);
         
         JScrollPane scrollPaneForEditor = new JAutoScrollPaneOnComponentFocus(editor.getJComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);

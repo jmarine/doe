@@ -40,7 +40,7 @@ public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport 
             this.spinner = new JSpinner();
             this.spinner.addPropertyChangeListener(this);  // if TemporalTypeEditorSupport is derived from PropertyEditorSupport, it is done automagically by EditorFactory (to bind edited properties back to entity object via JSR 295)
             this.spinner.putClientProperty("fixedSize", "true");
-            if(temporalClass.isAssignableFrom(java.sql.Date.class)) {
+            if(temporalClass.isAssignableFrom(java.sql.Date.class)) {  // FIXME? invert class order
                 this.spinner.setModel(new SpinnerDateModel());
                 this.spinner.setEditor(new JSpinner.DateEditor(spinner, "dd/MM/yyyy"));
             } else if(temporalClass.isAssignableFrom(java.sql.Time.class)) {

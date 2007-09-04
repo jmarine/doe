@@ -20,7 +20,7 @@ import javax.swing.JPanel;
 import org.doe4ejb3.binding.BindingContext;
 
 
-public class QueryParametersEditorImpl extends JPanel  
+public class QueryParametersEditorImpl extends JPanel implements EditorLayoutInterface
 {
     private final static Insets borderInsets = new Insets(4,2,4,2);
 
@@ -72,7 +72,7 @@ public class QueryParametersEditorImpl extends JPanel
     private void handleParameterProperty(Property property)
     {
         int defaultLength = 20;
-        JComponent comp = EditorFactory.getPropertyEditor(manager.getPersistenceUnitName(), property, defaultLength);
+        JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), property, defaultLength);
         if(comp != null) {
             Object binding = comp.getClientProperty("dataBinding");
             if(binding != null) bindingContext.addBinding(binding);
@@ -94,5 +94,13 @@ public class QueryParametersEditorImpl extends JPanel
         return borderInsets;
     }
 
-   
+    
+    public JComponent getCustomEditorLayout() {
+        return null;
+    }
+        
+    public JComponent getComponentFromEditorLayout(Class componentType, String componentName) {
+        return null;
+    }
+  
 }
