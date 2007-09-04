@@ -8,11 +8,24 @@
     <properties>
       <property name="toplink.logging.level" value="FINE"/>
       <property name="toplink.ddl-generation" value="create-tables"/>
-      <property name="toplink.create-ddl-jdbc-file-name" value="doe4ejb3_test_create_javadb.jdbc"/>
-      <property name="toplink.drop-ddl-jdbc-file-name" value="doe4ejb3_test_drop_javadb.jdbc"/>
+      <property name="toplink.create-ddl-jdbc-file-name" value="doe4ejb3_recipe_create_javadb.jdbc"/>
+      <property name="toplink.drop-ddl-jdbc-file-name" value="doe4ejb3_recipe_drop_javadb.jdbc"/>
     </properties>
   </persistence-unit>
 
+  
+  <persistence-unit name="Academy" transaction-type="JTA">
+    <jta-data-source>jdbc/doe4ejb3</jta-data-source>
+    <class>org.doe4ejb3.test.academy.Address</class>
+    <class>org.doe4ejb3.test.academy.Person</class>
+    <properties>
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="toplink.create-ddl-jdbc-file-name" value="doe4ejb3_academy_create_javadb.jdbc"/>
+      <property name="toplink.drop-ddl-jdbc-file-name" value="doe4ejb3_academy_drop_javadb.jdbc"/>
+    </properties>
+  </persistence-unit>
+  
 <!--
   <persistence-unit name="Invoice" transaction-type="JTA">
     <jta-data-source>jdbc/doe4ejb3</jta-data-source>
