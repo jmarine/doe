@@ -47,9 +47,11 @@ public class ReflectionUtils
     {
         if(setter instanceof Field) {
             Field field = (Field)setter;
+            field.setAccessible(true);
             field.set(obj, value);
         } else if(setter instanceof Method) {
             Method method = (Method)setter;
+            method.setAccessible(true);
             method.invoke(obj, value);
         }
     }

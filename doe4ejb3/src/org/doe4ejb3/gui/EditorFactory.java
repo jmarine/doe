@@ -25,11 +25,9 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ActionMap;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JComboBox;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -64,21 +62,24 @@ public class EditorFactory
     /**
      * Creates a new instance of EditorFactory
      */
-    public static EntityEditorInterface getEntityEditor(String puName, Class entityClass) throws ClassNotFoundException, IllegalAccessException, InstantiationException
+    public static EntityEditorInterface getEntityEditor(EditorLayoutInterface parentLayout, String puName, Class entityClass, String childLayoutPath) throws ClassNotFoundException, IllegalAccessException, InstantiationException
     {
         // search for @EntityDescriptor annotation in @Entity/@Embedded class.
         EntityEditorInterface entityEditor = null;
-        EntityDescriptor editorAnnotation = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
-        if( (editorAnnotation != null) && (editorAnnotation.editorClassName() != null) && (editorAnnotation.editorClassName().length() > 0) ) {
-            entityEditor = (EntityEditorInterface)Class.forName(editorAnnotation.editorClassName()).newInstance();
+        EntityDescriptor entityDescriptor = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
+        if( (entityDescriptor != null) && (entityDescriptor.editorClassName() != null) && (entityDescriptor.editorClassName().length() > 0) ) {
+            entityEditor = (EntityEditorInterface)Class.forName(entityDescriptor.editorClassName()).newInstance();
         } else {
             entityEditor = new EntityEditorImpl();
         }
+        // inject useful information to editor:
         entityEditor.setPersistenceUnitName(puName);
+        entityEditor.setEntityDescriptor(entityDescriptor);
+        entityEditor.setLayoutPath(parentLayout, childLayoutPath);
         return entityEditor;
     }
     
-    public static JComponent getPropertyEditor(final String puName, Property property, int maxLength)
+    public static JComponent getPropertyEditor(EditorLayoutInterface layout, final String puName, Property property, int maxLength)
     {
         JComponent comp = null;
         java.beans.PropertyEditor editor = null;        
@@ -110,7 +111,7 @@ public class EditorFactory
                     try {
                         System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
                         Object bindingOutParam[] = new Object[1];
-                        comp = getCollectionEditor(puName, property, memberClass, false, bindingOutParam);
+                        comp = getCollectionEditor(layout, puName, property, memberClass, false, bindingOutParam);
                         binding = bindingOutParam[0];
 
                     } catch(Exception ex) {
@@ -122,10 +123,22 @@ public class EditorFactory
 
                     // OneToOne || ManyToOne
                     try {
-                        final javax.swing.DefaultComboBoxModel comboBoxModel = new javax.swing.DefaultComboBoxModel();
-                        final Class optionClass = memberClass;
-                        final JComboBox combo = new JComboBoxJSR295(comboBoxModel);
+                        // Note: jsr295 beans binding doesn't work with standard JComboBox (because it doesn't propagate "selectedItem" property changes back to entity object),
+                        Object container = layout.getComponentFromEditorLayout(JPanel.class, property.getName());  // search for a JPanel holder in customized layout (to add JComboBoxJSR295 and "easy navigation" button).
 
+                        final Class optionClass = memberClass;
+                        final javax.swing.DefaultComboBoxModel comboBoxModel = new javax.swing.DefaultComboBoxModel();            
+                        final JComboBoxJSR295 combo = new JComboBoxJSR295(comboBoxModel);
+
+                        /** Note: Default JComboBox needs property change events for JSR295 bindings:
+                        combo.addActionListener(new ActionListener() {
+                            public void actionPerformed(ActionEvent e) {
+                                combo.firePropertyChange("selectedItem", "__OLD_VALUE__", combo.getSelectedItem());  // but this is a protected method :-(
+                            }
+                        });
+                        */
+                        
+                        
                         // define combobox prototype dimensions
                         EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, true);
                         combo.setMinimumSize(new java.awt.Dimension(50,26));  // it was too wided
@@ -229,21 +242,36 @@ public class EditorFactory
                         
 
                         // define UI:
-                        JButton jButtonNew = new JButton(newItemAction);
-                        jButtonNew.setHideActionText(true);
-                        JButton jButtonEdit = new JButton(editItemAction);
-                        jButtonEdit.setHideActionText(true);
+                        if(property instanceof HashKeyProperty) {
+                            // HashKeyProperty : Don't include navigation buttons
+                            if((container == null) || (!JPanel.class.isAssignableFrom(container.getClass()))) {
+                                comp = combo;  
+                            } else {
+                                JPanel panel = (JPanel)container;
+                                panel.putClientProperty("layout", layout);  // existing JComboBox or JPanel
+                                panel.setLayout(new BorderLayout());
+                                panel.add(combo, BorderLayout.CENTER);
+                                comp = panel;
+                            }
+                        } else {  
+                            // ObjectProperty : include navigation buttons
+                            JButton jButtonNew = new JButton(newItemAction);
+                            jButtonNew.setHideActionText(true);
+                            JButton jButtonEdit = new JButton(editItemAction);
+                            jButtonEdit.setHideActionText(true);
 
-                        JPanel jButtonsPanel = new JPanel();
-                        jButtonsPanel.setLayout(new java.awt.FlowLayout(FlowLayout.LEFT, 0, 0));
-                        jButtonsPanel.add(jButtonEdit);
-                        jButtonsPanel.add(jButtonNew);
+                            JPanel jButtonsPanel = new JPanel();
+                            jButtonsPanel.setLayout(new java.awt.FlowLayout(FlowLayout.LEFT, 0, 0));
+                            jButtonsPanel.add(jButtonEdit);
+                            jButtonsPanel.add(jButtonNew);
                         
-                        JPanel panel = new JPanel();
-                        panel.setLayout(new BorderLayout());
-                        panel.add(combo, BorderLayout.CENTER);
-                        panel.add(jButtonsPanel, BorderLayout.EAST);
-                        comp = panel;
+                            JPanel panel = ((container != null) && (JPanel.class.isAssignableFrom(container.getClass()))) ? (JPanel)container : new JPanel();
+                            if(container != null) panel.putClientProperty("layout", layout);  // existing JComboBox or JPanel
+                            panel.setLayout(new BorderLayout());
+                            panel.add(combo, BorderLayout.CENTER);
+                            panel.add(jButtonsPanel, BorderLayout.EAST);
+                            comp = panel;
+                        }
 
 
                         // Original binding (with setup of initial value):
@@ -285,13 +313,33 @@ public class EditorFactory
                 org.doe4ejb3.annotation.PropertyDescriptor pd = (org.doe4ejb3.annotation.PropertyDescriptor)objectProperty.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
                 if( (pd != null) && (pd.editorClassName() != null) && (pd.editorClassName().length() > 0) ) {
                     try {
-                        org.doe4ejb3.gui.PropertyEditorInterface propertyComponent  = (org.doe4ejb3.gui.PropertyEditorInterface)Class.forName(pd.editorClassName()).newInstance();
+                        Class editorClass = Class.forName(pd.editorClassName());
+                        Object container = layout.getComponentFromEditorLayout(editorClass, property.getName());
+
+                        org.doe4ejb3.gui.PropertyEditorInterface propertyComponent = null;
+                        if((container != null) && (editorClass.isAssignableFrom(container.getClass()))) {  // normally it will be a JPanel container, but it can also be the real editor UI (with dual interface)
+                            propertyComponent = (org.doe4ejb3.gui.PropertyEditorInterface)container;
+                        } else {
+                            propertyComponent = (org.doe4ejb3.gui.PropertyEditorInterface)(editorClass.newInstance());
+                        }
+                        
                         comp = propertyComponent.getJComponent();
+                        if(container != null) {
+                            if(JPanel.class.isAssignableFrom(container.getClass())) {
+                                JPanel panel = (JPanel)container;
+                                panel.setLayout(new BorderLayout());
+                                panel.add(comp, BorderLayout.CENTER);
+                                comp = panel;
+                            }
+                            comp.putClientProperty("layout", layout);
+                        }
+                        
+                        // set size when required (ie: ImagePropertyEditor)
                         if(pd.width() != 0 && pd.height() != 0) {
                             propertyComponent.setDimension(new java.awt.Dimension(pd.width(), pd.height()));
                             comp.putClientProperty("fixedSize", "true");
                         }
-                        
+
 
                         //Original binding (with setup of initial value):
                         Method editorGetter = propertyComponent.getClass().getMethod("getValue");
@@ -317,6 +365,7 @@ public class EditorFactory
 
         
         // normal property editors
+        // TODO: enable use of custom layout predefined components/JPanel holders.
         if(comp == null) {
             try {
                 editor = findEditor(memberClass);
@@ -334,10 +383,13 @@ public class EditorFactory
                 }
                 
                 if(customComponent != null) {
-                    if(customComponent instanceof JComponent) {
+                    // Note: a JComponent will be needed to putClientProperty("dataBinding", binding)
+                    Object container = layout.getComponentFromEditorLayout(JPanel.class, property.getName());  // search a JPanel holder for the customComponent generated by the PropertyEditor.
+                    if( (container == null) && (customComponent instanceof JComponent) ) {
                         comp = (JComponent)customComponent;
-                    } else {
-                        JPanel panel = new JPanel();  // A JComponent is needed to putClientProperty("dataBinding", binding)
+                    } else {  // convert to JComponent or integrate in customized layout holder:
+                        JPanel panel = (container != null) ? (JPanel)container : new JPanel();  
+                        if(container != null) panel.putClientProperty("layout", layout);
                         panel.setLayout(new FlowLayout());
                         panel.add(customComponent);
                         comp = panel;
@@ -374,13 +426,24 @@ public class EditorFactory
 
 
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
-                    JCheckBox checkBox = new JCheckBox();
+                    Object container = layout.getComponentFromEditorLayout(JCheckBox.class, property.getName());
+                    
+                    JCheckBox checkBox = ((container != null) && (JCheckBox.class.isAssignableFrom(container.getClass())))? (JCheckBox)container : new JCheckBox();
                     comp = checkBox;
+                    if(container != null) {
+                        if(JPanel.class.isAssignableFrom(container.getClass())) {
+                            JPanel panel = (JPanel)container;  
+                            panel.setLayout(new FlowLayout());
+                            panel.add(checkBox);
+                            comp = panel;
+                        }
+                        comp.putClientProperty("layout", layout);
+                    }
                     comp.putClientProperty("fixedSize", "true");
 
                     //Original binding (with setup of initial value):
                     Method compGetter = checkBox.getClass().getMethod("isSelected");
-                    binding = new JComponentDataBinding(comp, compGetter, editor, property);
+                    binding = new JComponentDataBinding(checkBox, compGetter, editor, property);
 
                     Object booleanObject = property.getValue();
                     Boolean value = (Boolean)booleanObject;
@@ -397,10 +460,15 @@ public class EditorFactory
                     */
 
                 } else { // using JTextField or JTextArea depending on Column's length attribute
+                    Object container = layout.getComponentFromEditorLayout(JTextComponent.class, property.getName());
 
                     JTextComponent textField = null;
                     Method compGetter = null;
-                    if( (maxLength >= 0) && (maxLength < 100) ) {
+                    if( (container != null) && (JTextComponent.class.isAssignableFrom(container.getClass())) ) {
+                        textField = (JTextComponent)container;
+                        compGetter = textField.getClass().getMethod("getText");
+                        comp = textField;
+                    } else if( (maxLength >= 0) && (maxLength < 100) ) {
                         textField = (maxLength > 0) ? new JTextField(maxLength) : new JTextField();
                         compGetter = textField.getClass().getMethod("getText");
                         comp = textField;
@@ -411,6 +479,17 @@ public class EditorFactory
                         comp = new JScrollPane(textField, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
                         comp.setPreferredSize(new java.awt.Dimension(400, 80));
                     }
+                    
+                    if(container != null) {
+                        if(JPanel.class.isAssignableFrom(container.getClass())) {
+                            JPanel panel = (JPanel)container;
+                            panel.setLayout(new BorderLayout());
+                            panel.add(textField, BorderLayout.CENTER);
+                            comp = panel;
+                        }
+                        comp.putClientProperty("layout", layout);                        
+                    }
+                    
                     
                     if(maxLength > 0) {
                         AbstractDocument doc = (AbstractDocument)textField.getDocument();
@@ -447,8 +526,6 @@ public class EditorFactory
                                 System.out.println("**** SOURCE TO TARGET: text=" + editorFinal.getAsText());
                                 return editorFinal.getAsText();
                             }
-
-                            @Override
                             public Object targetToSource(Object arg0) {
                                 System.out.println("**** TARGET TO SOURCE : text=" + arg0);
                                 editorFinal.setAsText(arg0.toString());
@@ -481,6 +558,7 @@ public class EditorFactory
     
     protected static java.beans.PropertyEditor findEditor(Class memberClass)
     {
+        // FIXME? invert class order
         if(memberClass.isAssignableFrom(java.lang.Byte.class)) memberClass = Byte.TYPE;
         else if(memberClass.isAssignableFrom(java.lang.Short.class)) memberClass = Short.TYPE;
         else if(memberClass.isAssignableFrom(java.lang.Integer.class)) memberClass = Integer.TYPE;
@@ -494,20 +572,24 @@ public class EditorFactory
     /** 
      * Setup an editor for a multi-valued property 
      */
-    public static JComponent getCollectionEditor(final String puName, final Property property, final Class memberClass, final boolean isManagerWindow,Object bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(EditorLayoutInterface layout, final String puName, final Property property, final Class memberClass, final boolean isManagerWindow,Object bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+        Object container = (property != null) ? layout.getComponentFromEditorLayout(JPanel.class, property.getName()) : null;  // search a JPanel holder for the relation and navigation commands.
+        
         final JTable jTable = new JTable();
         final JScrollPane scrollableItems = new JScrollPane(jTable);
-        final JPanel panel = new ComposedEditorHolder(scrollableItems);
+        final JPanel panel = (container != null) ? (JPanel)container : new JPanel();  
         
         final DefaultListModel listModel = new DefaultListModel();
         final ListSelectionModel listSelectionModel = jTable.getSelectionModel();
         final ObjectPropertyTableModel objectPropertyTableModel = new ObjectPropertyTableModel(memberClass, listModel);
         final EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, !isManagerWindow);
-        
+
+        panel.putClientProperty("printableContent", scrollableItems);
         panel.putClientProperty("scrollPane", scrollableItems);
         panel.putClientProperty("table", jTable);
         panel.putClientProperty("listModel", listModel);
         panel.putClientProperty("listSelectionModel", listSelectionModel);
+        if(container != null) panel.putClientProperty("layout", layout);
         
         if(property != null) {
             // Original binding (with setup of initial value):

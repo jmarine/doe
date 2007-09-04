@@ -207,8 +207,10 @@ public class ObjectProperty implements Property
         if( (propertyDescriptor != null) && (propertyDescriptor.getWriteMethod() != null) ) {
             System.out.println("> Setting " + propertyName + " (type: " + propertyDescriptor.getPropertyType().getName() + ") with value = " + value);
             if(value != null) System.out.println("- Value type: " + value.getClass().getName());
+            propertyDescriptor.getWriteMethod().setAccessible(true);
             propertyDescriptor.getWriteMethod().invoke(obj, value);
         } else if(field != null) {
+            field.setAccessible(true);
             field.set(obj, value);
         } else {
             throw new IllegalAccessException("Object without setter method/field");
