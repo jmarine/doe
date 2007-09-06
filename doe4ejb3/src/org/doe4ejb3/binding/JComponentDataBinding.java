@@ -26,10 +26,10 @@ public class JComponentDataBinding
     private Object  componentUI;
     private Method  componentDataGetter;
     private PropertyEditor editor;
-    private Property entityProperty;
+    private StatefulProperty entityProperty;
     
     
-    public JComponentDataBinding(Object componentUI, Method componentDataGetter, PropertyEditor editor, Property entityProperty) 
+    public JComponentDataBinding(Object componentUI, Method componentDataGetter, PropertyEditor editor, StatefulProperty entityProperty) 
     {
         this.active = false; 
         this.componentUI = componentUI;
@@ -57,7 +57,7 @@ public class JComponentDataBinding
             
             Class memberClass = entityProperty.getType();
             boolean convertToCollection = java.util.Collection.class.isAssignableFrom(memberClass);
-            if( (convertToCollection) && (value.getClass().isArray()) ) {  // Code has already been copied to ObjectProperty.setValue method
+            if( (convertToCollection) && (value.getClass().isArray()) ) {  // Code has already been copied to EntityProperty.setValue method
                 Class collectionClass = memberClass;
 
                 // ParameterizedType paramType = (ParameterizedType)memberType;

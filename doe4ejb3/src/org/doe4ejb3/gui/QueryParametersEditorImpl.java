@@ -7,6 +7,8 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.binding.HashKeyProperty;
+import org.doe4ejb3.binding.StatefulProperty;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -69,7 +71,7 @@ public class QueryParametersEditorImpl extends JPanel implements EditorLayoutInt
     }
 
     
-    private void handleParameterProperty(Property property)
+    private void handleParameterProperty(StatefulProperty property)
     {
         int defaultLength = 20;
         JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), property, defaultLength);

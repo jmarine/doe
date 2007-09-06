@@ -11,7 +11,7 @@ import java.awt.event.*;
 import java.lang.reflect.*;
 import javax.swing.*;
 
-import org.doe4ejb3.gui.ObjectPropertyTableModel;
+import org.doe4ejb3.gui.EntityTableModel;
 
 
 public class EntityTransferHandler extends TransferHandler 
@@ -78,7 +78,7 @@ public class EntityTransferHandler extends TransferHandler
                         }
                     } else if(c instanceof JTable) {
                         JTable table = (JTable)c;
-                        ObjectPropertyTableModel model = (ObjectPropertyTableModel)table.getModel();
+                        EntityTableModel model = (EntityTableModel)table.getModel();
                         for(int index = 0; index < items.length; index++) {
                             if(!model.getListModel().contains(items[index])) {
                                 model.getListModel().addElement(items[index]);
@@ -116,7 +116,7 @@ public class EntityTransferHandler extends TransferHandler
                 }
             } else if(sourceControl instanceof JTable) {
                 JTable table = (JTable)sourceControl;
-                ObjectPropertyTableModel model = (ObjectPropertyTableModel)table.getModel();
+                EntityTableModel model = (EntityTableModel)table.getModel();
                 for(int index = 0; index < items.length; index++) {
                     int position = model.getListModel().indexOf(items[index]);
                     if(position != -1) {
@@ -153,7 +153,7 @@ public class EntityTransferHandler extends TransferHandler
         EntityTransferable(JComponent component) {
             try { 
                 JTable table = (JTable)component;
-                ObjectPropertyTableModel model = (ObjectPropertyTableModel)table.getModel();
+                EntityTableModel model = (EntityTableModel)table.getModel();
 
                 items = null;
                 int selection[] = table.getSelectedRows();

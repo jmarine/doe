@@ -1,5 +1,5 @@
 /*
- * ObjectPropertyTableModel.java
+ * EntityTableModel.java
  *
  * Created on 15 October 2006, 17:32
  * @author jordi
@@ -18,10 +18,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 
-import org.doe4ejb3.annotation.PropertyDescriptor;
 
-
-public class ObjectPropertyTableModel implements javax.swing.table.TableModel, javax.swing.event.ListDataListener
+public class EntityTableModel implements javax.swing.table.TableModel, javax.swing.event.ListDataListener
 {
     private Class itemClass;
     private DefaultListModel listModel;
@@ -30,7 +28,7 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
     private EventListenerList listenerList;
     private java.beans.PropertyChangeSupport changeSupport;
     
-    public ObjectPropertyTableModel(Class itemClass, DefaultListModel listModel) throws Exception
+    public EntityTableModel(Class itemClass, DefaultListModel listModel) throws Exception
     {
         this.itemClass = itemClass;
         this.listModel = listModel;
@@ -42,13 +40,13 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
         this.changeSupport = null;
 
         // TODO: order by index
-        System.out.println("ObjectPropertyDescriptorTableModel: Scan columns...");
+        System.out.println("EntityTableModel: Scan columns...");
         for(Field field : itemClass.getFields()) {
             org.doe4ejb3.annotation.PropertyDescriptor pd = field.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
             if( (pd != null) && (pd.showInLists()) ) {
                 columnMembers.add(field);
                 columnPropertyDescriptors.add(pd);
-                System.out.println("ObjectPropertyDescriptorTableModel: found column: " + field.getName());
+                System.out.println("EntityTableModel: found column: " + field.getName());
             }
         }
 
@@ -60,11 +58,11 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
                 if( (pd != null) && (pd.showInLists()) ) {
                     columnMembers.add(method);
                     columnPropertyDescriptors.add(pd);
-                    System.out.println("ObjectPropertyDescriptorTableModel: found column: " + method.getName());
+                    System.out.println("EntityTableModel: found column: " + method.getName());
                 }
             }
         }
-        System.out.println("ObjectPropertyDescriptorTableModel: Scan done.");        
+        System.out.println("EntityTableModel: Scan done.");        
 
     }
     
@@ -75,13 +73,13 @@ public class ObjectPropertyTableModel implements javax.swing.table.TableModel, j
 
     public int getRowCount() {
         int rows = listModel.getSize();
-        System.out.println("ObjectPropertyDescriptorTableModel: RowCount =" + rows);
+        System.out.println("EntityTableModel: RowCount =" + rows);
         return rows;
     }
 
     public int getColumnCount() {
         int cols = Math.max(1,columnMembers.size());
-        System.out.println("ObjectPropertyDescriptorTableModel: Num columns =" + cols);
+        System.out.println("EntityTableModel: Num columns =" + cols);
         return cols;
     }
 

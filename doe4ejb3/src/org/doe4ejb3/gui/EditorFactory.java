@@ -7,6 +7,9 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.binding.HashKeyProperty;
+import org.doe4ejb3.binding.EntityProperty;
+import org.doe4ejb3.binding.StatefulProperty;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -79,7 +82,7 @@ public class EditorFactory
         return entityEditor;
     }
     
-    public static JComponent getPropertyEditor(EditorLayoutInterface layout, final String puName, Property property, int maxLength)
+    public static JComponent getPropertyEditor(EditorLayoutInterface layout, final String puName, StatefulProperty property, int maxLength)
     {
         JComponent comp = null;
         java.beans.PropertyEditor editor = null;        
@@ -254,7 +257,7 @@ public class EditorFactory
                                 comp = panel;
                             }
                         } else {  
-                            // ObjectProperty : include navigation buttons
+                            // EntityProperty : include navigation buttons
                             JButton jButtonNew = new JButton(newItemAction);
                             jButtonNew.setHideActionText(true);
                             JButton jButtonEdit = new JButton(editItemAction);
@@ -308,9 +311,9 @@ public class EditorFactory
         
         // custom property editors
         if(comp == null) {
-            if(property instanceof ObjectProperty) {
-                ObjectProperty objectProperty = (ObjectProperty)property;
-                org.doe4ejb3.annotation.PropertyDescriptor pd = (org.doe4ejb3.annotation.PropertyDescriptor)objectProperty.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
+            if(property instanceof EntityProperty) {
+                EntityProperty entityProperty = (EntityProperty)property;
+                org.doe4ejb3.annotation.PropertyDescriptor pd = (org.doe4ejb3.annotation.PropertyDescriptor)entityProperty.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
                 if( (pd != null) && (pd.editorClassName() != null) && (pd.editorClassName().length() > 0) ) {
                     try {
                         Class editorClass = Class.forName(pd.editorClassName());
@@ -572,7 +575,7 @@ public class EditorFactory
     /** 
      * Setup an editor for a multi-valued property 
      */
-    public static JComponent getCollectionEditor(EditorLayoutInterface layout, final String puName, final Property property, final Class memberClass, final boolean isManagerWindow,Object bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(EditorLayoutInterface layout, final String puName, final StatefulProperty property, final Class memberClass, final boolean isManagerWindow,Object bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
         Object container = (property != null) ? layout.getComponentFromEditorLayout(JPanel.class, property.getName()) : null;  // search a JPanel holder for the relation and navigation commands.
         
         final JTable jTable = new JTable();
@@ -581,7 +584,7 @@ public class EditorFactory
         
         final DefaultListModel listModel = new DefaultListModel();
         final ListSelectionModel listSelectionModel = jTable.getSelectionModel();
-        final ObjectPropertyTableModel objectPropertyTableModel = new ObjectPropertyTableModel(memberClass, listModel);
+        final EntityTableModel entityTableModel = new EntityTableModel(memberClass, listModel);
         final EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, !isManagerWindow);
 
         panel.putClientProperty("printableContent", scrollableItems);
@@ -611,7 +614,7 @@ public class EditorFactory
             
             /* New jsr-295 binding, that still doesn't work with Glassfish v2 implementation of "javax.el.ValueExpression" (auto-downloaded via JavaWebStart)
             System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JTable (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
-            javax.beans.binding.Binding binding = new javax.beans.binding.Binding(property, "${value}", objectPropertyTableModel, "values");
+            javax.beans.binding.Binding binding = new javax.beans.binding.Binding(property, "${value}", entityTableModel, "values");
             binding.setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
             bindingOutParam[0] = binding;
             */
@@ -752,7 +755,7 @@ public class EditorFactory
         AbstractAction printAction = new AbstractAction("Print", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/print.png"))) {
                 public void actionPerformed(ActionEvent evt)  {
                     try {
-                        if(objectPropertyTableModel.getRowCount() == 0) {
+                        if(entityTableModel.getRowCount() == 0) {
                             throw new ApplicationException("There aren't rows to print.");
                         } else {
                             MessageFormat headerFormat = new MessageFormat(I18n.getEntityName(memberClass) + " list:");
@@ -880,7 +883,7 @@ public class EditorFactory
         scrollableItems.setBorder(javax.swing.BorderFactory.createEtchedBorder());
         scrollableItems.setComponentPopupMenu(popupMenu);
 
-        jTable.setModel(objectPropertyTableModel);
+        jTable.setModel(entityTableModel);
         jTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         jTable.setCellSelectionEnabled(false);
         jTable.setRowSelectionAllowed(true);

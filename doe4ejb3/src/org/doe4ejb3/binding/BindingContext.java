@@ -10,7 +10,8 @@ package org.doe4ejb3.binding;
 import java.util.ArrayList;
 
 
-public class BindingContext extends ArrayList<JComponentDataBinding> {
+public class BindingContext extends ArrayList<JComponentDataBinding> 
+{
     
     private javax.beans.binding.BindingContext stdBindingContext = new javax.beans.binding.BindingContext();
 

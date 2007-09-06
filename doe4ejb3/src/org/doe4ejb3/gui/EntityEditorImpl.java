@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.binding.EntityProperty;
 import java.beans.*;
 import java.lang.reflect.*;
 import java.lang.annotation.*;
@@ -242,19 +243,19 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         removeAll();
         setLayout(new GridBagLayout());
         
-        ArrayList<ObjectProperty> properties = new ArrayList<ObjectProperty>();
+        ArrayList<EntityProperty> properties = new ArrayList<EntityProperty>();
         try {
             Class entityClass = entity.getClass();
             BeanInfo bi = Introspector.getBeanInfo(entityClass);
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                 // TODO: inherited properties?
-                ObjectProperty entityProperty = new ObjectProperty(entity, pd);
+                EntityProperty entityProperty = new EntityProperty(entity, pd);
                 if(!properties.contains(entityProperty)) properties.add(entityProperty);
             }
             
             for(Field field : entityClass.getFields()) {
                 // TODO: inherited fields
-                ObjectProperty entityProperty = new ObjectProperty(entity, field);
+                EntityProperty entityProperty = new EntityProperty(entity, field);
                 if(!properties.contains(entityProperty)) properties.add(entityProperty);
             }
             
@@ -266,7 +267,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
 
         PropertyOrderComparator orderComparator = new PropertyOrderComparator();
         Collections.sort(properties, orderComparator);
-        for(ObjectProperty property : properties) 
+        for(EntityProperty property : properties) 
         {
             handlePersistenceAnnotations(property);
         }
@@ -282,7 +283,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         bindingContext.bind();
     }
     
-    public void handlePersistenceAnnotations(ObjectProperty entityProperty)
+    public void handlePersistenceAnnotations(EntityProperty entityProperty)
     {
         // TODO: @Embedable --> new EntityEditorImpl(field.getType() || method.getReturnType())
         // (with "getEntity" method as "getter")

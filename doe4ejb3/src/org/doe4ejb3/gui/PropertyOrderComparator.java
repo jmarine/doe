@@ -12,18 +12,18 @@ import java.lang.annotation.Annotation;
 
 import java.util.Comparator;
 import org.doe4ejb3.annotation.PropertyDescriptor;
-import org.doe4ejb3.gui.ObjectProperty;
+import org.doe4ejb3.binding.EntityProperty;
 import org.doe4ejb3.util.ReflectionUtils;
 
 
-public class PropertyOrderComparator implements Comparator<ObjectProperty>
+public class PropertyOrderComparator implements Comparator<EntityProperty>
 {
     
     /** Creates a new instance of OrderAttributeComparator */
     public PropertyOrderComparator() { }
 
 
-    public int compare(ObjectProperty p1, ObjectProperty p2) 
+    public int compare(EntityProperty p1, EntityProperty p2) 
     {
         boolean m1IsIdentity = p1.hasAnnotation(javax.persistence.Id.class);
         boolean m2IsIdentity = p2.hasAnnotation(javax.persistence.Id.class);
