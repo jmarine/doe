@@ -1,12 +1,13 @@
 /**
- * ObjectProperty.java
+ * HashKeyProperty.java
  *
  * Created on 26 August 2006, 19:21
  * @author Jordi Marine Fort
  */
 
-package org.doe4ejb3.gui;
+package org.doe4ejb3.binding;
 
+import org.doe4ejb3.binding.StatefulProperty;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.AnnotationTypeMismatchException;
@@ -27,7 +28,7 @@ import java.util.Collections;
  *
  * @author jordi
  */
-public class HashKeyProperty implements Property 
+public class HashKeyProperty implements StatefulProperty 
 {
     private HashMap hashMap;
     private String key;

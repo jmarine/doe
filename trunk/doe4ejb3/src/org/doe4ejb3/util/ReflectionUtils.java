@@ -21,12 +21,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
-import org.doe4ejb3.gui.ObjectProperty;
 
-/**
- *
- * @author Jordi Marine Fort
- */
+
 public class ReflectionUtils 
 {
     public static Object getMemberValue(Object obj, Member getter) throws IllegalAccessException, InvocationTargetException

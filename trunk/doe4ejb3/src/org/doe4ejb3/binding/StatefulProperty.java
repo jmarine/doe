@@ -7,7 +7,7 @@
  * and open the template in the editor.
  */
 
-package org.doe4ejb3.gui;
+package org.doe4ejb3.binding;
 
 import java.lang.reflect.Type;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +16,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author jordi
  */
-public interface Property {
+public interface StatefulProperty {
     
     String getName(); 
     

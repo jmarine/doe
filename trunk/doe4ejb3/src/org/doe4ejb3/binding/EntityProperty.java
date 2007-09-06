@@ -1,32 +1,24 @@
 /**
- * ObjectProperty.java
+ * EntityProperty.java
  *
  * Created on 26 August 2006, 19:21
  * @author Jordi Marine Fort
  */
 
-package org.doe4ejb3.gui;
+package org.doe4ejb3.binding;
 
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
-import java.lang.annotation.AnnotationTypeMismatchException;
-import java.lang.reflect.Member;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
-import java.lang.reflect.ParameterizedType;
-import java.lang.IllegalAccessException;
 import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- *
- * @author jordi
- */
-public class ObjectProperty implements Property 
+
+public class EntityProperty implements StatefulProperty 
 {
     private Object obj;
     private String propertyName;
@@ -40,7 +32,7 @@ public class ObjectProperty implements Property
     
 
     
-    public ObjectProperty(Object obj, Field field) throws IllegalArgumentException
+    public EntityProperty(Object obj, Field field) throws IllegalArgumentException
     {
         this.obj = obj;
         this.field = field;
@@ -48,7 +40,7 @@ public class ObjectProperty implements Property
         this.propertyName = decapitalize(field.getName());
     }
 
-    public ObjectProperty(Object obj, PropertyDescriptor propertyDescriptor) throws IllegalArgumentException
+    public EntityProperty(Object obj, PropertyDescriptor propertyDescriptor) throws IllegalArgumentException
     {
         this.obj = obj;
         this.propertyDescriptor = propertyDescriptor;
@@ -58,9 +50,9 @@ public class ObjectProperty implements Property
         try { 
             // TODO? iterate until superclass
             this.field = obj.getClass().getDeclaredField(propertyName); 
-            System.out.println("ObjectProperty: INFO: field attribute found for propertyDescriptor  " + propertyName);
+            System.out.println("EntityProperty: INFO: field attribute found for propertyDescriptor  " + propertyName);
         } catch(Exception ex) { 
-            System.out.println("ObjectProperty: WARN: propertyDescriptor without field attribute: " + propertyName);
+            System.out.println("EntityProperty: WARN: propertyDescriptor without field attribute: " + propertyName);
         }
         
     }
@@ -241,8 +233,8 @@ public class ObjectProperty implements Property
     
     public boolean equals(Object obj)
     {
-        if( (obj != null) && (obj instanceof Property) ) {
-            Property p2 = (Property)obj;
+        if( (obj != null) && (obj instanceof StatefulProperty) ) {
+            StatefulProperty p2 = (StatefulProperty)obj;
             return propertyName.equals(p2.getName());
         }
         return false;
