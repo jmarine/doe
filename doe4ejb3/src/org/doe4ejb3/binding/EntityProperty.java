@@ -56,6 +56,11 @@ public class EntityProperty implements StatefulProperty
         }
         
     }
+    
+    public Object getSource()
+    {
+        return obj;
+    }
 
     
     public String getName()

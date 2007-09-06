@@ -18,6 +18,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 public interface StatefulProperty {
     
+    Object getSource();
+    
     String getName(); 
     
     Class getType();
