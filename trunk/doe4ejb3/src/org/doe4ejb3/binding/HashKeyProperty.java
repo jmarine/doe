@@ -7,22 +7,10 @@
 
 package org.doe4ejb3.binding;
 
-import org.doe4ejb3.binding.StatefulProperty;
-import java.beans.PropertyDescriptor;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.AnnotationTypeMismatchException;
-import java.lang.reflect.Member;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.ParameterizedType;
-import java.lang.IllegalAccessException;
 import java.lang.reflect.InvocationTargetException;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  *
@@ -43,7 +31,13 @@ public class HashKeyProperty implements StatefulProperty
         this.genericType = genericType;
     }
 
+    
+    public Object getSource()
+    {
+        return hashMap;
+    }
    
+    
     public String getName()
     {
         return key;
