@@ -6,6 +6,7 @@
 
 package org.doe4ejb3.gui;
 import java.util.HashMap;
+import org.doe4ejb3.util.JPAUtils;
 
 /**
  *
@@ -35,8 +36,6 @@ public class ConnectionManager extends javax.swing.JInternalFrame
     // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabelJPAimpl = new javax.swing.JLabel();
-        jComboBoxJPAimpl = new javax.swing.JComboBox();
         jLabelUsername = new javax.swing.JLabel();
         jTextFieldUsername = new javax.swing.JTextField();
         jLabelPassword = new javax.swing.JLabel();
@@ -46,11 +45,6 @@ public class ConnectionManager extends javax.swing.JInternalFrame
 
         setClosable(true);
         setTitle("Connection properties");
-
-        jLabelJPAimpl.setLabelFor(jComboBoxJPAimpl);
-        jLabelJPAimpl.setText("JPA implementation:");
-
-        jComboBoxJPAimpl.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "TopLink Essentials" }));
 
         jLabelUsername.setLabelFor(jTextFieldUsername);
         jLabelUsername.setText("Username:");
@@ -85,28 +79,22 @@ public class ConnectionManager extends javax.swing.JInternalFrame
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(layout.createSequentialGroup()
                         .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabelJPAimpl)
                             .add(jLabelUsername)
                             .add(jLabelPassword))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
-                            .add(jPasswordField)
-                            .add(jTextFieldUsername)
-                            .add(jComboBoxJPAimpl, 0, 167, Short.MAX_VALUE)))
+                        .add(74, 74, 74)
+                        .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jPasswordField, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
+                            .add(jTextFieldUsername, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)))
                     .add(layout.createSequentialGroup()
                         .add(jButtonAccept)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jButtonCancel)))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .addContainerGap()
-                .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabelJPAimpl)
-                    .add(jComboBoxJPAimpl, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                .add(33, 33, 33)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabelUsername)
                     .add(jTextFieldUsername, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
@@ -114,7 +102,7 @@ public class ConnectionManager extends javax.swing.JInternalFrame
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabelPassword)
                     .add(jPasswordField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 45, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 54, Short.MAX_VALUE)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jButtonAccept)
                     .add(jButtonCancel))
@@ -133,17 +121,17 @@ public class ConnectionManager extends javax.swing.JInternalFrame
     private void jButtonAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAcceptActionPerformed
         username = jTextFieldUsername.getText();
         password = new String(jPasswordField.getPassword());
-        if(jComboBoxJPAimpl.getSelectedIndex() == 0) {
-            // Setup TopLink properties:
-            if( (username != null) && (username.length() > 0) ) {
-                connectionParams.put(oracle.toplink.essentials.config.TopLinkProperties.JDBC_USER, username);
-                if( (password != null) && (password.length() > 0) ) connectionParams.put(oracle.toplink.essentials.config.TopLinkProperties.JDBC_PASSWORD, password);
-                else connectionParams.remove(oracle.toplink.essentials.config.TopLinkProperties.JDBC_PASSWORD);
-            } else {
-                connectionParams.remove(oracle.toplink.essentials.config.TopLinkProperties.JDBC_USER);
-                connectionParams.remove(oracle.toplink.essentials.config.TopLinkProperties.JDBC_PASSWORD);
-            }
+
+        // Setup TopLink properties:
+        if( (username != null) && (username.length() > 0) ) {
+            connectionParams.put(JPAUtils.USER_PROPERTY_NAME, username);
+            if( (password != null) && (password.length() > 0) ) connectionParams.put(JPAUtils.PASSWORD_PROPERTY_NAME, password);
+            else connectionParams.remove(JPAUtils.PASSWORD_PROPERTY_NAME);
+        } else {
+            connectionParams.remove(JPAUtils.USER_PROPERTY_NAME);
+            connectionParams.remove(JPAUtils.PASSWORD_PROPERTY_NAME);
         }
+
         close();
     }//GEN-LAST:event_jButtonAcceptActionPerformed
     
@@ -151,8 +139,6 @@ public class ConnectionManager extends javax.swing.JInternalFrame
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButtonAccept;
     private javax.swing.JButton jButtonCancel;
-    private javax.swing.JComboBox jComboBoxJPAimpl;
-    private javax.swing.JLabel jLabelJPAimpl;
     private javax.swing.JLabel jLabelPassword;
     private javax.swing.JLabel jLabelUsername;
     private javax.swing.JPasswordField jPasswordField;

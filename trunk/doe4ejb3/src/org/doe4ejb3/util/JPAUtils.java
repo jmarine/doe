@@ -41,8 +41,17 @@ import org.doe4ejb3.jaxb.persistence.Persistence;
 
 public class JPAUtils 
 {
+    public static final String USER_PROPERTY_NAME       = "username";
+    public static final String PASSWORD_PROPERTY_NAME   = "password";
+    
+    public static final String TOPLINK_PROVIDER         = "oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider";
+    public static final String HIBERNATE_PROVIDER       = "org.hibernate.ejb.HibernatePersistence";
+    public static final String OPENJPA_PROVIDER         = "org.apache.openjpa.persistence.PersistenceProviderImpl";
+    public static final String KODO_PROVIDER            = "kodo.persistence. PersistenceProviderImpl";
 
     private static JAXBContext jc = null;
+    private static String defaultPersistenceProvider = TOPLINK_PROVIDER;
+    private static Hashtable<String, String> providerByPU = new Hashtable<String, String>();
     private static Hashtable<String, ArrayList<Class>> entityListByPU = new Hashtable<String, ArrayList<Class>>();
     private static Hashtable<String, Class> classesByPUNameAndEntityName = new Hashtable<String, Class>();
     
@@ -61,6 +70,55 @@ public class JPAUtils
         String key = puName + "/" + entityName;
         return classesByPUNameAndEntityName.get(key);
     }
+    
+    public static String getPersistenceProvider(String puName)
+    {
+        String provider = providerByPU.get(puName);
+        if((provider == null) || (provider.length() == 0)) provider = getDefaultPersistenceProvider();
+        return provider;
+    }
+    
+    public static String getDefaultPersistenceProvider()
+    {
+        return defaultPersistenceProvider;
+    }
+    
+    public static void setDefaultPersistenceProvider(String provider)
+    {
+        defaultPersistenceProvider = provider;
+    }    
+    
+    private static String getUserPropertyName(String providerClass) 
+    {
+        if(providerClass != null) {
+            if(providerClass.equalsIgnoreCase(TOPLINK_PROVIDER)) {
+                return oracle.toplink.essentials.config.TopLinkProperties.JDBC_USER;
+            } else if(providerClass.equalsIgnoreCase(HIBERNATE_PROVIDER)) {
+                return "hibernate.connection.username";
+            } else if(providerClass.equalsIgnoreCase(OPENJPA_PROVIDER)) {
+                return "openjpa.ConnectionUserName";
+            } else if(providerClass.equalsIgnoreCase(KODO_PROVIDER)) {
+                return "kodo.ConnectionUserName";  // FIXME? "kodo.Connection2UserName";
+            }
+        }
+        return oracle.toplink.essentials.config.TopLinkProperties.JDBC_USER;
+    }
+
+    private static String getPasswordPropertyName(String providerClass) 
+    {
+        if(providerClass != null) {
+            if(providerClass.equalsIgnoreCase(TOPLINK_PROVIDER)) {
+                return oracle.toplink.essentials.config.TopLinkProperties.JDBC_PASSWORD;
+            } else if(providerClass.equalsIgnoreCase(HIBERNATE_PROVIDER)) {
+                return "hibernate.connection.password";
+            } else if(providerClass.equalsIgnoreCase(OPENJPA_PROVIDER)) {
+                return "openjpa.ConnectionPassword";
+            } else if(providerClass.equalsIgnoreCase(KODO_PROVIDER)) {
+                return "kodo.ConnectionPassword"; // FIXME? "kodo.Connection2Password";
+            }
+        }
+        return oracle.toplink.essentials.config.TopLinkProperties.JDBC_PASSWORD;
+    }    
 
     public static String getPersistenceUnitTitle(String puName)
     {
@@ -133,7 +191,16 @@ public class JPAUtils
             // examine content of persistence units
             for(org.doe4ejb3.jaxb.persistence.Persistence.PersistenceUnit pu : persistence.getPersistenceUnit() ) 
             {
-                System.out.println("Parsing PU: " + pu.getName());
+                String puName = pu.getName();
+                if(puName == null) puName = "";
+
+                System.out.println("Parsing PU: " + puName);
+
+                try {
+                    providerByPU.put(puName, pu.getProvider());
+                } catch(Exception ex) {
+                    providerByPU.put(puName, getDefaultPersistenceProvider());
+                }
                 
                 try {
                    excludeUnlistedClasses = pu.isExcludeUnlistedClasses();
@@ -147,8 +214,6 @@ public class JPAUtils
                         Entity entity = (Entity)clazz.getAnnotation(javax.persistence.Entity.class);
                         if(entity != null) {
                             System.out.println("> found entity class: " + className);
-                            String puName = pu.getName();
-                            if(puName == null) puName = "";
                             
                             String entityName = entity.name();
                             if( (entityName == null) || (entityName.length() == 0) ) entityName = clazz.getSimpleName();
@@ -222,12 +287,25 @@ public class JPAUtils
         }
         return classes;
     }
-
+    
     
     public static EntityManager getEntityManager(HashMap connectionParams, String puName)
     {    
         // TODO: the EntityManagerFactory should be pooled and create redefined EntityManager with specific user/password?
-        EntityManagerFactory emf = javax.persistence.Persistence.createEntityManagerFactory(puName, connectionParams);
+        String providerClass = getPersistenceProvider(puName);
+        HashMap<String,String> providerConnectionParams = new HashMap<String,String>();
+        String username = (String)connectionParams.get(USER_PROPERTY_NAME);
+        if(username != null) {
+            String userPropertyName = getUserPropertyName(providerClass);
+            providerConnectionParams.put(userPropertyName, username);
+        }
+        String password = (String)connectionParams.get(PASSWORD_PROPERTY_NAME);
+        if(password != null) {
+            String passwordPropertyName = getPasswordPropertyName(providerClass);
+            providerConnectionParams.put(passwordPropertyName, password);
+        }
+        
+        EntityManagerFactory emf = javax.persistence.Persistence.createEntityManagerFactory(puName, providerConnectionParams);
         EntityManager manager = emf.createEntityManager(connectionParams); // Retrieve an application managed entity manager
         
         return manager;
