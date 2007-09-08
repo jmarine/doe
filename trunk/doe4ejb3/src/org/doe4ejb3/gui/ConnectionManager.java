@@ -119,17 +119,17 @@ public class ConnectionManager extends javax.swing.JInternalFrame
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void jButtonAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAcceptActionPerformed
+        // Setup authentication properties:
         username = jTextFieldUsername.getText();
         password = new String(jPasswordField.getPassword());
 
-        // Setup TopLink properties:
         if( (username != null) && (username.length() > 0) ) {
-            connectionParams.put(JPAUtils.USER_PROPERTY_NAME, username);
-            if( (password != null) && (password.length() > 0) ) connectionParams.put(JPAUtils.PASSWORD_PROPERTY_NAME, password);
-            else connectionParams.remove(JPAUtils.PASSWORD_PROPERTY_NAME);
+            connectionParams.put(JPAUtils.GENERIC_USER_PROPERTY_NAME, username);
+            if( (password != null) && (password.length() > 0) ) connectionParams.put(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME, password);
+            else connectionParams.remove(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME);
         } else {
-            connectionParams.remove(JPAUtils.USER_PROPERTY_NAME);
-            connectionParams.remove(JPAUtils.PASSWORD_PROPERTY_NAME);
+            connectionParams.remove(JPAUtils.GENERIC_USER_PROPERTY_NAME);
+            connectionParams.remove(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME);
         }
 
         close();
