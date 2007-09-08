@@ -23,8 +23,8 @@
             <included-library files="1">libs.swing-layout.classpath</included-library>
             <included-library files="5">libs.jaxb20.classpath</included-library>
             <included-library files="2">libs.swing-app-framework.classpath</included-library>
-            <included-library files="1">libs.beans-binding.classpath</included-library>
             <included-library files="8">libs.ABEILLE-2.1.0.classpath</included-library>
+            <included-library files="1">libs.Beans_Binding-1.0.classpath</included-library>
         </data>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
             <reference>

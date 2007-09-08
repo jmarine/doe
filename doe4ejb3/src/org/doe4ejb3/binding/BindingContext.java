@@ -8,19 +8,20 @@
 package org.doe4ejb3.binding;
 
 import java.util.ArrayList;
+import org.jdesktop.beansbinding.Binding.SyncFailure;
 
 
 public class BindingContext extends ArrayList<JComponentDataBinding> 
 {
     
-    private javax.beans.binding.BindingContext stdBindingContext = new javax.beans.binding.BindingContext();
+    private org.jdesktop.beansbinding.BindingGroup bindingGroup = new org.jdesktop.beansbinding.BindingGroup();
 
     
     public void addBinding(Object binding)
     {
         if(binding != null) {
-            if(binding instanceof javax.beans.binding.Binding)
-                stdBindingContext.addBinding((javax.beans.binding.Binding)binding);
+            if(binding instanceof org.jdesktop.beansbinding.Binding)
+                bindingGroup.addBinding((org.jdesktop.beansbinding.Binding)binding);
             else if(binding instanceof JComponentDataBinding)
                 add((JComponentDataBinding)binding);
             else
@@ -31,8 +32,8 @@ public class BindingContext extends ArrayList<JComponentDataBinding>
     public void removeBinding(Object binding)
     {
         if(binding != null) {
-            if(binding instanceof javax.beans.binding.Binding)
-                stdBindingContext.removeBinding((javax.beans.binding.Binding)binding);
+            if(binding instanceof org.jdesktop.beansbinding.Binding)
+                bindingGroup.removeBinding((org.jdesktop.beansbinding.Binding)binding);
             else if(binding instanceof JComponentDataBinding)
                 remove((JComponentDataBinding)binding);
             else
@@ -42,7 +43,11 @@ public class BindingContext extends ArrayList<JComponentDataBinding>
         
     public void commitUncommittedValues()
     {
-        stdBindingContext.commitUncommittedValues();
+        for(org.jdesktop.beansbinding.Binding binding : bindingGroup.getBindings()) {
+            SyncFailure failure = binding.save();
+            if(failure != null) throw new PropertyResolverException("Binding failure: " + failure.toString(), binding, null, null);
+        }
+        
         for(JComponentDataBinding binding : this) {
             try {
                 binding.commitChanges();
@@ -54,7 +59,7 @@ public class BindingContext extends ArrayList<JComponentDataBinding>
        
     public void bind()
     {
-        stdBindingContext.bind();
+        bindingGroup.bind();
         for(JComponentDataBinding binding : this) {
             try {
                 binding.bind();
@@ -67,7 +72,7 @@ public class BindingContext extends ArrayList<JComponentDataBinding>
 
     public void unbind()
     {
-        stdBindingContext.unbind();
+        bindingGroup.unbind();
         for(JComponentDataBinding binding : this) {
             try {
                 binding.unbind();

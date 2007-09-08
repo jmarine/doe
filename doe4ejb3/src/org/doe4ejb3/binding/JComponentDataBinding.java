@@ -21,9 +21,7 @@ import org.doe4ejb3.util.ReflectionUtils;
 public class JComponentDataBinding
 {
     private boolean active;
-    private javax.beans.binding.Binding.UpdateStrategy updateStrategy;
-    
-    private Object  componentUI;
+     private Object  componentUI;
     private Method  componentDataGetter;
     private PropertyEditor editor;
     private StatefulProperty entityProperty;
@@ -36,8 +34,7 @@ public class JComponentDataBinding
         this.componentDataGetter = componentDataGetter;
         this.editor = editor;
         this.entityProperty = entityProperty;
-        setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy.READ_ONCE);
-    }
+     }
     
 
     public void bind()
@@ -92,16 +89,6 @@ public class JComponentDataBinding
     {
         if(!active) throw new IllegalStateException("Binding was not active");
         active = false;
-    }
-    
-    public void setUpdateStrategy(javax.beans.binding.Binding.UpdateStrategy strategy)
-    {
-        this.updateStrategy = strategy;
-    }
-    
-    public javax.beans.binding.Binding.UpdateStrategy getUpdateStrategy() 
-    {
-        return updateStrategy;
     }
     
 }
