@@ -161,7 +161,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     {
         if(binding != null) {
             bindingContext.addBinding(binding);
-            if(binding instanceof javax.beans.binding.Binding) ((javax.beans.binding.Binding)binding).bind();
+            if(binding instanceof org.jdesktop.beansbinding.Binding) ((org.jdesktop.beansbinding.Binding)binding).bind();
             else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).bind();
             else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
         }
@@ -171,7 +171,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     private void unbind(Object binding)
     {
         if(binding != null) {
-            if(binding instanceof javax.beans.binding.Binding) ((javax.beans.binding.Binding)binding).unbind();
+            if(binding instanceof org.jdesktop.beansbinding.Binding) ((org.jdesktop.beansbinding.Binding)binding).unbind();
             else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).unbind();
             else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
             bindingContext.removeBinding(binding);

@@ -470,8 +470,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                 if(generatedValue && (!objIsNew)) {
                     // disable binding of generated values:
                     if(binding != null) {
-                        if(binding instanceof javax.beans.binding.Binding) {
-                            javax.beans.binding.Binding stdBinding = (javax.beans.binding.Binding)binding;
+                        if(binding instanceof org.jdesktop.beansbinding.Binding) {
+                            org.jdesktop.beansbinding.Binding stdBinding = (org.jdesktop.beansbinding.Binding)binding;
                             stdBinding.bind();    // load initial value of property to UI,
                             stdBinding.unbind();  // but don't commit changes to entity object
                         }
