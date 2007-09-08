@@ -41,13 +41,13 @@ import org.doe4ejb3.jaxb.persistence.Persistence;
 
 public class JPAUtils 
 {
-    public static final String USER_PROPERTY_NAME       = "username";
-    public static final String PASSWORD_PROPERTY_NAME   = "password";
+    public static final String GENERIC_USER_PROPERTY_NAME       = "username";
+    public static final String GENERIC_PASSWORD_PROPERTY_NAME   = "password";
     
-    public static final String TOPLINK_PROVIDER         = "oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider";
-    public static final String HIBERNATE_PROVIDER       = "org.hibernate.ejb.HibernatePersistence";
-    public static final String OPENJPA_PROVIDER         = "org.apache.openjpa.persistence.PersistenceProviderImpl";
-    public static final String KODO_PROVIDER            = "kodo.persistence. PersistenceProviderImpl";
+    public static final String TOPLINK_PROVIDER    = "oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider";
+    public static final String HIBERNATE_PROVIDER  = "org.hibernate.ejb.HibernatePersistence";
+    public static final String OPENJPA_PROVIDER    = "org.apache.openjpa.persistence.PersistenceProviderImpl";
+    public static final String KODO_PROVIDER       = "kodo.persistence. PersistenceProviderImpl";
 
     private static JAXBContext jc = null;
     private static String defaultPersistenceProvider = TOPLINK_PROVIDER;
@@ -294,12 +294,12 @@ public class JPAUtils
         // TODO: the EntityManagerFactory should be pooled and create redefined EntityManager with specific user/password?
         String providerClass = getPersistenceProvider(puName);
         HashMap<String,String> providerConnectionParams = new HashMap<String,String>();
-        String username = (String)connectionParams.get(USER_PROPERTY_NAME);
+        String username = (String)connectionParams.get(GENERIC_USER_PROPERTY_NAME);
         if(username != null) {
             String userPropertyName = getUserPropertyName(providerClass);
             providerConnectionParams.put(userPropertyName, username);
         }
-        String password = (String)connectionParams.get(PASSWORD_PROPERTY_NAME);
+        String password = (String)connectionParams.get(GENERIC_PASSWORD_PROPERTY_NAME);
         if(password != null) {
             String passwordPropertyName = getPasswordPropertyName(providerClass);
             providerConnectionParams.put(passwordPropertyName, password);
