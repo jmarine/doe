@@ -205,22 +205,28 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                 // FIXME: inherited properties are included?
                 if(pd.getName().equals("class")) continue;
-                HashKeyProperty entityProperty = new HashKeyProperty(map, prefix + pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
-                if(entityProperty.getType().getAnnotation(javax.persistence.Embeddable.class) != null) {
-                    getProperties(properties, entityProperty.getType(), prefix + entityProperty.getName() + "."); 
-                } else if(!properties.contains(entityProperty)) {
-                    properties.add(entityProperty);
+                HashKeyProperty property = new HashKeyProperty(map, prefix + pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
+                if(property.getType().getAnnotation(javax.persistence.Embeddable.class) != null) {
+                    getProperties(properties, property.getType(), prefix + property.getName() + ".");    // but don't directly search by embbedded entity
+                } else if(!properties.contains(property)) {
+                    properties.add(property);
+                    if( (prefix.indexOf(".") == -1) && (property.getType().getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
+                        getProperties(properties, property.getType(), prefix + property.getName() + "."); 
+                    }
                 }
             }
             
             for(Field field : entityClass.getFields()) {
                 // TODO: inherited fields
                 if(field.getName().equals("class")) continue;
-                HashKeyProperty entityProperty = new HashKeyProperty(map, prefix + field.getName(), field.getType(), field.getGenericType());
-                if(entityProperty.getType().getAnnotation(javax.persistence.Embeddable.class) != null) {
-                    getProperties(properties, entityProperty.getType(), prefix + entityProperty.getName() + "."); 
-                } else if(!properties.contains(entityProperty)) {
-                    properties.add(entityProperty);
+                HashKeyProperty property = new HashKeyProperty(map, prefix + field.getName(), field.getType(), field.getGenericType());
+                if(property.getType().getAnnotation(javax.persistence.Embeddable.class) != null) {
+                    getProperties(properties, property.getType(), prefix + property.getName() + ".");  // but don't directly search by embbedded entity
+                } else if(!properties.contains(property)) {
+                    properties.add(property);
+                    if( (prefix.indexOf(".") == -1) && (property.getType().getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
+                        getProperties(properties, property.getType(), prefix + property.getName() + "."); 
+                    }
                 }
             }
             
