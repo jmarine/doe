@@ -10,6 +10,7 @@ package org.doe4ejb3.binding;
 import java.beans.PropertyDescriptor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.InvocationTargetException;
 
@@ -46,15 +47,46 @@ public class EntityProperty implements StatefulProperty
         this.propertyDescriptor = propertyDescriptor;
         this.memberClass = propertyDescriptor.getPropertyType();
         this.propertyName = decapitalize(propertyDescriptor.getName());
-        
-        try { 
-            // TODO? iterate until superclass
-            this.field = obj.getClass().getDeclaredField(propertyName); 
-            System.out.println("EntityProperty: INFO: field attribute found for propertyDescriptor  " + propertyName);
-        } catch(Exception ex) { 
+
+        // search protected write method (inherited from other entities)
+        Method writeMethod = propertyDescriptor.getWriteMethod();
+        if(writeMethod == null) {
+            String name = this.propertyDescriptor.getReadMethod().getName();  // exact getter name
+            if(name.startsWith("is")) name = name.substring(2);
+            else if(name.startsWith("get")) name = name.substring(3);
+            else name = null;
+
+            if(name != null) {
+                name = "set" + name;  // exact setter name
+                for(Class inspectedClass = obj.getClass(); (writeMethod == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
+                    try { 
+                        writeMethod = inspectedClass.getDeclaredMethod(name, this.propertyDescriptor.getReadMethod().getReturnType());
+                        if(writeMethod != null) {
+                            propertyDescriptor.setWriteMethod(writeMethod);
+                            break;
+                        } 
+                    } catch(Exception ex) { }
+                }
+            }
+        }
+
+        if(writeMethod == null) { 
+            System.out.println("EntityProperty: WARN: propertyDescriptor without write method: " + propertyName);
+        }
+
+
+        // search possible field with the same property name (it may contain additional annotations)
+        for(Class inspectedClass = obj.getClass(); (field == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
+            try { 
+                this.field = obj.getClass().getDeclaredField(propertyName); 
+                System.out.println("EntityProperty: INFO: field attribute found for propertyDescriptor  " + propertyName);
+            } catch(Exception ex) { }
+        }
+
+        if(field == null) {
             System.out.println("EntityProperty: WARN: propertyDescriptor without field attribute: " + propertyName);
         }
-        
+
     }
     
     public Object getSource()
