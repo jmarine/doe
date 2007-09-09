@@ -191,25 +191,37 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         return borderInsets;
     }
 
-    
     private ArrayList<HashKeyProperty> getProperties(Class entityClass) 
     {
-        HashMap map = new HashMap();
         ArrayList<HashKeyProperty> properties = new ArrayList<HashKeyProperty>();
+        return getProperties(properties, entityClass, ""); 
+    }
+    
+    private ArrayList<HashKeyProperty> getProperties(ArrayList<HashKeyProperty> properties, Class entityClass, String prefix) 
+    {
+        HashMap map = new HashMap();
         try {
             BeanInfo bi = Introspector.getBeanInfo(entityClass);
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                 // FIXME: inherited properties are included?
                 if(pd.getName().equals("class")) continue;
-                HashKeyProperty entityProperty = new HashKeyProperty(map, pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
-                if(!properties.contains(entityProperty)) properties.add(entityProperty);
+                HashKeyProperty entityProperty = new HashKeyProperty(map, prefix + pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
+                if(entityProperty.getType().getAnnotation(javax.persistence.Embeddable.class) != null) {
+                    getProperties(properties, entityProperty.getType(), prefix + entityProperty.getName() + "."); 
+                } else if(!properties.contains(entityProperty)) {
+                    properties.add(entityProperty);
+                }
             }
             
             for(Field field : entityClass.getFields()) {
                 // TODO: inherited fields
                 if(field.getName().equals("class")) continue;
-                HashKeyProperty entityProperty = new HashKeyProperty(map, field.getName(), field.getType(), field.getGenericType());
-                if(!properties.contains(entityProperty)) properties.add(entityProperty);
+                HashKeyProperty entityProperty = new HashKeyProperty(map, prefix + field.getName(), field.getType(), field.getGenericType());
+                if(entityProperty.getType().getAnnotation(javax.persistence.Embeddable.class) != null) {
+                    getProperties(properties, entityProperty.getType(), prefix + entityProperty.getName() + "."); 
+                } else if(!properties.contains(entityProperty)) {
+                    properties.add(entityProperty);
+                }
             }
             
         } catch(Exception ex) {
@@ -239,6 +251,8 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                 try {
                     HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
                     String parameterName = property.getName() + count;
+                    int lastDot = parameterName.lastIndexOf(".");
+                    if(lastDot != -1) parameterName = parameterName.substring(lastDot+1);
                     //bindingContext.commitUncommittedValues();
 
                     if(where.length() > 0) where.append(" " + filterTypeComboBox.getSelectedItem() + " ");  // AND / OR
