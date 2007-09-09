@@ -61,6 +61,13 @@ public class HashKeyProperty implements StatefulProperty
         return returnType;
     }
 
+    
+    public boolean isCollectionType()
+    {
+        return (java.util.Collection.class.isAssignableFrom(type));
+    }
+
+    
     public Type getGenericType() throws IllegalAccessException, InvocationTargetException
     {
         return genericType;
@@ -72,10 +79,12 @@ public class HashKeyProperty implements StatefulProperty
         return hashMap.get(key);
     }
 
+    
     public void setValue(Object value) throws IllegalAccessException, InvocationTargetException
     {
         hashMap.put(key, value);
     }
+    
     
     public String toString()
     {
