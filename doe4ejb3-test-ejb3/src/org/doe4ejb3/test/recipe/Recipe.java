@@ -11,7 +11,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
  * See the License for the specific language governing permissions and limitations under the License.
  * 
- * Modified by Jordi Mariné Fort (24/8/2007)
+ * Modified by Jordi Mariné Fort (18/8/2006)
  */
 package org.doe4ejb3.test.recipe;
 import application.Action;
@@ -156,6 +156,12 @@ public class Recipe implements java.io.Serializable
     {
         return this.photo;
     }
+
+    public void setPhoto(byte photo[])
+    {
+        this.photo = photo;
+    }  
+
    
     @PropertyDescriptor(index=8)
     @Column(name="PUBLISHED", nullable=true)
@@ -169,12 +175,21 @@ public class Recipe implements java.io.Serializable
         this.published = published;
     }
 
-    public void setPhoto(byte photo[])
+
+    public boolean equals(Object obj)
     {
-        this.photo = photo;
-    }    
+        if( (obj != null) && (obj instanceof Recipe) ) {
+            Recipe other = (Recipe)obj;
+            return id.equals(other.getId());
+        }
+        return false;
+    }  
+
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
     
-    @Override
     public String toString()
     {
         return title;

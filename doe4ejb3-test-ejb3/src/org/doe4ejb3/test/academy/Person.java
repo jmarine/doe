@@ -15,7 +15,7 @@ import org.doe4ejb3.annotation.EntityDescriptor;
 
 @Entity()
 @Inheritance(strategy = InheritanceType.JOINED)
-@EntityDescriptor(layoutClassName="org.doe4ejb3.test.academy.PersonEditor")
+//@EntityDescriptor(layoutClassName="org.doe4ejb3.test.academy.PersonEditor")
 public class Person implements Serializable {
 
     
@@ -93,5 +93,28 @@ public class Person implements Serializable {
         this.address = address;
     }
 
+
+    public boolean equals(Object obj)
+    {
+        if( (obj != null) && (obj instanceof Person) ) {
+            Person other = (Person)obj;
+            return ssn.equals(other.getSsn());
+        }
+        return false;
+    }
+
+    public int hashCode()
+    {
+        return ssn.hashCode();
+    }
+    
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        if(firstName != null) sb.append(firstName);
+        sb.append(' ');
+        if(lastName != null) sb.append(lastName);
+        return sb.toString().trim();
+    }
 
 }
