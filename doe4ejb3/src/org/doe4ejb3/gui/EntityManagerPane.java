@@ -254,13 +254,13 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
-            Class entityClass = (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
             
             int selectedIndexToEdit = listSelectionModel.getMinSelectionIndex();
             if(selectedIndexToEdit == -1) {
                 throw new ApplicationException("No se ha seleccionado ningun valor.");                
             } else {
                 Object entity = listModel.getElementAt(selectedIndexToEdit);
+                Class entityClass = entity.getClass();  // (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
                 DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, entity);
             }
             
