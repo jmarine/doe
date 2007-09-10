@@ -66,6 +66,11 @@ public class Ingredient implements java.io.Serializable
         return false;
     }
 
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
+
     public String toString()
     {
         return getAmount() + " " + getName();

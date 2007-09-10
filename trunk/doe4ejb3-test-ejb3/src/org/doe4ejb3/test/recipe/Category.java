@@ -10,6 +10,8 @@
  * software distributed under the License is distributed on an "AS IS" BASIS, 
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
  * See the License for the specific language governing permissions and limitations under the License.
+ *
+ * Modified by Jordi Mariné Fort (18/8/2006)
  */
 package org.doe4ejb3.test.recipe;
 
@@ -18,7 +20,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 
 @Entity
@@ -64,6 +65,11 @@ public class Category implements java.io.Serializable
         return false;
     }
     
+    public int hashCode()
+    {
+        return id.hashCode();
+    }
+
     public String toString()
     {
        return getName();
