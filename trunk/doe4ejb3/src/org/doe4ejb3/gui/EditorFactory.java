@@ -68,7 +68,6 @@ import org.doe4ejb3.util.JPAUtils;
 
 public class EditorFactory 
 {
-    
     /**
      * Creates a new instance of EditorFactory
      */
@@ -216,6 +215,8 @@ public class EditorFactory
                                 if(combo.getClientProperty("lazyModel") == null) 
                                 {
                                     try {
+                                        combo.putClientProperty("lazyModel", comboBoxModel);
+
                                         combo.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                                         Object selectedItem = comboBoxModel.getSelectedItem();
                                         comboBoxModel.removeAllElements();
@@ -226,15 +227,14 @@ public class EditorFactory
                                         }
                                         comboBoxModel.setSelectedItem(selectedItem);
 
-                                        combo.putClientProperty("lazyModel", comboBoxModel);
                                         // combo.hidePopup();
                                         // combo.showPopup();
 
                                         // combo.getUI().setPopupVisible( combo, true );
 
                                     } finally {
-                                        combo.putClientProperty("lazyModel", null);
                                         combo.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                                        combo.putClientProperty("lazyModel", null);
                                     }
                                 }
 
@@ -265,6 +265,11 @@ public class EditorFactory
                                 JButton jButtonEdit = new JButton(editItemAction);
                                 jButtonEdit.setHideActionText(true);
                                 jButtonsPanel.add(jButtonEdit);
+
+                                java.awt.Insets buttonMargin = jButtonNew.getMargin();
+                                buttonMargin = new java.awt.Insets(buttonMargin.top, 1, buttonMargin.bottom, 1);
+                                jButtonNew.setMargin(buttonMargin);
+                                jButtonEdit.setMargin(buttonMargin);
 
                                 panel.add(jButtonsPanel, BorderLayout.EAST);
                             }
@@ -454,6 +459,17 @@ public class EditorFactory
                    
                 } else { // using JTextField or JTextArea depending on Column's length attribute or existing component in customized layout
                     Object container = layout.getComponentFromEditorLayout(JTextComponent.class, property.getName());
+
+                    // TODO: use spinner for small numbers?
+                    // adjunt number lengths 
+                    if(maxLength != 0) {
+                        if( ((memberClass == Byte.TYPE) || (java.lang.Byte.class.isAssignableFrom(memberClass))) ) maxLength = 4;
+                        else if( ((memberClass == Short.TYPE) || (java.lang.Short.class.isAssignableFrom(memberClass))) ) maxLength = 6;
+                        else if( ((memberClass == Integer.TYPE) || (java.lang.Integer.class.isAssignableFrom(memberClass))) ) maxLength = 12;
+                        else if( ((memberClass == Long.TYPE) || (java.lang.Long.class.isAssignableFrom(memberClass))) ) maxLength = 25;
+                        else if( ((memberClass == Float.TYPE) || (java.lang.Float.class.isAssignableFrom(memberClass))) ) maxLength = 12;
+                        else if( ((memberClass == Double.TYPE) || (java.lang.Double.class.isAssignableFrom(memberClass)) || (java.lang.Number.class.isAssignableFrom(memberClass))) ) maxLength = 40;
+                    }
 
                     JTextComponent textField = null;
                     Method compGetter = null;
