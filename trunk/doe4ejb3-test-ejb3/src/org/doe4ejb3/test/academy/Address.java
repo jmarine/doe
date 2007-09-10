@@ -14,13 +14,13 @@ import javax.persistence.*;
 @Embeddable
 public class Address implements Serializable {
 
-    @Column(name = "location", length=50)
+    @Column(name = "location", length=30)
     public String location;
     
-    @Column(name = "city", length=50)
+    @Column(name = "city", length=30)
     public String city;
     
-    @Column(name = "state", length=50)
+    @Column(name = "state", length=30)
     public String state;
     
     @Column(name = "country", length=2)
