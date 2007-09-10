@@ -18,6 +18,8 @@
     <jta-data-source>jdbc/doe4ejb3</jta-data-source>
     <class>org.doe4ejb3.test.academy.Address</class>
     <class>org.doe4ejb3.test.academy.Person</class>
+    <class>org.doe4ejb3.test.academy.Teacher</class>
+    <class>org.doe4ejb3.test.academy.Course</class>
     <properties>
       <property name="toplink.logging.level" value="FINE"/>
       <property name="toplink.ddl-generation" value="create-tables"/>
