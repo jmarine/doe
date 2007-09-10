@@ -7,7 +7,6 @@
 
 package org.doe4ejb3.gui;
 
-import org.doe4ejb3.binding.EntityProperty;
 import java.beans.*;
 import java.lang.reflect.*;
 import java.lang.annotation.*;
@@ -23,6 +22,7 @@ import javax.swing.*;
 
 import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.binding.BindingContext;
+import org.doe4ejb3.binding.EntityProperty;
 
 
 public class EntityEditorImpl extends JPanel implements EntityEditorInterface, EditorLayoutInterface, Printable
@@ -34,8 +34,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
     private final static GridBagConstraints gbcLabel = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,5,5,5), 0,0);
     private final static GridBagConstraints gbcComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5,5,5,5), 0,0);
     private final static GridBagConstraints gbcFixedSizeComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,5,5,5), 0,0);
-    private final static GridBagConstraints gbcEmbeddedComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,-3, 5,-3), 0,0);
-    private final static GridBagConstraints gbcCustomLayout = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(5,5, 5,5), 0,0);
+    private final static GridBagConstraints gbcEmbeddedComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5,-3, 5,-3), 0,0);
+    private final static GridBagConstraints gbcCustomLayout = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(5,5, 5,5), 0,0);
     private final static GridBagConstraints gbcEmptyLabelForEmbeddedAndCustomLayoutPrinting = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0,0);
     private final static GridBagConstraints gbcGlue = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,0,0,0), 0,0);
     
@@ -337,7 +337,10 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
             if(a instanceof javax.persistence.Id) 
             {
                 persistent = true;
-                if(!objIsNew) generatedValue = true;
+                if(!objIsNew) {
+                    generatedValue = true;
+                    maxLength = 0;
+                }
             }               
             else if(a instanceof javax.persistence.GeneratedValue) 
             {
@@ -418,7 +421,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                 // TO TEST:
                 try {
                     container = this.getComponentFromEditorLayout(JPanel.class, entityProperty.getName());  // search a JPanel holder for the relation and navigation commands.
-                    
+                 
                     EntityEditorInterface entityEditor = EditorFactory.getEntityEditor(this, puName, memberClass, getLayoutPath() + "." + entityProperty.getName());
                     compGetter = entityEditor.getClass().getMethod("getEntity");
                     binding = new org.doe4ejb3.binding.JComponentDataBinding(entityEditor, compGetter, editor, entityProperty);
@@ -440,7 +443,6 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                             isNewComponent = true;
                         } else {
                             container.setLayout(new BorderLayout());
-                            container.setMinimumSize(entityEditorUI.getMinimumSize());
                             container.setPreferredSize(entityEditorUI.getPreferredSize());
                             container.add(entityEditorUI, BorderLayout.CENTER);
                             container.putClientProperty("layout", this);
@@ -448,7 +450,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                             isNewComponent = false;
                         }
                     }
-                    
+                  
                     
                 } catch(Exception ex) {
                     System.out.println("Error: " + ex.getMessage());
@@ -521,6 +523,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                         if( (comp instanceof JComponent) 
                                 && (((JComponent)comp).getClientProperty("fixedSize") != null) ) {
                             gbc = gbcFixedSizeComponent;
+                            comp.setMinimumSize(comp.getPreferredSize());
                         }
 
                         add(new JLabel(labelText), gbcLabel);
