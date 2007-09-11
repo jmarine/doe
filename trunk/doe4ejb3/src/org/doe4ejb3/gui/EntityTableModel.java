@@ -24,7 +24,6 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
     private Class itemClass;
     private DefaultListModel listModel;
     private ArrayList<Member> columnMembers;
-    private ArrayList<org.doe4ejb3.annotation.PropertyDescriptor> columnPropertyDescriptors;
     private EventListenerList listenerList;
     private java.beans.PropertyChangeSupport changeSupport;
     
@@ -35,21 +34,19 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
         this.listModel.addListDataListener(this);
         
         this.columnMembers = new ArrayList<Member>();
-        this.columnPropertyDescriptors = new ArrayList<org.doe4ejb3.annotation.PropertyDescriptor>();
         this.listenerList = new EventListenerList();
         this.changeSupport = null;
 
-        // TODO: order by index
-        System.out.println("EntityTableModel: Scan columns...");
+        System.out.println("EntityTableModel: Search fields to showInLists...");
         for(Field field : itemClass.getFields()) {
             org.doe4ejb3.annotation.PropertyDescriptor pd = field.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
             if( (pd != null) && (pd.showInLists()) ) {
                 columnMembers.add(field);
-                columnPropertyDescriptors.add(pd);
                 System.out.println("EntityTableModel: found column: " + field.getName());
             }
         }
 
+        System.out.println("EntityTableModel: Search properties to showInLists...");
         java.beans.BeanInfo bi = java.beans.Introspector.getBeanInfo(itemClass);
         for(java.beans.PropertyDescriptor bpd : bi.getPropertyDescriptors()) {
             Method method = bpd.getReadMethod();
@@ -57,13 +54,16 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
                 org.doe4ejb3.annotation.PropertyDescriptor pd = method.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
                 if( (pd != null) && (pd.showInLists()) ) {
                     columnMembers.add(method);
-                    columnPropertyDescriptors.add(pd);
                     System.out.println("EntityTableModel: found column: " + method.getName());
                 }
             }
         }
         System.out.println("EntityTableModel: Scan done.");        
-
+        
+        System.out.println("EntityTableModel: Ordering columns.");        
+        MemberOrderComparator orderComparator = new MemberOrderComparator();
+        java.util.Collections.sort(columnMembers, orderComparator);
+        System.out.println("EntityTableModel: Ordering done.");        
     }
     
     public DefaultListModel getListModel()
@@ -86,12 +86,20 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
     public String getColumnName(int columnIndex) {
         String columnName = "";
         try {
-            if( (columnIndex >= 0) && (columnIndex < columnPropertyDescriptors.size()) ) {
-                org.doe4ejb3.annotation.PropertyDescriptor pd = columnPropertyDescriptors.get(columnIndex);
+            if( (columnIndex >= 0) && (columnIndex < columnMembers.size()) ) {
+                Member member = columnMembers.get(columnIndex);
+                org.doe4ejb3.annotation.PropertyDescriptor pd = null;
+                if(member instanceof Field) {
+                    Field field = (Field)member;
+                    pd = field.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
+                } else if(member instanceof Method) {
+                    Method method = (Method)member;
+                    pd = method.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
+                }            
+                
                 if((pd != null) && (pd.displayName() != null) && (pd.displayName().length() > 0) ) {
                     columnName = pd.displayName();
                 } else {
-                    Member member = columnMembers.get(columnIndex);
                     if(member != null) {
                         columnName = member.getName();
                         if(columnName.startsWith("set")) columnName = columnName.substring(3);
