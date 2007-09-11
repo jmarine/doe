@@ -10,7 +10,9 @@ package org.doe4ejb3.test.academy;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
+
 import org.doe4ejb3.annotation.EntityDescriptor;
+import org.doe4ejb3.annotation.PropertyDescriptor;
 
 
 @Entity()
@@ -34,6 +36,7 @@ public class Person implements Serializable {
     
     @Id
     @Column(name="ssn", length=10)
+    @PropertyDescriptor(index=1, showInLists=true)    
     public String getSsn() {
         return ssn;
     }
@@ -44,6 +47,7 @@ public class Person implements Serializable {
 
         
     @Column(name="firstName", length=50)
+    @PropertyDescriptor(index=2, showInLists=true)    
     public String getFirstName() {
         return firstName;
     }
@@ -53,6 +57,7 @@ public class Person implements Serializable {
     }
 
     @Column(name="lastName", length=50)
+    @PropertyDescriptor(index=3, showInLists=true)    
     public String getLastName() {
         return lastName;
     }
