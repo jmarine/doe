@@ -4,7 +4,7 @@
 
 package org.doe4ejb3.gui;
 
-import application.SingleFrameApplication;
+import org.jdesktop.application.SingleFrameApplication;
 import java.awt.Window;
 import java.util.EventObject;
 import javax.swing.JOptionPane;

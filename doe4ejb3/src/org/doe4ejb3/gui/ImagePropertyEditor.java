@@ -57,15 +57,15 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
 
         jPanelButtons.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jButtonLoad.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("load"));
+        jButtonLoad.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("load"));
         jButtonLoad.setMnemonic('l');
         jPanelButtons.add(jButtonLoad);
 
-        jButtonSave.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("save"));
+        jButtonSave.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("save"));
         jButtonSave.setMnemonic('s');
         jPanelButtons.add(jButtonSave);
 
-        jButtonClear.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("delete"));
+        jButtonClear.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("delete"));
         jButtonClear.setMnemonic('c');
         jPanelButtons.add(jButtonClear);
 
@@ -123,8 +123,8 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
     }    
 
     
-    @application.Action
-    public application.Task load()
+    @org.jdesktop.application.Action
+    public org.jdesktop.application.Task load()
     {
         int ret = jFileChooser.showOpenDialog(this);
         if (ret == JFileChooser.APPROVE_OPTION) {
@@ -135,8 +135,8 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
     }
     
     
-    @application.Action(enabledProperty="ImageAvailable")
-    public application.Task save() 
+    @org.jdesktop.application.Action(enabledProperty="ImageAvailable")
+    public org.jdesktop.application.Task save() 
     {
         int ret = jFileChooser.showSaveDialog(this);
         if (ret == JFileChooser.APPROVE_OPTION) {
@@ -147,7 +147,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
     }
     
     
-    @application.Action(enabledProperty="ImageAvailable")
+    @org.jdesktop.application.Action(enabledProperty="ImageAvailable")
     public void delete() 
     {
         try {
@@ -169,7 +169,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
 
     
 
-    class LoadImageTask extends application.Task<byte[],Void>
+    class LoadImageTask extends org.jdesktop.application.Task<byte[],Void>
     {
         private File file;
         
@@ -234,7 +234,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
     }
 
     
-    class SaveImageTask extends application.Task<Boolean,Void>
+    class SaveImageTask extends org.jdesktop.application.Task<Boolean,Void>
     {
         private File file;
         

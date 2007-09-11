@@ -14,7 +14,7 @@
  * Modified by Jordi Mariné Fort (18/8/2006)
  */
 package org.doe4ejb3.test.recipe;
-import application.Action;
+import org.jdesktop.application.Action;
 
 import java.util.Date;
 import java.util.HashSet;

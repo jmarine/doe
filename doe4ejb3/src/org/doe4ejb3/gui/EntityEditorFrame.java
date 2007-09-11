@@ -79,7 +79,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         } else {
             jButtonDelete.setVisible(true);
             jButtonPrint.setVisible(true);
-            ActionMap actionMap = application.Application.getInstance(Application.class).getContext().getActionMap(entityClass, entity);
+            ActionMap actionMap = org.jdesktop.application.Application.getInstance(Application.class).getContext().getActionMap(entityClass, entity);
             if( (actionMap != null) && (actionMap.keys() != null) ) {
                 for(Object action : actionMap.keys()) {
                     System.out.println("Action found: " + action);
@@ -121,28 +121,28 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         setClosable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(EntityEditorFrame.class).getString("title")); // NOI18N
+        setTitle(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(EntityEditorFrame.class).getString("title")); // NOI18N
 
         jScrollPane.setVerticalScrollBarPolicy(javax.swing.ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         getContentPane().add(jScrollPane, java.awt.BorderLayout.CENTER);
 
         jButtonsPanel.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jButtonAccept.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("accept"));
+        jButtonAccept.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("accept"));
         jButtonsPanel.add(jButtonAccept);
 
-        jButtonSave.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("save"));
+        jButtonSave.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("save"));
         jButtonsPanel.add(jButtonSave);
 
-        jButtonDelete.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("delete"));
+        jButtonDelete.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("delete"));
         jButtonDelete.setMnemonic('d');
         jButtonsPanel.add(jButtonDelete);
 
-        jButtonPrint.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("print"));
+        jButtonPrint.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("print"));
         jButtonPrint.setMnemonic('p');
         jButtonsPanel.add(jButtonPrint);
 
-        jButtonClose.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("close"));
+        jButtonClose.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityEditorFrame.class, this).get("close"));
         jButtonClose.setMnemonic('c');
         jButtonsPanel.add(jButtonClose);
 
@@ -151,18 +151,18 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
     
-    @application.Action
-    public application.Task accept() 
+    @org.jdesktop.application.Action
+    public org.jdesktop.application.Task accept() 
     {
         return new SaveTask(Application.getApplication(), true);
     }
 
-    private class AcceptTask extends application.Task<Object, Void> {
+    private class AcceptTask extends org.jdesktop.application.Task<Object, Void> {
         AcceptTask() {
             // Runs on the EDT.  Copy GUI state that
             // doInBackground() depends on from parameters
             // to AcceptTask fields, here.
-            super(application.Application.getInstance(org.doe4ejb3.gui.Application.class));
+            super(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class));
         }
         @Override protected Object doInBackground() {
             // Your Task's code here.  This method runs
@@ -177,15 +177,15 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
     }
     
     
-    @application.Action
-    public application.Task save() 
+    @org.jdesktop.application.Action
+    public org.jdesktop.application.Task save() 
     {
         return new SaveTask(Application.getApplication(), false);
     }
     
 
-    @application.Action
-    public application.Task delete() 
+    @org.jdesktop.application.Action
+    public org.jdesktop.application.Task delete() 
     {
         int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete this object?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
         if(confirm != JOptionPane.OK_OPTION) {                
@@ -196,7 +196,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
     }
     
 
-    @application.Action
+    @org.jdesktop.application.Action
     public void print() 
     {
         // Don't run in background (UI refresh problems).
@@ -223,7 +223,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
     }
     
 
-    @application.Action
+    @org.jdesktop.application.Action
     public void close() {
         this.dispose();
     }
@@ -240,11 +240,11 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
     // End of variables declaration//GEN-END:variables
 
     
-    class SaveTask extends application.Task<Void, Void>
+    class SaveTask extends org.jdesktop.application.Task<Void, Void>
     {
         private boolean close = false;
         
-        SaveTask(application.Application app, boolean close)
+        SaveTask(org.jdesktop.application.Application app, boolean close)
         {
             super(app);
             this.close = close;
@@ -286,9 +286,9 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         }
     }
     
-    class DeleteTask extends application.Task<Void, Void>
+    class DeleteTask extends org.jdesktop.application.Task<Void, Void>
     {
-        DeleteTask(application.Application app)
+        DeleteTask(org.jdesktop.application.Application app)
         {
             super(app);
         }
