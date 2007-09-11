@@ -160,7 +160,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
         jPanelQueryParams.setBorder(javax.swing.BorderFactory.createTitledBorder("Parameters:"));
 
-        jButtonSearch.setAction(application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityManagerPane.class, this).get("searchInstances"));
+        jButtonSearch.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(EntityManagerPane.class, this).get("searchInstances"));
         jButtonSearch.setMnemonic('s');
 
         org.jdesktop.layout.GroupLayout jPanelResultsLayout = new org.jdesktop.layout.GroupLayout(jPanelResults);
@@ -374,10 +374,10 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
         return puName;
     }
     
-    @application.Action
-    public application.Task searchInstances()
+    @org.jdesktop.application.Action
+    public org.jdesktop.application.Task searchInstances()
     {
-        return new application.Task<List,Void>(Application.getApplication()) 
+        return new org.jdesktop.application.Task<List,Void>(Application.getApplication()) 
         {
             @Override 
             protected List doInBackground() throws Exception

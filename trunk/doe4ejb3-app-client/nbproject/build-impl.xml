@@ -345,8 +345,6 @@
         <copy file="${libs.jaxb20.classpath.libfile.3}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.jaxb20.classpath.libfile.2}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.jaxb20.classpath.libfile.1}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.swing-app-framework.classpath.libfile.2}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.swing-app-framework.classpath.libfile.1}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.8}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.7}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.6}" todir="${build.classes.dir}/META-INF/lib"/>
@@ -355,6 +353,8 @@
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.3}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.2}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.1}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copy file="${libs.Swing_Application_Framework-1.0.classpath.libfile.2}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copy file="${libs.Swing_Application_Framework-1.0.classpath.libfile.1}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.Beans_Binding-1.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
@@ -380,10 +380,6 @@
         <copy file="${libs.jaxb20.classpath.libfile.3}" todir="${dist.ear.dir}"/>
         <copy file="${libs.jaxb20.classpath.libfile.2}" todir="${dist.ear.dir}"/>
         <copy file="${libs.jaxb20.classpath.libfile.1}" todir="${dist.ear.dir}"/>
-        <basename file="${libs.swing-app-framework.classpath.libfile.2}" property="included.lib.libs.swing-app-framework.classpath.2"/>
-        <basename file="${libs.swing-app-framework.classpath.libfile.1}" property="included.lib.libs.swing-app-framework.classpath.1"/>
-        <copy file="${libs.swing-app-framework.classpath.libfile.2}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.swing-app-framework.classpath.libfile.1}" todir="${dist.ear.dir}"/>
         <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.8}" property="included.lib.libs.ABEILLE-2.1.0.classpath.8"/>
         <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.7}" property="included.lib.libs.ABEILLE-2.1.0.classpath.7"/>
         <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.6}" property="included.lib.libs.ABEILLE-2.1.0.classpath.6"/>
@@ -400,10 +396,14 @@
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.3}" todir="${dist.ear.dir}"/>
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.2}" todir="${dist.ear.dir}"/>
         <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.1}" todir="${dist.ear.dir}"/>
+        <basename file="${libs.Swing_Application_Framework-1.0.classpath.libfile.2}" property="included.lib.libs.Swing_Application_Framework-1.0.classpath.2"/>
+        <basename file="${libs.Swing_Application_Framework-1.0.classpath.libfile.1}" property="included.lib.libs.Swing_Application_Framework-1.0.classpath.1"/>
+        <copy file="${libs.Swing_Application_Framework-1.0.classpath.libfile.2}" todir="${dist.ear.dir}"/>
+        <copy file="${libs.Swing_Application_Framework-1.0.classpath.libfile.1}" todir="${dist.ear.dir}"/>
         <basename file="${libs.Beans_Binding-1.0.classpath}" property="included.lib.libs.Beans_Binding-1.0.classpath"/>
         <copy file="${libs.Beans_Binding-1.0.classpath}" todir="${dist.ear.dir}"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.reference.doe4ejb3.jar} ${included.lib.libs.toplink.classpath.1} ${included.lib.libs.toplink.classpath.2} ${included.lib.libs.ANTLR-2.7.6.classpath} ${included.lib.libs.absolutelayout.classpath} ${included.lib.libs.swing-layout.classpath} ${included.lib.libs.jaxb20.classpath.1} ${included.lib.libs.jaxb20.classpath.2} ${included.lib.libs.jaxb20.classpath.3} ${included.lib.libs.jaxb20.classpath.4} ${included.lib.libs.jaxb20.classpath.5} ${included.lib.libs.swing-app-framework.classpath.1} ${included.lib.libs.swing-app-framework.classpath.2} ${included.lib.libs.ABEILLE-2.1.0.classpath.1} ${included.lib.libs.ABEILLE-2.1.0.classpath.2} ${included.lib.libs.ABEILLE-2.1.0.classpath.3} ${included.lib.libs.ABEILLE-2.1.0.classpath.4} ${included.lib.libs.ABEILLE-2.1.0.classpath.5} ${included.lib.libs.ABEILLE-2.1.0.classpath.6} ${included.lib.libs.ABEILLE-2.1.0.classpath.7} ${included.lib.libs.ABEILLE-2.1.0.classpath.8} ${included.lib.libs.Beans_Binding-1.0.classpath} "/>
+            <attribute name="Class-Path" value="${included.lib.reference.doe4ejb3.jar} ${included.lib.libs.toplink.classpath.1} ${included.lib.libs.toplink.classpath.2} ${included.lib.libs.ANTLR-2.7.6.classpath} ${included.lib.libs.absolutelayout.classpath} ${included.lib.libs.swing-layout.classpath} ${included.lib.libs.jaxb20.classpath.1} ${included.lib.libs.jaxb20.classpath.2} ${included.lib.libs.jaxb20.classpath.3} ${included.lib.libs.jaxb20.classpath.4} ${included.lib.libs.jaxb20.classpath.5} ${included.lib.libs.ABEILLE-2.1.0.classpath.1} ${included.lib.libs.ABEILLE-2.1.0.classpath.2} ${included.lib.libs.ABEILLE-2.1.0.classpath.3} ${included.lib.libs.ABEILLE-2.1.0.classpath.4} ${included.lib.libs.ABEILLE-2.1.0.classpath.5} ${included.lib.libs.ABEILLE-2.1.0.classpath.6} ${included.lib.libs.ABEILLE-2.1.0.classpath.7} ${included.lib.libs.ABEILLE-2.1.0.classpath.8} ${included.lib.libs.Swing_Application_Framework-1.0.classpath.1} ${included.lib.libs.Swing_Application_Framework-1.0.classpath.2} ${included.lib.libs.Beans_Binding-1.0.classpath} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">
