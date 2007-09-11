@@ -258,13 +258,13 @@ public class EditorFactory
                                 JPanel jButtonsPanel = new JPanel();
                                 jButtonsPanel.setLayout(new java.awt.FlowLayout(FlowLayout.LEFT, 0, 0));
 
-                                JButton jButtonNew = new JButton(newItemAction);
-                                jButtonNew.setHideActionText(true);
-                                jButtonsPanel.add(jButtonNew);
-
                                 JButton jButtonEdit = new JButton(editItemAction);
                                 jButtonEdit.setHideActionText(true);
                                 jButtonsPanel.add(jButtonEdit);
+                                
+                                JButton jButtonNew = new JButton(newItemAction);
+                                jButtonNew.setHideActionText(true);
+                                jButtonsPanel.add(jButtonNew);
 
                                 java.awt.Insets buttonMargin = jButtonNew.getMargin();
                                 buttonMargin = new java.awt.Insets(buttonMargin.top, 1, buttonMargin.bottom, 1);
@@ -311,7 +311,7 @@ public class EditorFactory
         if(comp == null) {
             if(property instanceof EntityProperty) {
                 EntityProperty entityProperty = (EntityProperty)property;
-                org.doe4ejb3.annotation.PropertyDescriptor pd = (org.doe4ejb3.annotation.PropertyDescriptor)entityProperty.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
+                org.doe4ejb3.annotation.PropertyDescriptor pd = entityProperty.getAnnotation(org.doe4ejb3.annotation.PropertyDescriptor.class);
                 if( (pd != null) && (pd.editorClassName() != null) && (pd.editorClassName().length() > 0) ) {
                     try {
                         Class editorClass = Class.forName(pd.editorClassName());

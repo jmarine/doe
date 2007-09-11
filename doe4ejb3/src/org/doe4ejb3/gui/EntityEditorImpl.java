@@ -125,6 +125,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                 try {
                     Class entityClass = entity.getClass();
                     resourceStream = entityClass.getClassLoader().getResourceAsStream(entityClass.getName().replace('.', '/') + ".jfrm");
+                    if(resourceStream == null) resourceStream = entityClass.getClassLoader().getResourceAsStream(entityClass.getName().replace('.', '/') + ".xml");
                     if(resourceStream != null) customLayout = new com.jeta.forms.components.panel.FormPanel(resourceStream);  
                 } catch(Exception ex) {
                     System.out.println("EntityEditorImpl.getLayout: Error loading editor layout: " + ex.getMessage());
@@ -265,7 +266,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         
 
 
-        PropertyOrderComparator orderComparator = new PropertyOrderComparator();
+        EntityPropertyOrderComparator orderComparator = new EntityPropertyOrderComparator();
         Collections.sort(properties, orderComparator);
         for(EntityProperty property : properties) 
         {

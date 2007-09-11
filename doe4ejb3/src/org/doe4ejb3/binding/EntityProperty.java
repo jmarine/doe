@@ -148,10 +148,10 @@ public class EntityProperty implements StatefulProperty
         return false;
     }
 
-    public Annotation getAnnotation(Class annotationClass)
+    public <T extends Annotation> T getAnnotation(Class<T> annotationClass)
     {
         // TODO: use "annotations" cache
-        Annotation annotation = null;
+        T annotation = null;
         if(propertyDescriptor != null) {
             if(propertyDescriptor.getReadMethod() != null) {
                 annotation = propertyDescriptor.getReadMethod().getAnnotation(annotationClass);

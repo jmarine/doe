@@ -7,11 +7,13 @@
 
 package org.doe4ejb3.gui;
 
+import java.awt.event.ItemEvent;
 import org.doe4ejb3.binding.HashKeyProperty;
 import java.awt.BorderLayout;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.awt.event.ItemListener;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.lang.reflect.Field;
@@ -32,9 +34,14 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 {
 
     private final static Insets borderInsets = new Insets(4,2,4,2);
+    private final static String defaultOperators[] = { "             " };
+    private final static String simpleFieldOperators[] = { "" , "=", "<>", "<", "<=", ">", ">=", "LIKE", "NOT LIKE", "IS NULL", "IS NOT NULL" }; 
+    private final static String manyRelationOperators[] = { "" , "MEMBER", "NOT MEMBER", "IS EMPTY", "IS NOT EMPTY" }; 
+    private final static String oneRelationOperators[] = { "" , "=", "<>", "IS NULL", "IS NOT NULL" };
+
 
     private final static GridBagConstraints gbcProperty = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,4,2,4), 0,0);
-    private final static GridBagConstraints gbcOperator = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,4,2,4), 0,0);
+    private final static GridBagConstraints gbcOperator = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0,4,2,4), 0,0);
     private final static GridBagConstraints gbcComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,4,6,4), 0,0);
     
     
@@ -76,9 +83,8 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     
     private void addPropertySelector()
     {
-        String operators[] = { "" , "=", "<>", "<", "<=", ">", ">=", "LIKE", "NOT LIKE", "MEMBER", "NOT MEMBER" }; 
         JComboBox selector = new JComboBox(getProperties(entityClass).toArray());
-        JComboBox operator = new JComboBox(operators);
+        JComboBox operator = new JComboBox(defaultOperators);
         JPanel editorContainer = new JPanel();
         editorContainer.setLayout(new BorderLayout());
 
@@ -89,6 +95,22 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         selector.addItemListener(this);
         propertySelectors.add(selector);
        
+        operator.putClientProperty("editorContainer", editorContainer);
+        operator.addItemListener(new ItemListener() {
+            public void itemStateChanged(ItemEvent e) {
+                JComboBox operator = (JComboBox)e.getSource();
+                JPanel editorContainer = (JPanel)operator.getClientProperty("editorContainer");
+                JComponent editor = (JComponent)editorContainer.getClientProperty("editor");
+                if(editor != null) {
+                    if((operator.getSelectedIndex() == 0) || (operator.getSelectedItem().toString().toUpperCase().startsWith("IS ")) ) {
+                        editor.setVisible(false);  // unary operator or unselected
+                    } else {
+                        editor.setVisible(true);   // binary operator
+                    }
+                }
+            }
+        });
+        
         conditionPanel.add(selector, gbcProperty);
         conditionPanel.add(operator, gbcOperator);
         conditionPanel.add(editorContainer, gbcComponent);
@@ -115,8 +137,8 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
         if(selector.getSelectedIndex() == 0) {
 
-            selector.putClientProperty("editorValue", null);
             operator.setSelectedIndex(0);
+            editorContainer.putClientProperty("editor", null);
             editorContainer.revalidate();
             editorContainer.repaint();
 
@@ -124,13 +146,17 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
             HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
             JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), property, 0);
-            selector.putClientProperty("editorValue", comp);
 
+            editorContainer.putClientProperty("editor", comp);
             editorContainer.add("Center", comp);
             editorContainer.revalidate();
-            if(operator.getSelectedIndex() == 0) {
-                operator.setSelectedIndex(1);
+            
+            if(property.getType().getAnnotation(javax.persistence.Entity.class) != null) {
+                operator.setModel(new DefaultComboBoxModel(property.isCollectionType() ? manyRelationOperators : oneRelationOperators));
+            } else {
+                operator.setModel(new DefaultComboBoxModel(simpleFieldOperators));
             }
+            operator.setSelectedIndex(1);
 
             Object binding = comp.getClientProperty("dataBinding");
             if(binding != null) {
@@ -231,7 +257,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             }
             
         } catch(Exception ex) {
-            System.out.println("ReflectionUtils: ERROR: " + ex.getMessage());
+            System.out.println("CustomQueryEditorImpl.getProperties: ERROR: " + ex.getMessage());
         }
         
         return properties;
@@ -256,26 +282,33 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                 Object binding = selector.getClientProperty("dataBinding");
                 try {
                     HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
-                    String parameterName = property.getName() + count;
-                    int lastDot = parameterName.lastIndexOf(".");
-                    if(lastDot != -1) parameterName = parameterName.substring(lastDot+1);
-                    //bindingContext.commitUncommittedValues();
 
                     if(where.length() > 0) where.append(" " + filterTypeComboBox.getSelectedItem() + " ");  // AND / OR
-                    if(operator.getSelectedItem().toString().indexOf("MEMBER") == -1) {
-                        // normal operands order
+                    
+                    if(operator.getSelectedItem().toString().toUpperCase().startsWith("IS ")) {
                         where.append("e."); where.append(property.getName()); where.append(" ");
-                        where.append(operator.getSelectedItem()); where.append(" ");
-                        where.append(":" + parameterName);
+                        where.append(operator.getSelectedItem()); 
                     } else {
-                        // inverse operands order
-                        where.append(":" + parameterName); where.append(" ");
-                        where.append(operator.getSelectedItem()); where.append(" ");
-                        where.append("e."); where.append(property.getName()); 
-                    }
-                    parameterValues.put(parameterName, property.getValue());
+                        String parameterName = property.getName() + count;
+                        int lastDot = parameterName.lastIndexOf(".");
+                        if(lastDot != -1) parameterName = parameterName.substring(lastDot+1);
+                        //bindingContext.commitUncommittedValues();
 
-                    System.out.println("DEBUG: Parameter " + parameterName + " = " + property.getValue());
+                        if(operator.getSelectedItem().toString().indexOf("MEMBER") == -1) {
+                            // normal operands order
+                            where.append("e."); where.append(property.getName()); where.append(" ");
+                            where.append(operator.getSelectedItem()); where.append(" ");
+                            where.append(":" + parameterName);
+                        } else {
+                            // inverse operands order
+                            where.append(":" + parameterName); where.append(" ");
+                            where.append(operator.getSelectedItem()); where.append(" ");
+                            where.append("e."); where.append(property.getName()); 
+                        }
+                        parameterValues.put(parameterName, property.getValue());
+                        System.out.println("DEBUG: Parameter " + parameterName + " = " + property.getValue());
+                    }
+
                 } catch(Exception ex) {
                     System.out.println("CustomQueryEditorImpl.getEJBQL: Error executing binding (" + binding + "): " + ex.getMessage());
                     System.err.println("CustomQueryEditorImpl.getEJBQL: Error executing binding (" + binding + "): " + ex.getMessage());
