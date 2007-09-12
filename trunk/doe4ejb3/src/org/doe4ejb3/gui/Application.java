@@ -40,13 +40,6 @@ public class Application extends SingleFrameApplication {
     @Override protected void configureWindow(Window root) {
     }
 
-    /**
-     * A convenient static getter for the application instance.
-     * @return the instance of DomainObjectExplorer
-    public static Application getApplication() {
-        return Application.getInstance(Application.class);
-    }
-     */
     
     /**
      * Main method launching the application.
