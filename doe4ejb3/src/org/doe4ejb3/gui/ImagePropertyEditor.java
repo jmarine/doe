@@ -57,15 +57,15 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
 
         jPanelButtons.setLayout(new java.awt.FlowLayout(java.awt.FlowLayout.LEFT));
 
-        jButtonLoad.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("load"));
+        jButtonLoad.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(ImagePropertyEditor.class, this).get("load"));
         jButtonLoad.setMnemonic('l');
         jPanelButtons.add(jButtonLoad);
 
-        jButtonSave.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("save"));
+        jButtonSave.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(ImagePropertyEditor.class, this).get("save"));
         jButtonSave.setMnemonic('s');
         jPanelButtons.add(jButtonSave);
 
-        jButtonClear.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(ImagePropertyEditor.class, this).get("delete"));
+        jButtonClear.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(ImagePropertyEditor.class, this).get("delete"));
         jButtonClear.setMnemonic('c');
         jPanelButtons.add(jButtonClear);
 
@@ -128,7 +128,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
     {
         int ret = jFileChooser.showOpenDialog(this);
         if (ret == JFileChooser.APPROVE_OPTION) {
-            return new LoadImageTask(Application.getApplication(), jFileChooser.getSelectedFile());
+            return new LoadImageTask(Application.getInstance(), jFileChooser.getSelectedFile());
         } else {
             return null;
         }
@@ -140,7 +140,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
     {
         int ret = jFileChooser.showSaveDialog(this);
         if (ret == JFileChooser.APPROVE_OPTION) {
-            return new SaveImageTask(Application.getApplication(), jFileChooser.getSelectedFile());
+            return new SaveImageTask(Application.getInstance(), jFileChooser.getSelectedFile());
         } else {
             return null;
         }
@@ -173,7 +173,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
     {
         private File file;
         
-        public LoadImageTask(Application app, File file)
+        public LoadImageTask(org.jdesktop.application.Application app, File file)
         {
             super(app);
             this.file = file;
@@ -238,7 +238,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
     {
         private File file;
         
-        public SaveImageTask(Application app, File file)
+        public SaveImageTask(org.jdesktop.application.Application app, File file)
         {
             super(app);
             this.file = file;

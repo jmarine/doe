@@ -43,11 +43,11 @@ public class Application extends SingleFrameApplication {
     /**
      * A convenient static getter for the application instance.
      * @return the instance of DomainObjectExplorer
-     */
     public static Application getApplication() {
         return Application.getInstance(Application.class);
     }
-
+     */
+    
     /**
      * Main method launching the application.
      */
