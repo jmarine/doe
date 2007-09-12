@@ -88,7 +88,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         
         
         // status bar initialization
-        ResourceMap resourceMap = Application.getInstance(Application.class).getContext().getResourceMap(DomainObjectExplorer.class);
+        ResourceMap resourceMap = Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class);
         int busyAnimationRate = resourceMap.getInteger("StatusBar.busyAnimationRate");
         for (int i = 0; i < busyIcons.length; i++) {
             busyIcons[i] = resourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
@@ -104,7 +104,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jProgressBar.setVisible(false);
 
 
-        taskMonitor = new org.jdesktop.application.TaskMonitor(Application.getApplication().getContext());
+        taskMonitor = new org.jdesktop.application.TaskMonitor(Application.getInstance().getContext());
         taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 taskMonitorPropertyChange(evt);
@@ -166,13 +166,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuHelp = new javax.swing.JMenu();
         jMenuItemAbout = new javax.swing.JMenuItem();
 
-        jMenuItemNew.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("createNewEntity"));
+        jMenuItemNew.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("createNewEntity"));
         jMenuItemNew.setMnemonic('n');
         jPopupMenuContextual.add(jMenuItemNew);
 
-        jMenuItemManager.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("manageEntityClass"));
+        jMenuItemManager.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("manageEntityClass"));
         jMenuItemManager.setMnemonic('m');
-        jMenuItemManager.setText(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
+        jMenuItemManager.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
         jPopupMenuContextual.add(jMenuItemManager);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -183,7 +183,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             }
         });
 
-        jButtonConnectionProperties.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("openConnectionManager"));
+        jButtonConnectionProperties.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("openConnectionManager"));
         jButtonConnectionProperties.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonConnectionProperties.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jButtonConnectionProperties.addActionListener(new java.awt.event.ActionListener() {
@@ -197,7 +197,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jSeparator3.setMaximumSize(new java.awt.Dimension(4, 0));
         jToolBar.add(jSeparator3);
 
-        jButtonCut.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("cut"));
+        jButtonCut.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("cut"));
         jButtonCut.setFocusable(false);
         jButtonCut.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonCut.setName("cutToolBarButton"); // NOI18N
@@ -209,7 +209,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
         jToolBar.add(jButtonCut);
 
-        jButtonCopy.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("copy"));
+        jButtonCopy.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("copy"));
         jButtonCopy.setFocusable(false);
         jButtonCopy.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonCopy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -220,7 +220,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
         jToolBar.add(jButtonCopy);
 
-        jButtonPaste.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("paste"));
+        jButtonPaste.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("paste"));
         jButtonPaste.setFocusable(false);
         jButtonPaste.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonPaste.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -255,29 +255,29 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         getContentPane().add(jSplitPaneCentral, java.awt.BorderLayout.CENTER);
 
         jMenuFile.setMnemonic('f');
-        jMenuFile.setText(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(DomainObjectExplorer.class).getString("fileMenu.text")); // NOI18N
+        jMenuFile.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("fileMenu.text")); // NOI18N
 
         jMenuNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/new.png"))); // NOI18N
         jMenuNew.setMnemonic('n');
-        jMenuNew.setText(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(DomainObjectExplorer.class).getString("newMenu.text")); // NOI18N
+        jMenuNew.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("newMenu.text")); // NOI18N
         jMenuFile.add(jMenuNew);
 
         jMenuManage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/manager.png"))); // NOI18N
         jMenuManage.setMnemonic('m');
-        jMenuManage.setText(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
+        jMenuManage.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
         jMenuFile.add(jMenuManage);
         jMenuFile.add(jSeparator1);
 
-        jMenuItemExit.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("exit"));
+        jMenuItemExit.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("exit"));
         jMenuItemExit.setMnemonic('x');
         jMenuFile.add(jMenuItemExit);
 
         jMainMenuBar.add(jMenuFile);
 
         jMenuEdit.setMnemonic('e');
-        jMenuEdit.setText(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(DomainObjectExplorer.class).getString("editMenu.text")); // NOI18N
+        jMenuEdit.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("editMenu.text")); // NOI18N
 
-        jMenuItemCut.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("cut"));
+        jMenuItemCut.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("cut"));
         jMenuItemCut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemClipboardActionPerformed(evt);
@@ -285,7 +285,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
         jMenuEdit.add(jMenuItemCut);
 
-        jMenuItemCopy.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("copy"));
+        jMenuItemCopy.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("copy"));
         jMenuItemCopy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemClipboardActionPerformed(evt);
@@ -293,7 +293,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
         jMenuEdit.add(jMenuItemCopy);
 
-        jMenuItemPaste.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("paste"));
+        jMenuItemPaste.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("paste"));
         jMenuItemPaste.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemClipboardActionPerformed(evt);
@@ -302,7 +302,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuEdit.add(jMenuItemPaste);
         jMenuEdit.add(jSeparator2);
 
-        jMenuItemConnectionProperties.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("openConnectionManager"));
+        jMenuItemConnectionProperties.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("openConnectionManager"));
         jMenuItemConnectionProperties.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemConnectionPropertiesActionPerformed(evt);
@@ -313,9 +313,9 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMainMenuBar.add(jMenuEdit);
 
         jMenuHelp.setMnemonic('h');
-        jMenuHelp.setText(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(DomainObjectExplorer.class).getString("helpMenu.text")); // NOI18N
+        jMenuHelp.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("helpMenu.text")); // NOI18N
 
-        jMenuItemAbout.setAction(org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("about"));
+        jMenuItemAbout.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("about"));
         jMenuItemAbout.setMnemonic('a');
         jMenuHelp.add(jMenuItemAbout);
 
@@ -480,13 +480,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         String entityName = I18n.getEntityName(entityClass);
         
         JMenuItem newMenuItem = new JMenuItem(entityName);
-        newMenuItem.setAction(org.jdesktop.application.Application.getInstance(Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("createNewEntity"));
+        newMenuItem.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("createNewEntity"));
         newMenuItem.setText(entityName);
         newMenuItem.putClientProperty("org.doe4ejb3.entityClass", entityClass);
         newMenuItem.putClientProperty("org.doe4ejb3.persistenceUnit", puName);
 
         JMenuItem manageMenuItem = new JMenuItem(entityName);
-        manageMenuItem.setAction(org.jdesktop.application.Application.getInstance(Application.class).getContext().getActionMap(DomainObjectExplorer.class, this).get("manageEntityClass"));
+        manageMenuItem.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("manageEntityClass"));
         manageMenuItem.setText(entityName);
         manageMenuItem.putClientProperty("org.doe4ejb3.entityClass", entityClass);
         manageMenuItem.putClientProperty("org.doe4ejb3.persistenceUnit", puName);
@@ -627,7 +627,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     @org.jdesktop.application.Action
     public void exit()
     {
-       Application.getApplication().exit();
+       Application.getInstance().exit();
     }    
 
     @org.jdesktop.application.Action    
