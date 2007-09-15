@@ -17,8 +17,8 @@
             <included-library files="1">libs.ANTLR-2.7.6.classpath</included-library>
             <included-library files="1">libs.absolutelayout.classpath</included-library>
             <included-library files="1">libs.swing-layout.classpath</included-library>
-            <included-library files="3">libs.jaxb20.classpath</included-library>
             <included-library files="1">libs.ABEILLE-2.1.0.classpath</included-library>
+            <included-library files="5">libs.jaxb21.classpath</included-library>
             <included-library files="1">libs.beans-binding.classpath</included-library>
             <included-library files="2">libs.swing-app-framework.classpath</included-library>
         </data>
