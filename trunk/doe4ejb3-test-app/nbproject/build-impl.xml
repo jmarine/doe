@@ -15,7 +15,6 @@ is divided into following sections:
 
 -->
 <project xmlns:ear2="http://www.netbeans.org/ns/j2ee-earproject/2" basedir=".." default="build" name="doe4ejb3-test-app-impl">
-    <import file="extendArchiveGF.xml"/>
     <import file="ant-deploy.xml"/>
     <target depends="dist" description="Build whole project." name="default"/>
     <!-- 
@@ -48,6 +47,7 @@ is divided into following sections:
         <condition property="do.display.browser">
             <and>
                 <istrue value="${display.browser}"/>
+                <isset property="client.module.uri"/>
                 <not>
                     <isset property="app.client"/>
                 </not>
@@ -130,7 +130,7 @@ is divided into following sections:
     <!--
     DIST BUILDING SECTION
     -->
-    <target depends="-extend-archive" name="pre-dist">
+    <target name="pre-dist">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>

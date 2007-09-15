@@ -2,11 +2,7 @@
 <project xmlns="http://www.netbeans.org/ns/project/1">
     <type>org.netbeans.modules.j2ee.clientproject</type>
     <configuration>
-        <buildExtensions xmlns="http://www.netbeans.org/ns/ant-build-extender/1">
-            <extension file="extendArchiveGF.xml" id="gfarchiveextend">
-                <dependency dependsOn="-extend-archive" target="-pre-dist"/>
-            </extension>
-        </buildExtensions>
+        <buildExtensions xmlns="http://www.netbeans.org/ns/ant-build-extender/1"/>
         <data xmlns="http://www.netbeans.org/ns/car-project/1">
             <name>doe4ejb3-app-client</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
@@ -21,10 +17,10 @@
             <included-library files="1">libs.ANTLR-2.7.6.classpath</included-library>
             <included-library files="1">libs.absolutelayout.classpath</included-library>
             <included-library files="1">libs.swing-layout.classpath</included-library>
-            <included-library files="5">libs.jaxb20.classpath</included-library>
-            <included-library files="8">libs.ABEILLE-2.1.0.classpath</included-library>
-            <included-library files="2">libs.Swing_Application_Framework-1.0.classpath</included-library>
-            <included-library files="1">libs.Beans_Binding-1.0.classpath</included-library>
+            <included-library files="3">libs.jaxb20.classpath</included-library>
+            <included-library files="1">libs.ABEILLE-2.1.0.classpath</included-library>
+            <included-library files="1">libs.beans-binding.classpath</included-library>
+            <included-library files="2">libs.swing-app-framework.classpath</included-library>
         </data>
         <references xmlns="http://www.netbeans.org/ns/ant-project-references/1">
             <reference>

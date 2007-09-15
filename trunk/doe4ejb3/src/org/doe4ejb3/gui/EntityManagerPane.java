@@ -90,7 +90,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
             
         } catch(Exception ex) {
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
             ex.printStackTrace();
         }
         
@@ -217,7 +217,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                 throw new ApplicationException("There are not selected objects.");
             }
 
-            int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+            int confirm = DomainObjectExplorer.getInstance().getWindowManager().showConfirmDialog( "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
             if(confirm == JOptionPane.OK_OPTION) 
             {
                 Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
@@ -239,11 +239,11 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             
         } catch(ApplicationException ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }//GEN-LAST:event_jMenuItemContextualDeleteActionPerformed
@@ -261,16 +261,16 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             } else {
                 Object entity = listModel.getElementAt(selectedIndexToEdit);
                 Class entityClass = entity.getClass();  // (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-                DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, entity);
+                DomainObjectExplorer.getInstance().getWindowManager().openInternalFrameEntityEditor(puName, entityClass, entity);
             }
             
         } catch(ApplicationException ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }
@@ -283,15 +283,15 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
             Class entityClass = (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-            DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, null);
+            DomainObjectExplorer.getInstance().getWindowManager().openInternalFrameEntityEditor(puName, entityClass, null);
             
         } catch(ApplicationException ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }

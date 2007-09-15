@@ -20,7 +20,6 @@
 
         -->
 <project xmlns:carproject="http://www.netbeans.org/ns/car-project/1" basedir=".." default="default" name="doe4ejb3-app-client-impl">
-    <import file="extendArchiveGF.xml"/>
     <import file="ant-deploy.xml"/>
     <target depends="dist,javadoc" description="Build whole project." name="default"/>
     <!-- 
@@ -112,6 +111,15 @@
             </and>
         </condition>
         <property name="source.encoding" value="${file.encoding}"/>
+        <condition property="javadoc.encoding.used" value="${javadoc.encoding}">
+            <and>
+                <isset property="javadoc.encoding"/>
+                <not>
+                    <equals arg1="${javadoc.encoding}" arg2=""/>
+                </not>
+            </and>
+        </condition>
+        <property name="javadoc.encoding.used" value="${source.encoding}"/>
     </target>
     <target name="-post-init">
         <!-- Empty placeholder for easier customization. -->
@@ -145,15 +153,14 @@
             <attribute default="${build.classes.dir}" name="destdir"/>
             <attribute default="${javac.classpath}:${j2ee.platform.classpath}" name="classpath"/>
             <attribute default="${javac.debug}" name="debug"/>
-            <attribute default="${jaxws.endorsed.dir}" name="jaxwsendorsed"/>
+            <attribute default="" name="javac.compilerargs.jaxws"/>
             <element name="customize" optional="true"/>
             <sequential>
                 <javac debug="@{debug}" deprecation="${javac.deprecation}" destdir="@{destdir}" encoding="${source.encoding}" includeantruntime="false" source="${javac.source}" srcdir="@{srcdir}" target="${javac.target}">
                     <classpath>
                         <path path="@{classpath}"/>
                     </classpath>
-                    <compilerarg line="-Djava.endorsed.dirs='@{jaxwsendorsed}'"/>
-                    <compilerarg line="${javac.compilerargs}"/>
+                    <compilerarg line="${javac.compilerargs} @{javac.compilerargs.jaxws}"/>
                     <customize/>
                 </javac>
             </sequential>
@@ -340,22 +347,13 @@
         <copy file="${libs.ANTLR-2.7.6.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.absolutelayout.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.swing-layout.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.jaxb20.classpath.libfile.5}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.jaxb20.classpath.libfile.4}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.jaxb20.classpath.libfile.3}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.jaxb20.classpath.libfile.2}" todir="${build.classes.dir}/META-INF/lib"/>
         <copy file="${libs.jaxb20.classpath.libfile.1}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.8}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.7}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.6}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.5}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.4}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.3}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.2}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.1}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.Swing_Application_Framework-1.0.classpath.libfile.2}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.Swing_Application_Framework-1.0.classpath.libfile.1}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copy file="${libs.Beans_Binding-1.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copy file="${libs.ABEILLE-2.1.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copy file="${libs.beans-binding.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copy file="${libs.swing-app-framework.classpath.libfile.2}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copy file="${libs.swing-app-framework.classpath.libfile.1}" todir="${build.classes.dir}/META-INF/lib"/>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <basename file="${reference.doe4ejb3.jar}" property="included.lib.reference.doe4ejb3.jar"/>
@@ -370,40 +368,22 @@
         <copy file="${libs.absolutelayout.classpath}" todir="${dist.ear.dir}"/>
         <basename file="${libs.swing-layout.classpath}" property="included.lib.libs.swing-layout.classpath"/>
         <copy file="${libs.swing-layout.classpath}" todir="${dist.ear.dir}"/>
-        <basename file="${libs.jaxb20.classpath.libfile.5}" property="included.lib.libs.jaxb20.classpath.5"/>
-        <basename file="${libs.jaxb20.classpath.libfile.4}" property="included.lib.libs.jaxb20.classpath.4"/>
         <basename file="${libs.jaxb20.classpath.libfile.3}" property="included.lib.libs.jaxb20.classpath.3"/>
         <basename file="${libs.jaxb20.classpath.libfile.2}" property="included.lib.libs.jaxb20.classpath.2"/>
         <basename file="${libs.jaxb20.classpath.libfile.1}" property="included.lib.libs.jaxb20.classpath.1"/>
-        <copy file="${libs.jaxb20.classpath.libfile.5}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.jaxb20.classpath.libfile.4}" todir="${dist.ear.dir}"/>
         <copy file="${libs.jaxb20.classpath.libfile.3}" todir="${dist.ear.dir}"/>
         <copy file="${libs.jaxb20.classpath.libfile.2}" todir="${dist.ear.dir}"/>
         <copy file="${libs.jaxb20.classpath.libfile.1}" todir="${dist.ear.dir}"/>
-        <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.8}" property="included.lib.libs.ABEILLE-2.1.0.classpath.8"/>
-        <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.7}" property="included.lib.libs.ABEILLE-2.1.0.classpath.7"/>
-        <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.6}" property="included.lib.libs.ABEILLE-2.1.0.classpath.6"/>
-        <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.5}" property="included.lib.libs.ABEILLE-2.1.0.classpath.5"/>
-        <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.4}" property="included.lib.libs.ABEILLE-2.1.0.classpath.4"/>
-        <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.3}" property="included.lib.libs.ABEILLE-2.1.0.classpath.3"/>
-        <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.2}" property="included.lib.libs.ABEILLE-2.1.0.classpath.2"/>
-        <basename file="${libs.ABEILLE-2.1.0.classpath.libfile.1}" property="included.lib.libs.ABEILLE-2.1.0.classpath.1"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.8}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.7}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.6}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.5}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.4}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.3}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.2}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.ABEILLE-2.1.0.classpath.libfile.1}" todir="${dist.ear.dir}"/>
-        <basename file="${libs.Swing_Application_Framework-1.0.classpath.libfile.2}" property="included.lib.libs.Swing_Application_Framework-1.0.classpath.2"/>
-        <basename file="${libs.Swing_Application_Framework-1.0.classpath.libfile.1}" property="included.lib.libs.Swing_Application_Framework-1.0.classpath.1"/>
-        <copy file="${libs.Swing_Application_Framework-1.0.classpath.libfile.2}" todir="${dist.ear.dir}"/>
-        <copy file="${libs.Swing_Application_Framework-1.0.classpath.libfile.1}" todir="${dist.ear.dir}"/>
-        <basename file="${libs.Beans_Binding-1.0.classpath}" property="included.lib.libs.Beans_Binding-1.0.classpath"/>
-        <copy file="${libs.Beans_Binding-1.0.classpath}" todir="${dist.ear.dir}"/>
+        <basename file="${libs.ABEILLE-2.1.0.classpath}" property="included.lib.libs.ABEILLE-2.1.0.classpath"/>
+        <copy file="${libs.ABEILLE-2.1.0.classpath}" todir="${dist.ear.dir}"/>
+        <basename file="${libs.beans-binding.classpath}" property="included.lib.libs.beans-binding.classpath"/>
+        <copy file="${libs.beans-binding.classpath}" todir="${dist.ear.dir}"/>
+        <basename file="${libs.swing-app-framework.classpath.libfile.2}" property="included.lib.libs.swing-app-framework.classpath.2"/>
+        <basename file="${libs.swing-app-framework.classpath.libfile.1}" property="included.lib.libs.swing-app-framework.classpath.1"/>
+        <copy file="${libs.swing-app-framework.classpath.libfile.2}" todir="${dist.ear.dir}"/>
+        <copy file="${libs.swing-app-framework.classpath.libfile.1}" todir="${dist.ear.dir}"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${included.lib.reference.doe4ejb3.jar} ${included.lib.libs.toplink.classpath.1} ${included.lib.libs.toplink.classpath.2} ${included.lib.libs.ANTLR-2.7.6.classpath} ${included.lib.libs.absolutelayout.classpath} ${included.lib.libs.swing-layout.classpath} ${included.lib.libs.jaxb20.classpath.1} ${included.lib.libs.jaxb20.classpath.2} ${included.lib.libs.jaxb20.classpath.3} ${included.lib.libs.jaxb20.classpath.4} ${included.lib.libs.jaxb20.classpath.5} ${included.lib.libs.ABEILLE-2.1.0.classpath.1} ${included.lib.libs.ABEILLE-2.1.0.classpath.2} ${included.lib.libs.ABEILLE-2.1.0.classpath.3} ${included.lib.libs.ABEILLE-2.1.0.classpath.4} ${included.lib.libs.ABEILLE-2.1.0.classpath.5} ${included.lib.libs.ABEILLE-2.1.0.classpath.6} ${included.lib.libs.ABEILLE-2.1.0.classpath.7} ${included.lib.libs.ABEILLE-2.1.0.classpath.8} ${included.lib.libs.Swing_Application_Framework-1.0.classpath.1} ${included.lib.libs.Swing_Application_Framework-1.0.classpath.2} ${included.lib.libs.Beans_Binding-1.0.classpath} "/>
+            <attribute name="Class-Path" value="${included.lib.reference.doe4ejb3.jar} ${included.lib.libs.toplink.classpath.1} ${included.lib.libs.toplink.classpath.2} ${included.lib.libs.ANTLR-2.7.6.classpath} ${included.lib.libs.absolutelayout.classpath} ${included.lib.libs.swing-layout.classpath} ${included.lib.libs.jaxb20.classpath.1} ${included.lib.libs.jaxb20.classpath.2} ${included.lib.libs.jaxb20.classpath.3} ${included.lib.libs.ABEILLE-2.1.0.classpath} ${included.lib.libs.beans-binding.classpath} ${included.lib.libs.swing-app-framework.classpath.1} ${included.lib.libs.swing-app-framework.classpath.2} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">
@@ -451,7 +431,7 @@
         <dirname file="${dist.jar}" property="dist.jar.dir"/>
         <mkdir dir="${dist.jar.dir}"/>
     </target>
-    <target depends="-extend-archive" name="-pre-dist">
+    <target name="-pre-dist">
         <!-- Empty placeholder for easier customization. -->
         <!-- You can override this target in the ../build.xml file. -->
     </target>
@@ -684,7 +664,7 @@
             -->
     <target depends="init" name="-javadoc-build">
         <mkdir dir="${dist.javadoc.dir}"/>
-        <javadoc additionalparam="${javadoc.additionalparam}" author="${javadoc.author}" destdir="${dist.javadoc.dir}" failonerror="true" noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}" private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}" use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}">
+        <javadoc additionalparam="${javadoc.additionalparam}" author="${javadoc.author}" destdir="${dist.javadoc.dir}" encoding="${javadoc.encoding.used}" failonerror="true" noindex="${javadoc.noindex}" nonavbar="${javadoc.nonavbar}" notree="${javadoc.notree}" private="${javadoc.private}" source="${javac.source}" splitindex="${javadoc.splitindex}" use="${javadoc.use}" useexternalfile="true" version="${javadoc.version}" windowtitle="${javadoc.windowtitle}">
             <classpath>
                 <path path="${javac.classpath}"/>
             </classpath>
@@ -777,9 +757,15 @@
             -->
     <target depends="init,compile-test" if="have.tests" name="-debug-start-debuggee-test">
         <fail unless="test.class">Must select one file in the IDE or set test.class</fail>
-        <carproject:debug classname="junit.textui.TestRunner" classpath="${debug.test.classpath}">
+        <property location="${build.test.results.dir}/TEST-${test.class}.xml" name="test.report.file"/>
+        <delete file="${test.report.file}"/>
+        <!-- the directory must exist, otherwise the XML formatter would fail -->
+        <mkdir dir="${build.test.results.dir}"/>
+        <carproject:debug classname="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner" classpath="${ant.home}/lib/ant.jar:${ant.home}/lib/ant-junit.jar:${debug.test.classpath}">
             <customize>
-                <arg line="${test.class}"/>
+                <arg value="${test.class}"/>
+                <arg value="formatter=org.apache.tools.ant.taskdefs.optional.junit.BriefJUnitResultFormatter"/>
+                <arg value="formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,${test.report.file}"/>
             </customize>
         </carproject:debug>
     </target>
