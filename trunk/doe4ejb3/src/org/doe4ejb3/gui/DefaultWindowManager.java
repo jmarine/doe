@@ -24,6 +24,10 @@ public class DefaultWindowManager implements WindowManager
     private MDIDesktopPane mdiDesktopPane;
     private HashMap<Object,JInternalFrame> openedInternalFrames;
 
+    public Object findWindow(Object key) 
+    {
+        return openedInternalFrames.get(key);
+    }
     
     public DefaultWindowManager(MDIDesktopPane mdiDesktopPane)
     {
@@ -31,21 +35,21 @@ public class DefaultWindowManager implements WindowManager
         this.openedInternalFrames = new HashMap<Object,JInternalFrame>();
     }
 
-    public JComponent getActiveWindow() 
+    public Object getActiveWindow() 
     {
         return mdiDesktopPane.getSelectedFrame();
     }
 
-    public JComponent getWindowFromComponent(JComponent source) 
+    public Object getWindowFromComponent(Object source) 
     {
-        Component parent = source;
+        Component parent = (Component)source;
         while( (parent != null) && (!(parent instanceof JInternalFrame)) ) {
             parent = parent.getParent();
         }
-        return (JComponent)parent;
+        return parent;
     }        
 
-    public void showWindow(JComponent window, boolean center) 
+    public void showWindow(Object window, boolean center) 
     {
         try { 
             JInternalFrame iFrame = (JInternalFrame)window;
@@ -68,7 +72,7 @@ public class DefaultWindowManager implements WindowManager
         }
     }
 
-    public void hideWindow(JComponent window) 
+    public void hideWindow(Object window) 
     {
         try { 
             JInternalFrame iFrame = (JInternalFrame)window;
@@ -79,7 +83,7 @@ public class DefaultWindowManager implements WindowManager
         }
     }
 
-    public void closeWindow(JComponent window) 
+    public void closeWindow(Object window) 
     {
         try { 
             JInternalFrame iFrame = (JInternalFrame)window;
@@ -91,7 +95,7 @@ public class DefaultWindowManager implements WindowManager
         }
     }
 
-    public void bringToFront(JComponent window) 
+    public void bringToFront(Object window) 
     {
         try {
             JInternalFrame iFrame = (JInternalFrame)window;
@@ -116,9 +120,10 @@ public class DefaultWindowManager implements WindowManager
     public void openInternalFrameEntityManager(String puName, Class entityClass) throws Exception
     {
         final Object key = entityClass.getName() + "Manager";
-        JInternalFrame iFrame = openedInternalFrames.get(key);
-        if(iFrame == null) {
-
+        JInternalFrame iFrame = (JInternalFrame)findWindow(key);
+        if(iFrame != null) {
+            bringToFront(iFrame);
+        } else {
             String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass) + " manager";
             iFrame = new JInternalFrame(title, true, true, true, false );
             iFrame.setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
@@ -135,23 +140,29 @@ public class DefaultWindowManager implements WindowManager
 
 
             openedInternalFrames.put(key, iFrame);
-            mdiDesktopPane.add(iFrame);
+            showWindow(iFrame, false);
         }
-
-        if(iFrame.isIcon()) iFrame.setIcon(false);
-        iFrame.setSelected(true);        
-        iFrame.setVisible(true);
 
     }
 
 
-    public JComponent openInternalFrameEntityEditor(String puName, Class entityClass, Object entity) throws Exception
+    public Object openInternalFrameEntityEditor(String puName, Class entityClass, Object entity) throws Exception
     {
         final Object key = (entity != null) ? entity : entityClass.getName() + "Editor";
-        JInternalFrame iFrame = openedInternalFrames.get(key);
+        JInternalFrame iFrame = (JInternalFrame)findWindow(key);
 
-        if(iFrame == null) {
-            iFrame = new EntityEditorFrame(puName, entityClass, entity);
+        if(iFrame != null) {
+            bringToFront(iFrame);
+        } else {
+            
+            String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass);
+            if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
+            else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
+            
+            iFrame = new JInternalFrame(title, true, true, true, false ); 
+            iFrame.setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
+            iFrame.getContentPane().setLayout(new BorderLayout());            
+            iFrame.getContentPane().add(new EntityEditorView(puName, entityClass, entity), BorderLayout.CENTER);
             iFrame.addInternalFrameListener(new InternalFrameAdapter() {
                 public void internalFrameClosed(InternalFrameEvent evt) {
                     openedInternalFrames.remove(key);
@@ -159,15 +170,14 @@ public class DefaultWindowManager implements WindowManager
               });
 
             openedInternalFrames.put(key, iFrame);
-            mdiDesktopPane.add(iFrame);
+            showWindow(iFrame, false);
         }
-
-        showWindow(iFrame, false);
 
         return iFrame;
     }
 
-    public EventListenerList getEventListenerList(Object window) {
+    public EventListenerList getEventListenerList(Object window) 
+    {
         JInternalFrame iFrame = (JInternalFrame)window;
         EventListenerList eventListenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
         if(eventListenerList == null) {
@@ -175,6 +185,11 @@ public class DefaultWindowManager implements WindowManager
             iFrame.putClientProperty("entityListeners", eventListenerList);
         }
         return eventListenerList;
+    }
+    
+    public void showStatus(String msg)
+    {
+        DomainObjectExplorer.getInstance().showStatus(msg);
     }
 
 }
