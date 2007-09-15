@@ -241,7 +241,9 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
                 setMessage(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
 
                 EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
-                EventListenerList listenerList = DomainObjectExplorer.getInstance().getWindowManager().getEventListenerList(EntityEditorFrame.this);
+                WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                Object window = wm.getWindowFromComponent(EntityEditorFrame.this);
+                EventListenerList listenerList = DomainObjectExplorer.getInstance().getWindowManager().getEventListenerList(window);
                 Object[] listeners = listenerList.getListenerList();
                 for (int i = listeners.length-2; i>=0; i-=2) {
                     if (listeners[i]==EntityListener.class) {
@@ -284,7 +286,9 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
                 setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
 
                 EntityEvent entityEvent = new EntityEvent(this, EntityEvent.ENTITY_DELETE, entity, null);
-                EventListenerList listenerList = DomainObjectExplorer.getInstance().getWindowManager().getEventListenerList(EntityEditorFrame.this);
+                WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                Object window = wm.getWindowFromComponent(EntityEditorFrame.this);
+                EventListenerList listenerList = DomainObjectExplorer.getInstance().getWindowManager().getEventListenerList(window);
                 Object[] listeners = listenerList.getListenerList();
                 for (int i = listeners.length-2; i>=0; i-=2) {
                     if (listeners[i]==EntityListener.class) {
