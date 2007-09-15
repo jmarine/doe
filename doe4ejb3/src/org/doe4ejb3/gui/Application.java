@@ -1,5 +1,8 @@
 /*
- * DomainObjectExplorer.java
+ * Application.java
+ *
+ * Created on 9 / september / 2007
+ * @author Jordi Marine Fort
  */
 
 package org.doe4ejb3.gui;
@@ -9,9 +12,7 @@ import java.awt.Window;
 import java.util.EventObject;
 import javax.swing.JOptionPane;
 
-/**
- * The main class of the application.
- */
+
 public class Application extends SingleFrameApplication {
 
     /**
@@ -21,7 +22,7 @@ public class Application extends SingleFrameApplication {
        setMainFrame(DomainObjectExplorer.getInstance());
        addExitListener(new ExitListener() {
             public boolean canExit(EventObject e) {
-                int option = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), 
+                int option = DomainObjectExplorer.getInstance().getWindowManager().showConfirmDialog( 
                                 "Do you really want to exit?", "Exit confirmation", JOptionPane.YES_NO_OPTION) ;
                 return option == JOptionPane.YES_OPTION;
             }

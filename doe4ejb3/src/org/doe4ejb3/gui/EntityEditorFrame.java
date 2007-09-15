@@ -41,7 +41,6 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
         
         System.out.println("Creating internal frame");
         setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
-        putClientProperty("entityListeners", new EventListenerList());
         
         System.out.println("Preparing editor ");
         editor = EditorFactory.getEntityEditor(null, puName, entityClass, "");
@@ -168,7 +167,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
     @org.jdesktop.application.Action
     public org.jdesktop.application.Task delete() 
     {
-        int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete this object?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+        int confirm = DomainObjectExplorer.getInstance().getWindowManager().showConfirmDialog( "Do you really want to delete this object?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
         if(confirm != JOptionPane.OK_OPTION) {                
             return null;
         } else {
@@ -242,7 +241,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
                 setMessage(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
 
                 EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
-                EventListenerList listenerList = (EventListenerList)EntityEditorFrame.this.getClientProperty("entityListeners");
+                EventListenerList listenerList = DomainObjectExplorer.getInstance().getWindowManager().getEventListenerList(EntityEditorFrame.this);
                 Object[] listeners = listenerList.getListenerList();
                 for (int i = listeners.length-2; i>=0; i-=2) {
                     if (listeners[i]==EntityListener.class) {
@@ -285,7 +284,7 @@ public class EntityEditorFrame extends javax.swing.JInternalFrame
                 setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
 
                 EntityEvent entityEvent = new EntityEvent(this, EntityEvent.ENTITY_DELETE, entity, null);
-                EventListenerList listenerList = (EventListenerList)EntityEditorFrame.this.getClientProperty("entityListeners");
+                EventListenerList listenerList = DomainObjectExplorer.getInstance().getWindowManager().getEventListenerList(EntityEditorFrame.this);
                 Object[] listeners = listenerList.getListenerList();
                 for (int i = listeners.length-2; i>=0; i-=2) {
                     if (listeners[i]==EntityListener.class) {

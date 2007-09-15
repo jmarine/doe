@@ -31,7 +31,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -174,14 +173,15 @@ public class EditorFactory
                                 try { 
                                     if(combo.getSelectedIndex() >= 0) {
                                         Object entity = comboBoxModel.getSelectedItem();
-                                        JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, optionClass, entity);
-                                        final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                                        WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                                        JComponent window = wm.openInternalFrameEntityEditor(puName, optionClass, entity);
+                                        final EventListenerList listenerList = wm.getEventListenerList(window);
                                         listenerList.add(EntityListener.class, relationshipListener);
                                     }
                                 } catch(ApplicationException ex) { 
-                                    JOptionPane.showInternalMessageDialog(combo, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 } catch(Exception ex) { 
-                                    JOptionPane.showInternalMessageDialog(combo, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 }
                             }
                         };         
@@ -189,13 +189,14 @@ public class EditorFactory
                         AbstractAction newItemAction = new AbstractAction("New", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
                             public void actionPerformed(ActionEvent evt)  {
                                 try { 
-                                    JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, optionClass, null);
-                                    final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                                    WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                                    JComponent window = wm.openInternalFrameEntityEditor(puName, optionClass, null);
+                                    final EventListenerList listenerList = wm.getEventListenerList(window);
                                     listenerList.add(EntityListener.class, relationshipListener);
                                 } catch(ApplicationException ex) { 
-                                    JOptionPane.showInternalMessageDialog(combo, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 } catch(Exception ex) { 
-                                    JOptionPane.showInternalMessageDialog(combo, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 }
                             }
                         };
@@ -624,9 +625,10 @@ public class EditorFactory
         AbstractAction newAction = new AbstractAction("New", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
-                    JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, memberClass, null);
+                    WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                    JComponent window = wm.openInternalFrameEntityEditor(puName, memberClass, null);
                     if(!isManagerWindow) {
-                        final EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                        final EventListenerList listenerList = wm.getEventListenerList(window);
                         listenerList.add(EntityListener.class, new EntityListener() {
                             public void entityChanged(EntityEvent event) {
                                 if(event.getEventType() == EntityEvent.ENTITY_INSERT) {
@@ -636,9 +638,10 @@ public class EditorFactory
                         });
                     }
                 } catch(ApplicationException ex) { 
-                    JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                 } catch(Exception ex) { 
-                    JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);  
+                    ex.printStackTrace();
                 }
             }
         };
@@ -654,7 +657,7 @@ public class EditorFactory
                             if(!listModel.contains(newItem)) {  
                                 listModel.addElement(newItem);
                             } else {
-                                JOptionPane.showInternalMessageDialog(panel, "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
+                                DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     } finally {
@@ -671,8 +674,9 @@ public class EditorFactory
                     } else {
                         for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
                             if(listSelectionModel.isSelectedIndex(index)) {
-                                JInternalFrame iFrame = DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, memberClass, listModel.getElementAt(index)); 
-                                EventListenerList listenerList = (EventListenerList)iFrame.getClientProperty("entityListeners");
+                                WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                                JComponent window = wm.openInternalFrameEntityEditor(puName, memberClass, listModel.getElementAt(index)); 
+                                EventListenerList listenerList = wm.getEventListenerList(window);
                                 listenerList.add(EntityListener.class, new EntityListener() {
                                     public void entityChanged(EntityEvent event) {
                                         int index;
@@ -706,10 +710,10 @@ public class EditorFactory
                     }
                     
                 } catch(ApplicationException ex) { 
-                    JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
+                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
                     
                 } catch(Exception ex) { 
-                    JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
+                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
                     ex.printStackTrace();
                 }
            }
@@ -721,7 +725,7 @@ public class EditorFactory
                     if(listSelectionModel.isSelectionEmpty()) {
                         throw new ApplicationException("No items selected");
                     } else {
-                        int confirm = JOptionPane.showInternalConfirmDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+                        int confirm = DomainObjectExplorer.getInstance().getWindowManager().showConfirmDialog( "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
                         if(confirm == JOptionPane.OK_OPTION) 
                         {
                             try {
@@ -743,10 +747,10 @@ public class EditorFactory
                     }
 
                 } catch(ApplicationException ex) { 
-                    JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
+                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
                     
                 } catch(Exception ex) { 
-                    JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
+                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         };         
@@ -762,9 +766,9 @@ public class EditorFactory
                             jTable.print(JTable.PrintMode.FIT_WIDTH, headerFormat, footerFormat);
                         }
                     } catch(ApplicationException ex) { 
-                        JOptionPane.showInternalMessageDialog(panel, ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);                
+                        DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);                
                     } catch(Exception ex) {
-                        JOptionPane.showInternalMessageDialog(panel, "Error: " + ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);
+                        DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
         };
@@ -772,15 +776,10 @@ public class EditorFactory
         AbstractAction closeAction = new AbstractAction("Close", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cancel.png"))) {
                 public void actionPerformed(ActionEvent evt)  
                 {        
-                    Component parent = (Component)evt.getSource();
-                    while( (parent != null) && (!(parent instanceof JInternalFrame)) ) {
-                        parent = parent.getParent();
-                    }
-                
-                    if(parent != null) {
-                        JInternalFrame iFrame = (JInternalFrame)parent;
-                        iFrame.dispose();
-                    }
+                    JComponent source = (JComponent)evt.getSource();
+                    WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                    JComponent window = wm.getWindowFromComponent(source);
+                    if(window != null) wm.closeWindow(window);
                 }
         };
 

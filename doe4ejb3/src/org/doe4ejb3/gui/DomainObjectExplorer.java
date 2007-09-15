@@ -1,4 +1,4 @@
-/*
+/**
  * DomainObjectExplorer.java
  *
  * Created on 18 / august / 2006, 21:38
@@ -12,50 +12,23 @@ import java.awt.datatransfer.*;
 import java.awt.print.*;
 import java.beans.*;
 import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.EventListenerList;
-import javax.swing.event.InternalFrameAdapter;
-import javax.swing.event.InternalFrameEvent;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NamedQuery;
-import javax.persistence.Query;
 
-// import javax.jnlp.*;
 
-//import org.jdesktop.application.Action;
-import org.jdesktop.application.ApplicationContext;
 import org.jdesktop.application.ResourceMap;
-import org.jdesktop.application.Task;
 
 import org.doe4ejb3.annotation.EntityDescriptor;
-import org.doe4ejb3.event.EntityEvent;
-import org.doe4ejb3.event.EntityListener;
 import org.doe4ejb3.exception.ApplicationException;
 import org.doe4ejb3.util.JPAUtils;
-import org.doe4ejb3.util.EJBQLUtils;
-import org.doe4ejb3.util.PrintUtils;
 
 
 
-
-public class DomainObjectExplorer extends javax.swing.JFrame
+public class DomainObjectExplorer extends javax.swing.JFrame 
 {
     
     /**
@@ -79,7 +52,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jSplitPaneCentral.setLeftComponent(jOutlinePanePersistenceUnits);
         
         // replace JDesktopPane with a better  MDI container
-        mdiDesktopPane = new MDIDesktopPane();
         jScrollDesktopPane.setViewportView(mdiDesktopPane);
         jSplitPaneCentral.setRightComponent(jScrollDesktopPane);
         jMainMenuBar.add(new WindowMenu(mdiDesktopPane), 2);
@@ -88,7 +60,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         
         
         // status bar initialization
-        ResourceMap resourceMap = Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class);
+        ResourceMap resourceMap = org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class);
         int busyAnimationRate = resourceMap.getInteger("StatusBar.busyAnimationRate");
         for (int i = 0; i < busyIcons.length; i++) {
             busyIcons[i] = resourceMap.getIcon("StatusBar.busyIcons[" + i + "]");
@@ -119,7 +91,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         // if(jComboBoxEntityClass.getItemCount() == 0) error = new ApplicationException("No persistent entities found.");
         
         if(error != null) {
-           JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Error: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+           getWindowManager().showMessageDialog("Error: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         
     }
@@ -166,11 +138,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuHelp = new javax.swing.JMenu();
         jMenuItemAbout = new javax.swing.JMenuItem();
 
-        jMenuItemNew.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("createNewEntity"));
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this);
+
+        jMenuItemNew.setAction(actionMap.get("createNewEntity"));
         jMenuItemNew.setMnemonic('n');
         jPopupMenuContextual.add(jMenuItemNew);
 
-        jMenuItemManager.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("manageEntityClass"));
+        jMenuItemManager.setAction(actionMap.get("manageEntityClass"));
         jMenuItemManager.setMnemonic('m');
         jMenuItemManager.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
         jPopupMenuContextual.add(jMenuItemManager);
@@ -183,7 +157,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             }
         });
 
-        jButtonConnectionProperties.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("openConnectionManager"));
+        jButtonConnectionProperties.setAction(actionMap.get("openConnectionManager"));
         jButtonConnectionProperties.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonConnectionProperties.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jButtonConnectionProperties.addActionListener(new java.awt.event.ActionListener() {
@@ -197,7 +171,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jSeparator3.setMaximumSize(new java.awt.Dimension(4, 0));
         jToolBar.add(jSeparator3);
 
-        jButtonCut.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("cut"));
+        jButtonCut.setAction(actionMap.get("cut"));
         jButtonCut.setFocusable(false);
         jButtonCut.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonCut.setName("cutToolBarButton"); // NOI18N
@@ -209,7 +183,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
         jToolBar.add(jButtonCut);
 
-        jButtonCopy.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("copy"));
+        jButtonCopy.setAction(actionMap.get("copy"));
         jButtonCopy.setFocusable(false);
         jButtonCopy.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonCopy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -220,7 +194,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
         jToolBar.add(jButtonCopy);
 
-        jButtonPaste.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("paste"));
+        jButtonPaste.setAction(actionMap.get("paste"));
         jButtonPaste.setFocusable(false);
         jButtonPaste.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonPaste.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -268,7 +242,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuFile.add(jMenuManage);
         jMenuFile.add(jSeparator1);
 
-        jMenuItemExit.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("exit"));
+        jMenuItemExit.setAction(actionMap.get("exit"));
         jMenuItemExit.setMnemonic('x');
         jMenuFile.add(jMenuItemExit);
 
@@ -277,7 +251,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuEdit.setMnemonic('e');
         jMenuEdit.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("editMenu.text")); // NOI18N
 
-        jMenuItemCut.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("cut"));
+        jMenuItemCut.setAction(actionMap.get("cut"));
         jMenuItemCut.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemClipboardActionPerformed(evt);
@@ -285,7 +259,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
         jMenuEdit.add(jMenuItemCut);
 
-        jMenuItemCopy.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("copy"));
+        jMenuItemCopy.setAction(actionMap.get("copy"));
         jMenuItemCopy.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemClipboardActionPerformed(evt);
@@ -293,7 +267,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         });
         jMenuEdit.add(jMenuItemCopy);
 
-        jMenuItemPaste.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("paste"));
+        jMenuItemPaste.setAction(actionMap.get("paste"));
         jMenuItemPaste.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemClipboardActionPerformed(evt);
@@ -302,7 +276,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuEdit.add(jMenuItemPaste);
         jMenuEdit.add(jSeparator2);
 
-        jMenuItemConnectionProperties.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("openConnectionManager"));
+        jMenuItemConnectionProperties.setAction(actionMap.get("openConnectionManager"));
         jMenuItemConnectionProperties.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItemConnectionPropertiesActionPerformed(evt);
@@ -315,7 +289,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuHelp.setMnemonic('h');
         jMenuHelp.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("helpMenu.text")); // NOI18N
 
-        jMenuItemAbout.setAction(org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this).get("about"));
+        jMenuItemAbout.setAction(actionMap.get("about"));
         jMenuItemAbout.setMnemonic('a');
         jMenuHelp.add(jMenuItemAbout);
 
@@ -460,10 +434,17 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }
 
 
-    public JDesktopPane getDesktopPane()
+
+    
+    public void setWindowManager(WindowManager windowManager)
     {
-        return this.mdiDesktopPane;
+        this.windowManager = windowManager;
     }
+    
+    public WindowManager getWindowManager()
+    {
+        return this.windowManager;
+    }    
     
 
     public void showStatus(String msg)
@@ -587,7 +568,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                         String puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
                         Class  entityClass = (Class)list.getSelectedValue();
                         if( (evt.getClickCount() > 1) && (entityClass != null) ) {
-                            openInternalFrameEntityManager(puName, entityClass);
+                            getWindowManager().openInternalFrameEntityManager(puName, entityClass);
                         }
                     } catch(Exception ex) {
                         showStatus("Error: " + ex.getMessage());
@@ -601,6 +582,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             for(Class entityClass : persistenceEntities) addEntityClassActions(persistenceUnit, entityClass);
         }
     }
+    
     
     public static Collection<Class> getVisiblePersistentEntities(String persistenceUnit) throws Exception
     {
@@ -620,7 +602,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     @org.jdesktop.application.Action
     public void about() {
-        JOptionPane.showInternalMessageDialog(mdiDesktopPane, "Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
+        getWindowManager().showMessageDialog("Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
     }
 
     
@@ -674,15 +656,15 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             }
 
-            DomainObjectExplorer.getInstance().openInternalFrameEntityManager(puName, entityClass);
+            getWindowManager().openInternalFrameEntityManager(puName, entityClass);
             
         } catch(ApplicationException ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }
@@ -712,15 +694,15 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             }
             
-            DomainObjectExplorer.getInstance().openInternalFrameEntityEditor(puName, entityClass, null);
+            getWindowManager().openInternalFrameEntityEditor(puName, entityClass, null);
             
         } catch(ApplicationException ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            JOptionPane.showInternalMessageDialog(DomainObjectExplorer.getInstance().getDesktopPane(), "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }
@@ -728,64 +710,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     
 
-    public void openInternalFrameEntityManager(String puName, Class entityClass) throws Exception
-    {
-        final Object key = entityClass.getName() + "Manager";
-        JInternalFrame oldFrame = openedInternalFrames.get(key);
-        if(oldFrame != null) {
-
-            if(oldFrame.isIcon()) oldFrame.setIcon(false);
-            oldFrame.setSelected(true);
-            
-        } else {
-
-            String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass) + " manager";
-            JInternalFrame iFrame = new JInternalFrame(title, true, true, true, false );
-            iFrame.setFrameIcon(EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
-            iFrame.getContentPane().setLayout(new BorderLayout());
-            iFrame.getContentPane().add(new EntityManagerPane(puName, entityClass), BorderLayout.CENTER);
-            
-            iFrame.addInternalFrameListener(new InternalFrameAdapter() {
-                public void internalFrameClosed(InternalFrameEvent evt) {
-                    JInternalFrame iFrame = evt.getInternalFrame();
-                    iFrame.putClientProperty("acceptListeners", null);
-                    openedInternalFrames.remove(key);
-                }
-              });
-
-
-            openedInternalFrames.put(key, iFrame);
-            mdiDesktopPane.add(iFrame);
-            iFrame.setVisible(true);
-            iFrame.setSelected(true);
-
-        }
-    }
-    
-    
-    public JInternalFrame openInternalFrameEntityEditor(String puName, Class entityClass, Object entity) throws Exception
-    {
-        final Object key = (entity != null) ? entity : entityClass.getName() + "Editor";
-        JInternalFrame iFrame = openedInternalFrames.get(key);
-
-        if(iFrame == null) {
-            iFrame = new EntityEditorFrame(puName, entityClass, entity);
-            iFrame.addInternalFrameListener(new InternalFrameAdapter() {
-                public void internalFrameClosed(InternalFrameEvent evt) {
-                    openedInternalFrames.remove(key);
-                }
-              });
-
-            openedInternalFrames.put(key, iFrame);
-            mdiDesktopPane.add(iFrame);
-        }
-
-        if(iFrame.isIcon()) iFrame.setIcon(false);
-        iFrame.setVisible(true);
-        iFrame.setSelected(true);
-        
-        return iFrame;
-    }
 
     // </editor-fold>
 
@@ -827,7 +751,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     /** Other UI components */
     private static DomainObjectExplorer DOE = null;
-    private MDIDesktopPane mdiDesktopPane = null;
+    
+    private MDIDesktopPane mdiDesktopPane = new MDIDesktopPane();
+    private WindowManager  windowManager = new DefaultWindowManager(mdiDesktopPane);
+    
     private JOutlinePane jOutlinePanePersistenceUnits = new JOutlinePane();
 
     /** Connection Manager */ 
@@ -835,7 +762,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private ConnectionManager connectionManagerFrame = null;
 
     /** Caches */ 
-    private HashMap<Object,JInternalFrame> openedInternalFrames = new HashMap<Object,JInternalFrame>();
     private HashMap<String,JMenuItem> newMenuItemsForPUandEntityClasses = new HashMap<String,JMenuItem>();
     private HashMap<String,JMenuItem> manageMenuItemsForPUandEntityClasses = new HashMap<String,JMenuItem>();
 
@@ -847,9 +773,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private int busyIconIndex = 0;
     
     private org.jdesktop.application.TaskMonitor taskMonitor;
-    
-    
+
     // </editor-fold>
     
 
+
+    
 }
