@@ -149,7 +149,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuItemManager.setText(org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class).getString("managerMenu.text")); // NOI18N
         jPopupMenuContextual.add(jMenuItemManager);
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        //setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Domain Object Explorer for EJB3");
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowOpened(java.awt.event.WindowEvent evt) {
@@ -636,7 +636,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     @org.jdesktop.application.Action
     public void manageEntityClass(ActionEvent evt) {
         try {
-            DomainObjectExplorer.getInstance().showStatus("");
+            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
             
             // Check "File-->Manage-->Entity" class:
             javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
@@ -674,7 +674,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     @org.jdesktop.application.Action
     public void createNewEntity(ActionEvent evt) {
         try {
-            DomainObjectExplorer.getInstance().showStatus("");
+            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
 
             // Check "File-->New-->Entity" class:
             javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();

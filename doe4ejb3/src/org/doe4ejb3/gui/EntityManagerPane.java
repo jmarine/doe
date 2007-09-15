@@ -211,7 +211,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
     private void jMenuItemContextualDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualDeleteActionPerformed
         try {
-            DomainObjectExplorer.getInstance().showStatus("");
+            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
             
             if(listSelectionModel.getMinSelectionIndex() == -1) {
                 throw new ApplicationException("There are not selected objects.");
@@ -234,7 +234,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             }
             
 
-            DomainObjectExplorer.getInstance().showStatus("Selected items has been deleted.");
+            DomainObjectExplorer.getInstance().getWindowManager().showStatus("Selected items has been deleted.");
             
             
         } catch(ApplicationException ex) {
@@ -250,7 +250,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
     private void jMenuItemContextualEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualEditActionPerformed
         try {
-            DomainObjectExplorer.getInstance().showStatus("");
+            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
             
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
@@ -278,7 +278,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
     private void jMenuItemContextualNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualNewActionPerformed
         try {
-            DomainObjectExplorer.getInstance().showStatus("");
+            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
             
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
@@ -313,7 +313,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(0,0,0,0));
 
         } else {
-            DomainObjectExplorer.getInstance().showStatus("Searching parameter types...");
+            DomainObjectExplorer.getInstance().getWindowManager().showStatus("Searching parameter types...");
             
             ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
             NamedQuery namedQuery = (NamedQuery)listItem.getValue();
@@ -348,7 +348,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             
         }
         
-        DomainObjectExplorer.getInstance().showStatus("done");            
+        DomainObjectExplorer.getInstance().getWindowManager().showStatus("done");            
         revalidate();
 
     }//GEN-LAST:event_jComboBoxNamedQueryItemStateChanged
@@ -385,7 +385,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                 List entities = null;
                 try {
                     EntityManagerPane.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    DomainObjectExplorer.getInstance().showStatus("Searching...");
+                    DomainObjectExplorer.getInstance().getWindowManager().showStatus("Searching...");
                     if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
                         entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entityClass);
 
