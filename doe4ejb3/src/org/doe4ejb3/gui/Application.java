@@ -7,10 +7,13 @@
 
 package org.doe4ejb3.gui;
 
-import org.jdesktop.application.SingleFrameApplication;
 import java.awt.Window;
 import java.util.EventObject;
 import javax.swing.JOptionPane;
+
+import org.jdesktop.application.SingleFrameApplication;
+import org.doe4ejb3.util.DOEUtils;
+
 
 
 public class Application extends SingleFrameApplication {
@@ -22,7 +25,7 @@ public class Application extends SingleFrameApplication {
        setMainFrame(DomainObjectExplorer.getInstance());
        addExitListener(new ExitListener() {
             public boolean canExit(EventObject e) {
-                int option = DomainObjectExplorer.getInstance().getWindowManager().showConfirmDialog( 
+                int option = DOEUtils.getWindowManager().showConfirmDialog( 
                                 "Do you really want to exit?", "Exit confirmation", JOptionPane.YES_NO_OPTION) ;
                 return option == JOptionPane.YES_OPTION;
             }

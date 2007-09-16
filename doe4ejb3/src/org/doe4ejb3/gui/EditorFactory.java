@@ -62,6 +62,7 @@ import org.doe4ejb3.event.EntityEvent;
 import org.doe4ejb3.event.EntityListener;
 import org.doe4ejb3.event.EntityTransferHandler;
 import org.doe4ejb3.exception.ApplicationException;
+import org.doe4ejb3.util.DOEUtils;
 import org.doe4ejb3.util.JPAUtils;
 
 
@@ -173,15 +174,15 @@ public class EditorFactory
                                 try { 
                                     if(combo.getSelectedIndex() >= 0) {
                                         Object entity = comboBoxModel.getSelectedItem();
-                                        WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
-                                        Object window = wm.openInternalFrameEntityEditor(puName, optionClass, entity);
+                                        WindowManager wm = DOEUtils.getWindowManager();
+                                        Object window = DOEUtils.openInternalFrameEntityEditor(puName, optionClass, entity);
                                         final EventListenerList listenerList = wm.getEventListenerList(window);
                                         listenerList.add(EntityListener.class, relationshipListener);
                                     }
                                 } catch(ApplicationException ex) { 
-                                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 } catch(Exception ex) { 
-                                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 }
                             }
                         };         
@@ -189,14 +190,14 @@ public class EditorFactory
                         AbstractAction newItemAction = new AbstractAction("New", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
                             public void actionPerformed(ActionEvent evt)  {
                                 try { 
-                                    WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
-                                    Object window = wm.openInternalFrameEntityEditor(puName, optionClass, null);
+                                    WindowManager wm = DOEUtils.getWindowManager();
+                                    Object window = DOEUtils.openInternalFrameEntityEditor(puName, optionClass, null);
                                     final EventListenerList listenerList = wm.getEventListenerList(window);
                                     listenerList.add(EntityListener.class, relationshipListener);
                                 } catch(ApplicationException ex) { 
-                                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 } catch(Exception ex) { 
-                                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                                 }
                             }
                         };
@@ -223,7 +224,7 @@ public class EditorFactory
                                         comboBoxModel.removeAllElements();
                                         comboBoxModel.addElement(null);
                                         System.out.println("Searching items!!!");
-                                        for(Object option : JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), puName, optionClass).toArray()) {
+                                        for(Object option : JPAUtils.findAllEntities(puName, optionClass).toArray()) {
                                             comboBoxModel.addElement(option);
                                         }
                                         comboBoxModel.setSelectedItem(selectedItem);
@@ -625,8 +626,8 @@ public class EditorFactory
         AbstractAction newAction = new AbstractAction("New", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
-                    WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
-                    Object window = wm.openInternalFrameEntityEditor(puName, memberClass, null);
+                    WindowManager wm = DOEUtils.getWindowManager();
+                    Object window = DOEUtils.openInternalFrameEntityEditor(puName, memberClass, null);
                     if(!isManagerWindow) {
                         final EventListenerList listenerList = wm.getEventListenerList(window);
                         listenerList.add(EntityListener.class, new EntityListener() {
@@ -638,9 +639,9 @@ public class EditorFactory
                         });
                     }
                 } catch(ApplicationException ex) { 
-                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
                 } catch(Exception ex) { 
-                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);  
+                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);  
                     ex.printStackTrace();
                 }
             }
@@ -650,14 +651,14 @@ public class EditorFactory
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                        List allValues = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), puName, memberClass);
+                        List allValues = JPAUtils.findAllEntities(puName, memberClass);
                         Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
                         if(newItem != null) {
                             // FIXME: caution with duplicated relations and "Set" collection types.
                             if(!listModel.contains(newItem)) {  
                                 listModel.addElement(newItem);
                             } else {
-                                DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
+                                DOEUtils.getWindowManager().showMessageDialog( "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     } finally {
@@ -674,8 +675,8 @@ public class EditorFactory
                     } else {
                         for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
                             if(listSelectionModel.isSelectedIndex(index)) {
-                                WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
-                                Object window = wm.openInternalFrameEntityEditor(puName, memberClass, listModel.getElementAt(index)); 
+                                WindowManager wm = DOEUtils.getWindowManager();
+                                Object window = DOEUtils.openInternalFrameEntityEditor(puName, memberClass, listModel.getElementAt(index)); 
                                 EventListenerList listenerList = wm.getEventListenerList(window);
                                 listenerList.add(EntityListener.class, new EntityListener() {
                                     public void entityChanged(EntityEvent event) {
@@ -710,10 +711,10 @@ public class EditorFactory
                     }
                     
                 } catch(ApplicationException ex) { 
-                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
+                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
                     
                 } catch(Exception ex) { 
-                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
+                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
                     ex.printStackTrace();
                 }
            }
@@ -725,7 +726,7 @@ public class EditorFactory
                     if(listSelectionModel.isSelectionEmpty()) {
                         throw new ApplicationException("No items selected");
                     } else {
-                        int confirm = DomainObjectExplorer.getInstance().getWindowManager().showConfirmDialog( "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+                        int confirm = DOEUtils.getWindowManager().showConfirmDialog( "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
                         if(confirm == JOptionPane.OK_OPTION) 
                         {
                             try {
@@ -735,7 +736,7 @@ public class EditorFactory
                                         System.out.println("EditorFactory: removing selected index: " + index);
                                         if(isManagerWindow) {  // delete command from "EntityManagerPane"
                                             Object entity = listModel.getElementAt(index);
-                                            JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entity);                                
+                                            JPAUtils.removeEntity(puName, entity);                                
                                         }
                                         listModel.removeElementAt(index);
                                     }
@@ -747,10 +748,10 @@ public class EditorFactory
                     }
 
                 } catch(ApplicationException ex) { 
-                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
+                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
                     
                 } catch(Exception ex) { 
-                    DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
+                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         };         
@@ -766,9 +767,9 @@ public class EditorFactory
                             jTable.print(JTable.PrintMode.FIT_WIDTH, headerFormat, footerFormat);
                         }
                     } catch(ApplicationException ex) { 
-                        DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);                
+                        DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);                
                     } catch(Exception ex) {
-                        DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);
+                        DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
         };
@@ -777,7 +778,7 @@ public class EditorFactory
                 public void actionPerformed(ActionEvent evt)  
                 {        
                     JComponent source = (JComponent)evt.getSource();
-                    WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                    WindowManager wm = DOEUtils.getWindowManager();
                     Object window = wm.getWindowFromComponent(source);
                     if(window != null) wm.closeWindow(window);
                 }
@@ -793,7 +794,7 @@ public class EditorFactory
         deleteAction.setEnabled(false);
         copyAction.setEnabled(false);
         cutAction.setEnabled(false);
-        // pasteAction.setEnabled(DomainObjectExplorer.getInstance().getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
+        pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 boolean enabled = !listSelectionModel.isSelectionEmpty();
@@ -801,7 +802,7 @@ public class EditorFactory
                 deleteAction.setEnabled(enabled);
                 copyAction.setEnabled(enabled);
                 cutAction.setEnabled(!isManagerWindow && enabled);
-                // pasteAction.setEnabled(DomainObjectExplorer.getInstance().getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
+                pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
             }
         });
         
@@ -826,7 +827,7 @@ public class EditorFactory
                 copyAction.setEnabled(enabled);
                 cutAction.setEnabled(!isManagerWindow && enabled);
                 if(isManagerWindow) pasteAction.setEnabled(false);
-                // pasteAction.setEnabled(DomainObjectExplorer.getInstance().getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
+                pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
             }
         });
 

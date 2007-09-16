@@ -45,46 +45,59 @@ public class MDIDesktopPane extends JDesktopPane {
                            Math.max(1,(getParent().getHeight() - frame.getHeight())/2) );
     }
     
-    public Component add(JInternalFrame frame) {
-        return add(frame, false);
+    public Component add(Component frame) {
+        add(frame, null);
+        return frame;
+    }
+    
+    public void add(JInternalFrame frame, boolean center) {
+        add((Component)frame, (Object)center);
     }
 
-    public Component add(JInternalFrame frame, boolean center) {
-        Point p;
-        int w;
-        int h;
+    public void add(Component comp, Object constraints) {
+        if( (comp != null) && (comp instanceof JInternalFrame) ) {
+            Point p;
+            int w;
+            int h;
+            JInternalFrame frame = (JInternalFrame)comp;
+            boolean center = ( (constraints != null) && (constraints == Boolean.TRUE) ) ? true : false;
 
-        frame.pack();
-        Component retval=super.add(frame);
-        if(center) {
-            p = new Point( Math.max(1,(getParent().getWidth()  - frame.getWidth())/2), 
-                           Math.max(1,(getParent().getHeight() - frame.getHeight())/2) );
+            frame.pack();
+            super.add(comp, constraints);
+            if(center) {
+                p = new Point( Math.max(1,(getParent().getWidth()  - frame.getWidth())/2), 
+                               Math.max(1,(getParent().getHeight() - frame.getHeight())/2) );
+            } else {
+                p = new Point( 1 + (FRAME_POSITION * FRAME_OFFSET_X) % 100,
+                               1 + (FRAME_POSITION * FRAME_OFFSET_Y) % 120);
+                FRAME_POSITION++;
+            }
+            frame.setLocation(p.x, p.y);
+
+            if (frame.isResizable()) {
+                w = (int)frame.getSize().getWidth() + VERTICAL_SCROLL_SIZE;
+                h = (int)frame.getSize().getHeight();
+                if (p.x + w + FRAME_BORDER_SIZE > getParent().getWidth()) w = getParent().getWidth() - p.x - FRAME_BORDER_SIZE;
+                if (p.y + h + FRAME_BORDER_SIZE > getParent().getHeight()) h = getParent().getHeight() - p.y - FRAME_BORDER_SIZE;
+                frame.setSize(w, h);
+            }
+
+            moveToFront(frame);
+            frame.setVisible(true);
+            try {
+                frame.setSelected(true);
+            } catch (PropertyVetoException e) {
+                frame.toBack();
+            }
+
+            checkDesktopSize();
+            
         } else {
-            p = new Point( 1 + (FRAME_POSITION * FRAME_OFFSET_X) % 100,
-                           1 + (FRAME_POSITION * FRAME_OFFSET_Y) % 120);
-            FRAME_POSITION++;
-        }
-        frame.setLocation(p.x, p.y);
-        
-        if (frame.isResizable()) {
-            w = (int)frame.getSize().getWidth() + VERTICAL_SCROLL_SIZE;
-            h = (int)frame.getSize().getHeight();
-            if (p.x + w + FRAME_BORDER_SIZE > getParent().getWidth()) w = getParent().getWidth() - p.x - FRAME_BORDER_SIZE;
-            if (p.y + h + FRAME_BORDER_SIZE > getParent().getHeight()) h = getParent().getHeight() - p.y - FRAME_BORDER_SIZE;
-            frame.setSize(w, h);
+            
+            super.add(comp, constraints);
+            
         }
         
-        moveToFront(frame);
-        frame.setVisible(true);
-        try {
-            frame.setSelected(true);
-        } catch (PropertyVetoException e) {
-            frame.toBack();
-        }
-
-        checkDesktopSize();
-        
-        return retval;
     }
 
     public void remove(Component c) {

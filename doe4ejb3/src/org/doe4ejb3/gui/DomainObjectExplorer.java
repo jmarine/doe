@@ -25,6 +25,7 @@ import org.jdesktop.application.ResourceMap;
 import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.exception.ApplicationException;
 import org.doe4ejb3.util.JPAUtils;
+import org.doe4ejb3.util.DOEUtils;
 
 
 
@@ -39,6 +40,8 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     {
         Exception error = null;
         initComponents();
+        
+        DOEUtils.setWindowManager(new DefaultWindowManager(mdiDesktopPane, jLabelStatus));
 
         try {
             initPersistenceEntities();
@@ -91,7 +94,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         // if(jComboBoxEntityClass.getItemCount() == 0) error = new ApplicationException("No persistent entities found.");
         
         if(error != null) {
-           getWindowManager().showMessageDialog("Error: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+           DOEUtils.getWindowManager().showMessageDialog("Error: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         
     }
@@ -322,7 +325,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         }
         else if ("message".equals(propertyName)) {
             String text = (String)(evt.getNewValue());
-            showStatus((text == null) ? "" : text);
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, (text == null) ? "" : text);
         }
         else if ("progress".equals(propertyName)) {
             int value = (Integer)(evt.getNewValue());
@@ -349,7 +352,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         if(iFrame != null) {
             iFrame.restoreSubcomponentFocus(); // fix focus
             JComponent focusOwner = (JComponent)KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();  //  iFrame.getMostRecentFocusOwner(); ???
-            clipboardActionPerformed(focusOwner, evt);
+            org.doe4ejb3.event.ClipboardAction.performClipboardAction(focusOwner, evt);
         }
     }//GEN-LAST:event_jMenuItemClipboardActionPerformed
    
@@ -364,31 +367,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     
     // <editor-fold defaultstate="collapsed" desc=" Main menu events ">
 
-    public void clipboardActionPerformed(JComponent focusOwner, java.awt.event.ActionEvent evt) {
-        System.out.println("Clipboard action on control: " + focusOwner);
-        if(focusOwner != null) {
-            //if(focusOwner instanceof JScrollPane) {
-            //    focusOwner = (JComponent)((JScrollPane)focusOwner).getViewport().getView();
-            //}
-            ActionMap actionMap = focusOwner.getActionMap();
-            Action action = actionMap.get(evt.getActionCommand());
-            System.out.println("Clipboard action : " + action);
-            if (action != null) {
-                action.actionPerformed(new ActionEvent(focusOwner,
-                                          ActionEvent.ACTION_PERFORMED,
-                                          null));
-            }
-        }
-    }                    
-    
-    /*
-    public java.awt.datatransfer.Clipboard getClipboard()
-    {
-       java.awt.datatransfer.Clipboard clipboard = getToolkit().getSystemClipboard(); 
-       System.out.println("System clipboard: " + clipboard);
-       return clipboard;
-    }
-    */
+   
 
     // </editor-fold>
  
@@ -410,11 +389,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
    
     // <editor-fold defaultstate="collapsed" desc=" Public methods ">
-    public HashMap getConnectionParams()
-    {
-        return connectionParams;
-    }
-    
     public static final void main(String args[]) throws Exception
     {
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -432,27 +406,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         }
         return DOE;
     }
-
-
-
-    
-    public void setWindowManager(WindowManager windowManager)
-    {
-        this.windowManager = windowManager;
-    }
-    
-    public WindowManager getWindowManager()
-    {
-        return this.windowManager;
-    }    
-    
-
-    public void showStatus(String msg)
-    {
-        if(msg == null) msg = "";
-        this.jLabelStatus.setText(" " + msg);
-    }
-
 
 
 
@@ -568,10 +521,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                         String puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
                         Class  entityClass = (Class)list.getSelectedValue();
                         if( (evt.getClickCount() > 1) && (entityClass != null) ) {
-                            getWindowManager().openInternalFrameEntityManager(puName, entityClass);
+                            DOEUtils.openInternalFrameEntityManager(puName, entityClass);
                         }
                     } catch(Exception ex) {
-                        showStatus("Error: " + ex.getMessage());
+                        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Error: " + ex.getMessage());
                     }
                 }
             });
@@ -602,7 +555,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     @org.jdesktop.application.Action
     public void about() {
-        getWindowManager().showMessageDialog("Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
+        DOEUtils.getWindowManager().showMessageDialog("Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
     }
 
     
@@ -617,14 +570,10 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     {
         try {
             if(connectionManagerFrame == null) {
-                connectionManagerFrame = new ConnectionManager(connectionParams);
+                connectionManagerFrame = new ConnectionManager();
             }
-            if(connectionManagerFrame.getParent() == null) {
-                mdiDesktopPane.add(connectionManagerFrame, true);
-            }
-            mdiDesktopPane.centerFrame(connectionManagerFrame);
-            connectionManagerFrame.setVisible(true);
-            connectionManagerFrame.setSelected(true);
+            
+            DOEUtils.getWindowManager().showWindow(connectionManagerFrame, true);
             
         } catch(Exception ex) {
             System.out.println("DOE.openConnectionManager(): Error " + ex.getMessage());
@@ -636,7 +585,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     @org.jdesktop.application.Action
     public void manageEntityClass(ActionEvent evt) {
         try {
-            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
             
             // Check "File-->Manage-->Entity" class:
             javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
@@ -656,15 +605,15 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             }
 
-            getWindowManager().openInternalFrameEntityManager(puName, entityClass);
+            DOEUtils.openInternalFrameEntityManager(puName, entityClass);
             
         } catch(ApplicationException ex) {
             
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }
@@ -674,7 +623,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     @org.jdesktop.application.Action
     public void createNewEntity(ActionEvent evt) {
         try {
-            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
 
             // Check "File-->New-->Entity" class:
             javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
@@ -694,15 +643,15 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             }
             
-            getWindowManager().openInternalFrameEntityEditor(puName, entityClass, null);
+            DOEUtils.openInternalFrameEntityEditor(puName, entityClass, null);
             
         } catch(ApplicationException ex) {
             
-            getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }
@@ -753,12 +702,9 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private static DomainObjectExplorer DOE = null;
     
     private MDIDesktopPane mdiDesktopPane = new MDIDesktopPane();
-    private WindowManager  windowManager = new DefaultWindowManager(mdiDesktopPane);
-    
-    private JOutlinePane jOutlinePanePersistenceUnits = new JOutlinePane();
+    private JOutlinePane   jOutlinePanePersistenceUnits = new JOutlinePane();
 
     /** Connection Manager */ 
-    private HashMap<String,String> connectionParams = new HashMap<String,String>();
     private ConnectionManager connectionManagerFrame = null;
 
     /** Caches */ 
