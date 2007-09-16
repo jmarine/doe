@@ -1,31 +1,26 @@
-/*
+/**
  * ConnectionManager.java
  *
  * Created on January 27, 2007, 8:38 PM
+ * @author Jordi Marine Fort
  */
 
 package org.doe4ejb3.gui;
-import java.util.HashMap;
+
+import org.doe4ejb3.util.DOEUtils;
 import org.doe4ejb3.util.JPAUtils;
 
-/**
- *
- * @author  jordi
- */
+
 public class ConnectionManager extends javax.swing.JInternalFrame
 {
-    private HashMap<String,String> connectionParams = null;
+
     private String username = "";
     private String password = "";
 
     
     /** Creates new form ConnectionManager */
     public ConnectionManager() {
-        this(new HashMap<String,String>());
-    }
-    public ConnectionManager(HashMap<String,String> connectionParams) {
         initComponents();
-        this.connectionParams = connectionParams;
     }
     
     /** This method is called from within the constructor to
@@ -113,25 +108,20 @@ public class ConnectionManager extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
+        // Restore authentication parameters
         jTextFieldUsername.setText(username);
         jPasswordField.setText(password);
+        
         close();
     }//GEN-LAST:event_jButtonCancelActionPerformed
 
     private void jButtonAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAcceptActionPerformed
-        // Setup authentication properties:
+        // Remember new authentication parameters:
         username = jTextFieldUsername.getText();
         password = new String(jPasswordField.getPassword());
 
-        if( (username != null) && (username.length() > 0) ) {
-            connectionParams.put(JPAUtils.GENERIC_USER_PROPERTY_NAME, username);
-            if( (password != null) && (password.length() > 0) ) connectionParams.put(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME, password);
-            else connectionParams.remove(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME);
-        } else {
-            connectionParams.remove(JPAUtils.GENERIC_USER_PROPERTY_NAME);
-            connectionParams.remove(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME);
-        }
-
+        JPAUtils.setConnectionParams(username, password);
+        
         close();
     }//GEN-LAST:event_jButtonAcceptActionPerformed
     
@@ -145,11 +135,7 @@ public class ConnectionManager extends javax.swing.JInternalFrame
     private javax.swing.JTextField jTextFieldUsername;
     // End of variables declaration//GEN-END:variables
 
-    
-    public HashMap getConnectionParams()
-    {
-        return connectionParams;
-    }
+
     
     private void close()
     {

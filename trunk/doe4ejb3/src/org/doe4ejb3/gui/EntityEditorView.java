@@ -37,7 +37,7 @@ public class EntityEditorView extends javax.swing.JPanel
         this.entityClass = entityClass;
         this.defaultActionsCount = jButtonsPanel.getComponentCount();
         
-        DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
+        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
         
         System.out.println("Creating internal frame");
         
@@ -159,7 +159,7 @@ public class EntityEditorView extends javax.swing.JPanel
     @org.jdesktop.application.Action
     public org.jdesktop.application.Task delete() 
     {
-        int confirm = DomainObjectExplorer.getInstance().getWindowManager().showConfirmDialog( "Do you really want to delete this object?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+        int confirm = DOEUtils.getWindowManager().showConfirmDialog( "Do you really want to delete this object?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
         if(confirm != JOptionPane.OK_OPTION) {                
             return null;
         } else {
@@ -183,11 +183,11 @@ public class EntityEditorView extends javax.swing.JPanel
         
         if(printJob.printDialog()) {        
             try {
-                DomainObjectExplorer.getInstance().getWindowManager().showStatus(MessageFormat.format("Printing {0}.", JPAUtils.getEntityName(entityClass)));
+                DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, MessageFormat.format("Printing {0}.", JPAUtils.getEntityName(entityClass)));
                 printJob.print();
-                DomainObjectExplorer.getInstance().getWindowManager().showStatus("Printing job has been submited");
+                DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Printing job has been submited");
             } catch(PrinterException pe) {
-                DomainObjectExplorer.getInstance().getWindowManager().showStatus("Printing error: " + pe.getMessage());
+                DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Printing error: " + pe.getMessage());
                 System.out.println("Printing error: " + pe.getMessage());
                 pe.printStackTrace();
             }                    
@@ -197,7 +197,7 @@ public class EntityEditorView extends javax.swing.JPanel
 
     @org.jdesktop.application.Action
     public void close() {
-        WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+        WindowManager wm = DOEUtils.getWindowManager();
         Object window = wm.getWindowFromComponent(this);
         wm.closeWindow(window);
     }
@@ -231,13 +231,13 @@ public class EntityEditorView extends javax.swing.JPanel
                 EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 setMessage(MessageFormat.format("Saving {0}.", JPAUtils.getEntityName(entityClass)));                    
                 Object oldEntity = editor.getEntity();
-                Object newEntity = JPAUtils.saveEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, oldEntity);
+                Object newEntity = JPAUtils.saveEntity(puName, oldEntity);
                 setMessage(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
 
                 EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
-                WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                WindowManager wm = DOEUtils.getWindowManager();
                 Object window = wm.getWindowFromComponent(EntityEditorView.this);
-                EventListenerList listenerList = DomainObjectExplorer.getInstance().getWindowManager().getEventListenerList(window);
+                EventListenerList listenerList = DOEUtils.getWindowManager().getEventListenerList(window);
                 Object[] listeners = listenerList.getListenerList();
                 for (int i = listeners.length-2; i>=0; i-=2) {
                     if (listeners[i]==EntityListener.class) {
@@ -276,13 +276,13 @@ public class EntityEditorView extends javax.swing.JPanel
                 EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                 setMessage(MessageFormat.format("Deleting {0}.", JPAUtils.getEntityName(entityClass)));                    
                 Object entity = editor.getEntity();
-                JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entity);
+                JPAUtils.removeEntity(puName, entity);
                 setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
 
                 EntityEvent entityEvent = new EntityEvent(this, EntityEvent.ENTITY_DELETE, entity, null);
-                WindowManager wm = DomainObjectExplorer.getInstance().getWindowManager();
+                WindowManager wm = DOEUtils.getWindowManager();
                 Object window = wm.getWindowFromComponent(EntityEditorView.this);
-                EventListenerList listenerList = DomainObjectExplorer.getInstance().getWindowManager().getEventListenerList(window);
+                EventListenerList listenerList = DOEUtils.getWindowManager().getEventListenerList(window);
                 Object[] listeners = listenerList.getListenerList();
                 for (int i = listeners.length-2; i>=0; i-=2) {
                     if (listeners[i]==EntityListener.class) {

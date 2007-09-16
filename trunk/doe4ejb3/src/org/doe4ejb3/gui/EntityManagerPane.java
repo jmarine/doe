@@ -25,8 +25,9 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 import org.doe4ejb3.exception.ApplicationException;
-import org.doe4ejb3.util.JPAUtils;
+import org.doe4ejb3.util.DOEUtils;
 import org.doe4ejb3.util.EJBQLUtils;
+import org.doe4ejb3.util.JPAUtils;
 
 
 public class EntityManagerPane extends javax.swing.JPanel implements EditorLayoutInterface
@@ -90,7 +91,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
             
         } catch(Exception ex) {
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
             ex.printStackTrace();
         }
         
@@ -211,13 +212,13 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
     private void jMenuItemContextualDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualDeleteActionPerformed
         try {
-            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
             
             if(listSelectionModel.getMinSelectionIndex() == -1) {
                 throw new ApplicationException("There are not selected objects.");
             }
 
-            int confirm = DomainObjectExplorer.getInstance().getWindowManager().showConfirmDialog( "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+            int confirm = DOEUtils.getWindowManager().showConfirmDialog( "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
             if(confirm == JOptionPane.OK_OPTION) 
             {
                 Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
@@ -227,30 +228,30 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                 {
                     if(listSelectionModel.isSelectedIndex(index)) {
                         Object entity = listModel.getElementAt(index);
-                        JPAUtils.removeEntity(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entity);
+                        JPAUtils.removeEntity(puName, entity);
                         listModel.removeElementAt(index);
                     }
                 }
             }
             
 
-            DomainObjectExplorer.getInstance().getWindowManager().showStatus("Selected items has been deleted.");
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Selected items has been deleted.");
             
             
         } catch(ApplicationException ex) {
             
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }//GEN-LAST:event_jMenuItemContextualDeleteActionPerformed
 
     private void jMenuItemContextualEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualEditActionPerformed
         try {
-            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
             
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
@@ -261,16 +262,16 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             } else {
                 Object entity = listModel.getElementAt(selectedIndexToEdit);
                 Class entityClass = entity.getClass();  // (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-                DomainObjectExplorer.getInstance().getWindowManager().openInternalFrameEntityEditor(puName, entityClass, entity);
+                DOEUtils.openInternalFrameEntityEditor(puName, entityClass, entity);
             }
             
         } catch(ApplicationException ex) {
             
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }
@@ -278,20 +279,20 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
     private void jMenuItemContextualNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemContextualNewActionPerformed
         try {
-            DomainObjectExplorer.getInstance().getWindowManager().showStatus("");
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
             
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
             Class entityClass = (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-            DomainObjectExplorer.getInstance().getWindowManager().openInternalFrameEntityEditor(puName, entityClass, null);
+            DOEUtils.openInternalFrameEntityEditor(puName, entityClass, null);
             
         } catch(ApplicationException ex) {
             
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            DomainObjectExplorer.getInstance().getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }
@@ -313,7 +314,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(0,0,0,0));
 
         } else {
-            DomainObjectExplorer.getInstance().getWindowManager().showStatus("Searching parameter types...");
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Searching parameter types...");
             
             ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
             NamedQuery namedQuery = (NamedQuery)listItem.getValue();
@@ -348,7 +349,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             
         }
         
-        DomainObjectExplorer.getInstance().getWindowManager().showStatus("done");            
+        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "done");            
         revalidate();
 
     }//GEN-LAST:event_jComboBoxNamedQueryItemStateChanged
@@ -385,21 +386,21 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                 List entities = null;
                 try {
                     EntityManagerPane.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    DomainObjectExplorer.getInstance().getWindowManager().showStatus("Searching...");
+                    DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Searching...");
                     if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
-                        entities = JPAUtils.findAllEntities(DomainObjectExplorer.getInstance().getConnectionParams(), puName, entityClass);
+                        entities = JPAUtils.findAllEntities(puName, entityClass);
 
                     } else if(jComboBoxNamedQuery.getSelectedIndex() == 1) {   // Custom query editor
                         String ejbql = customQueryEditor.getEJBQL();
                         HashMap parameterValues = customQueryEditor.getParameterValues();
-                        entities = JPAUtils.executeQuery(DomainObjectExplorer.getInstance().getConnectionParams(), puName, ejbql, parameterValues);
+                        entities = JPAUtils.executeQuery(puName, ejbql, parameterValues);
 
                     } else {  // NamedQuery: jComboBoxNamedQuery.getSelectedIndex() > 1
                         ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
                         NamedQuery namedQuery = (NamedQuery)listItem.getValue();
                         HashMap parameterValues = null;
                         if(queryParametersPanel != null) parameterValues = queryParametersPanel.getParameterValues();
-                        entities = JPAUtils.executeNamedQuery(DomainObjectExplorer.getInstance().getConnectionParams(), puName, namedQuery.name(), parameterValues);
+                        entities = JPAUtils.executeNamedQuery(puName, namedQuery.name(), parameterValues);
                     }
 
                 } finally {

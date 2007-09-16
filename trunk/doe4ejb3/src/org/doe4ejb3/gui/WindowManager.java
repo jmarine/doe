@@ -7,11 +7,13 @@
 
 package org.doe4ejb3.gui;
 
+import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 
 
 public interface WindowManager 
 {
+    Object createWindow(final Object key, String title, ImageIcon icon);
     Object findWindow(Object key);
     Object getActiveWindow();
     Object getWindowFromComponent(Object source);
@@ -26,8 +28,5 @@ public interface WindowManager
 
     EventListenerList getEventListenerList(Object window);
     
-    Object openInternalFrameEntityEditor(String puName, Class entityClass, Object entity) throws Exception;
-    void   openInternalFrameEntityManager(String puName, Class entityClass) throws Exception;
-    
-    void showStatus(String msg);
+    void showStatus(Object window, String msg);
 }
