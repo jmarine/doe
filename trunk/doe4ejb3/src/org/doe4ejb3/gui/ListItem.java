@@ -2,7 +2,7 @@
  * ListItem.java
  *
  * Created on 28 / maig / 2005, 10:02
- * @author Jordi Marine Fort
+ * @author Jordi Mariné Fort
  */
 
 package org.doe4ejb3.gui;

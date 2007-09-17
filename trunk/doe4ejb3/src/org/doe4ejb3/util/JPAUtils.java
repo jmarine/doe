@@ -41,6 +41,7 @@ import org.doe4ejb3.jaxb.persistence.Persistence;
 
 public class JPAUtils 
 {
+    public static final String GENERIC_PERSISTENCE_UNIT         = null;
     public static final String GENERIC_USER_PROPERTY_NAME       = "username";
     public static final String GENERIC_PASSWORD_PROPERTY_NAME   = "password";
     
@@ -63,16 +64,28 @@ public class JPAUtils
     private JPAUtils() { }
 
 
-    public static void setConnectionParams(String username, String password) 
+    public static void setConnectionParams(String puName, String username, String password) 
     {
+        String prefix = "";
+        if(puName != null) prefix = puName + "/";
         if( (username != null) && (username.length() > 0) ) {
-            connectionParams.put(JPAUtils.GENERIC_USER_PROPERTY_NAME, username);
-            if( (password != null) && (password.length() > 0) ) connectionParams.put(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME, password);
-            else connectionParams.remove(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME);
+            connectionParams.put(prefix+JPAUtils.GENERIC_USER_PROPERTY_NAME, username);
+            if( (password != null) && (password.length() > 0) ) connectionParams.put(prefix+JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME, password);
+            else connectionParams.remove(prefix+JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME);
         } else {
-            connectionParams.remove(JPAUtils.GENERIC_USER_PROPERTY_NAME);
-            connectionParams.remove(JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME);
+            connectionParams.remove(prefix+JPAUtils.GENERIC_USER_PROPERTY_NAME);
+            connectionParams.remove(prefix+JPAUtils.GENERIC_PASSWORD_PROPERTY_NAME);
         }
+    }
+    
+    public static String getConnectionParam(String puName, String propertyName)
+    {
+        String prefix = "";
+        if( (puName != null) && (connectionParams.get(puName+"/"+JPAUtils.GENERIC_USER_PROPERTY_NAME) != null) ) {
+            prefix = puName + "/";
+        }
+        
+        return connectionParams.get(prefix + propertyName);
     }
 
     
@@ -309,12 +322,12 @@ public class JPAUtils
         // TODO: the EntityManagerFactory should be pooled and create redefined EntityManager with specific user/password?
         String providerClass = getPersistenceProvider(puName);
         HashMap<String,String> providerConnectionParams = new HashMap<String,String>();
-        String username = (String)connectionParams.get(GENERIC_USER_PROPERTY_NAME);
+        String username = getConnectionParam(puName, GENERIC_USER_PROPERTY_NAME);
         if(username != null) {
             String userPropertyName = getUserPropertyName(providerClass);
             providerConnectionParams.put(userPropertyName, username);
         }
-        String password = (String)connectionParams.get(GENERIC_PASSWORD_PROPERTY_NAME);
+        String password = getConnectionParam(puName, GENERIC_PASSWORD_PROPERTY_NAME);
         if(password != null) {
             String passwordPropertyName = getPasswordPropertyName(providerClass);
             providerConnectionParams.put(passwordPropertyName, password);
