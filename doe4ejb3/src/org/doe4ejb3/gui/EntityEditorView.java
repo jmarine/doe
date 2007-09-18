@@ -63,6 +63,8 @@ public class EntityEditorView extends javax.swing.JPanel
         }
 
         updateActions();
+        revalidate();    
+        repaint();
     }
     
     private void updateActions()
@@ -214,7 +216,7 @@ public class EntityEditorView extends javax.swing.JPanel
     // End of variables declaration//GEN-END:variables
 
     
-    class SaveTask extends org.jdesktop.application.Task<Void, Void>
+    class SaveTask extends org.jdesktop.application.Task<Object, Void>
     {
         private boolean close = false;
         
@@ -225,15 +227,15 @@ public class EntityEditorView extends javax.swing.JPanel
         }
         
         @Override 
-        protected Void doInBackground() 
+        protected Object doInBackground() throws java.lang.Exception
         {
+            EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            
+            setMessage(MessageFormat.format("Saving {0}.", JPAUtils.getEntityName(entityClass)));                    
+            Object oldEntity = editor.getEntity();
+            Object newEntity = JPAUtils.saveEntity(puName, oldEntity);
+                
             try {
-                EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                setMessage(MessageFormat.format("Saving {0}.", JPAUtils.getEntityName(entityClass)));                    
-                Object oldEntity = editor.getEntity();
-                Object newEntity = JPAUtils.saveEntity(puName, oldEntity);
-                setMessage(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
-
                 EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
                 WindowManager wm = DOEUtils.getWindowManager();
                 Object window = wm.getWindowFromComponent(EntityEditorView.this);
@@ -244,22 +246,61 @@ public class EntityEditorView extends javax.swing.JPanel
                         System.out.println("EditorFactory: notification of tableChanged to: " + listeners[i+1]);
                         ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
                     }
-                }
+                }                
+            } catch(Exception ex) {
+                setMessage(MessageFormat.format("Saving notification error for {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
+                ex.printStackTrace();
+            } 
+            
+            return newEntity;
+        }
+        
 
-                if(close) {
-                    close();
-                } else {
+        
+        @Override
+        protected void cancelled() 
+        {
+            setMessage("Not saved.");
+        }        
+
+        @Override
+        protected void succeeded(Object newEntity) 
+        {
+            setMessage(MessageFormat.format("{0} saved.", JPAUtils.getEntityName(entityClass)));
+
+            if(close) {
+                close();
+            } else {
+                try {
                     // FIXME: DOE's window manager allows to open created entities in other windows
                     EntityEditorView.this.setEntity(newEntity);
+                } catch(Exception ex) {
+                    setMessage("Error loading saved entity: " + ex.getMessage());
                 }
-            } catch(Exception ex) {
-                setMessage(MessageFormat.format("Error saving {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
-                ex.printStackTrace();
-            } finally {
-                EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
-            return null;
+
         }
+
+        @Override
+        protected void interrupted(InterruptedException ex) 
+        {
+            setMessage("Not saved: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        @Override
+        protected void failed(Throwable cause) 
+        {
+            setMessage("Error: " + cause.getClass().getName() + ":" + getMessage());
+            cause.printStackTrace();
+        }
+        
+        @Override
+        protected void finished()
+        {
+            EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));            
+        }
+
     }
     
     class DeleteTask extends org.jdesktop.application.Task<Void, Void>
@@ -270,15 +311,15 @@ public class EntityEditorView extends javax.swing.JPanel
         }
 
         @Override 
-        protected Void doInBackground() 
+        protected Void doInBackground() throws java.lang.Exception
         {        
-            try {
-                EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                setMessage(MessageFormat.format("Deleting {0}.", JPAUtils.getEntityName(entityClass)));                    
-                Object entity = editor.getEntity();
-                JPAUtils.removeEntity(puName, entity);
-                setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
+            EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            setMessage(MessageFormat.format("Deleting {0}.", JPAUtils.getEntityName(entityClass)));                    
+            Object entity = editor.getEntity();
+            JPAUtils.removeEntity(puName, entity);
+            setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
 
+            try {
                 EntityEvent entityEvent = new EntityEvent(this, EntityEvent.ENTITY_DELETE, entity, null);
                 WindowManager wm = DOEUtils.getWindowManager();
                 Object window = wm.getWindowFromComponent(EntityEditorView.this);
@@ -290,17 +331,47 @@ public class EntityEditorView extends javax.swing.JPanel
                         ((EntityListener)listeners[i+1]).entityChanged(entityEvent);
                     }
                 }
-
-                close();
             } catch(Exception ex) {
-                setMessage(MessageFormat.format("Error deleting {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
+                setMessage(MessageFormat.format("Delete notification error for {0}: {1}", JPAUtils.getEntityName(entityClass), ex.getMessage()));
                 ex.printStackTrace();
-            } finally {
-                EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
             }
 
             return null;
         }
+        
+        @Override
+        protected void cancelled() 
+        {
+            setMessage("Not saved.");
+        }        
+
+        @Override
+        protected void succeeded(Void result) 
+        {
+            close();
+        }
+
+        @Override
+        protected void interrupted(InterruptedException ex) 
+        {
+            setMessage("Not deleted: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+
+        @Override
+        protected void failed(Throwable cause) 
+        {
+            setMessage("Error: " + cause.getClass().getName() + ":" + getMessage());
+            cause.printStackTrace();
+        }
+                
+        
+        @Override
+        protected void finished()
+        {
+            EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));            
+        }
+        
     }
     
 }
