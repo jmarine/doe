@@ -37,8 +37,6 @@ public class DOEUtils
     }    
     
     
-
-
     
     
     public static void openInternalFrameEntityManager(String puName, Class entityClass) throws Exception
