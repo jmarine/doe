@@ -156,6 +156,13 @@ public class DefaultWindowManager implements WindowManager
         return eventListenerList;
     }
     
+    public void setWindowTitle(Object window, String title)
+    {
+        JInternalFrame iFrame = (JInternalFrame)window;
+        if(title == null) title = "";
+        iFrame.setTitle(title);
+    }
+    
     public void showStatus(Object window, String msg)
     {
         if(msg == null) msg = "";

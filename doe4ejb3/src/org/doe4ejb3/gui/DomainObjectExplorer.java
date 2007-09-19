@@ -304,37 +304,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     
-    private void taskMonitorPropertyChange(java.beans.PropertyChangeEvent evt) {                                     
-        String propertyName = evt.getPropertyName();
-        if ("started".equals(propertyName)) {
-            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-            if (!busyIconTimer.isRunning()) {
-                jStatusAnimationLabel.setIcon(busyIcons[0]);
-                busyIconIndex = 0;
-                busyIconTimer.start();
-            }
-            jProgressBar.setVisible(true);
-            jProgressBar.setIndeterminate(true);
-        }
-        else if ("done".equals(propertyName)) {
-            busyIconTimer.stop();
-            jStatusAnimationLabel.setIcon(idleIcon);
-            jProgressBar.setVisible(false);
-            jProgressBar.setValue(0);
-            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        }
-        else if ("message".equals(propertyName)) {
-            String text = (String)(evt.getNewValue());
-            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, (text == null) ? "" : text);
-        }
-        else if ("progress".equals(propertyName)) {
-            int value = (Integer)(evt.getNewValue());
-            jProgressBar.setVisible(true);
-            jProgressBar.setIndeterminate(false);
-            jProgressBar.setValue(value);
-        }
-    }                                    
-
 
     private void jMenuItemConnectionPropertiesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItemConnectionPropertiesActionPerformed
         openConnectionManager();
@@ -364,30 +333,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
 
     // </editor-fold>
 
-    
-    // <editor-fold defaultstate="collapsed" desc=" Main menu events ">
 
-   
-
-    // </editor-fold>
- 
-    
-    // <editor-fold defaultstate="collapsed" desc=" Contextual menu events ">
-    
-    // </editor-fold>
-
-    
-    // <editor-fold defaultstate="collapsed" desc=" ToolBar events ">
-    
-    // </editor-fold>
-
-    
-    // <editor-fold defaultstate="collapsed" desc=" Other application events ">
-
-    
-    // </editor-fold>
-
-   
     // <editor-fold defaultstate="collapsed" desc=" Public methods ">
     public static final void main(String args[]) throws Exception
     {
@@ -407,6 +353,21 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         return DOE;
     }
 
+    
+    public static Collection<Class> getVisiblePersistentEntities(String persistenceUnit) throws Exception
+    {
+        Collection<Class> persistenceEntities = org.doe4ejb3.util.JPAUtils.getPersistentEntities(persistenceUnit);
+        Iterator<Class> iter = persistenceEntities.iterator();
+        while(iter.hasNext()) {
+            Class entityClass = iter.next();
+            EntityDescriptor ed = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
+            if( (ed != null) && (ed.hidden()) ) {
+                iter.remove();
+            }
+        }
+
+        return persistenceEntities;
+    }
 
 
     public void addEntityClassActions(String puName, Class entityClass)
@@ -449,6 +410,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         System.out.println("DomainObjectExplorer: added managed entity class: " +  entityClass.getName());
     }
     
+    
     public void removePersistenceUnit(String puName)
     {
         // TODO:
@@ -468,41 +430,43 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         System.out.println("DomainObjectExplorer: removed persistence unit: " + puName);
     }
 
-/*    
-    public byte[] openFileDialogFromJwsApp(String extensionFilters[]) throws Exception
-    {
-        BufferedInputStream bis = null;
-        try {
-            FileOpenService fos = (FileOpenService)ServiceManager.lookup("javax.jnlp.FileOpenService");
-            FileContents fileContents = fos.openFileDialog(null, extensionFilters);
-            byte data[] = new byte[(int)fileContents.getLength()];
-            bis = new BufferedInputStream(fileContents.getInputStream());
-            int len = bis.read(data, 0, data.length);
-            if(len < data.length) throw new Exception("Cannot get all content in 1 read.");
-            return data;
-           
-        } finally {
-            if(bis != null) {
-                try { bis.close(); bis = null; }
-                catch(Exception ex) { }
-            }
-        }
-    }
-    
-    
-    public ImageIcon createImageIcon(byte imageRawData[]) throws Exception
-    {
-        Image img = this.getToolkit().createImage(imageRawData);
-        return new ImageIcon(img);
-    }
- */
-
-
 
     // </editor-fold>
     
     
     // <editor-fold defaultstate="collapsed" desc=" Private/protected methods ">
+    private void taskMonitorPropertyChange(java.beans.PropertyChangeEvent evt) {                                     
+        String propertyName = evt.getPropertyName();
+        if ("started".equals(propertyName)) {
+            setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+            if (!busyIconTimer.isRunning()) {
+                jStatusAnimationLabel.setIcon(busyIcons[0]);
+                busyIconIndex = 0;
+                busyIconTimer.start();
+            }
+            jProgressBar.setVisible(true);
+            jProgressBar.setIndeterminate(true);
+        }
+        else if ("done".equals(propertyName)) {
+            busyIconTimer.stop();
+            jStatusAnimationLabel.setIcon(idleIcon);
+            jProgressBar.setVisible(false);
+            jProgressBar.setValue(0);
+            setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
+        else if ("message".equals(propertyName)) {
+            String text = (String)(evt.getNewValue());
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, (text == null) ? "" : text);
+        }
+        else if ("progress".equals(propertyName)) {
+            int value = (Integer)(evt.getNewValue());
+            jProgressBar.setVisible(true);
+            jProgressBar.setIndeterminate(false);
+            jProgressBar.setValue(value);
+        }
+    }      
+    
+    
     protected void initPersistenceEntities() throws Exception
     {
         System.out.println("EntityContainer: initPersistentEntities...");
@@ -537,22 +501,12 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }
     
     
-    public static Collection<Class> getVisiblePersistentEntities(String persistenceUnit) throws Exception
-    {
-        Collection<Class> persistenceEntities = org.doe4ejb3.util.JPAUtils.getPersistentEntities(persistenceUnit);
-        Iterator<Class> iter = persistenceEntities.iterator();
-        while(iter.hasNext()) {
-            Class entityClass = iter.next();
-            EntityDescriptor ed = (EntityDescriptor)entityClass.getAnnotation(EntityDescriptor.class);
-            if( (ed != null) && (ed.hidden()) ) {
-                iter.remove();
-            }
-        }
 
-        return persistenceEntities;
-    }
+    // </editor-fold>
 
-
+    
+    // <editor-fold defaultstate="collapsed" desc=" Actions ">
+    
     @org.jdesktop.application.Action
     public void about() {
         DOEUtils.getWindowManager().showMessageDialog("Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);

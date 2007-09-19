@@ -95,6 +95,10 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             ex.printStackTrace();
         }
         
+        // Define public actions (for Netbeans integration)
+        this.getActionMap().put("printAction", entityListEditor.getActionMap().get("printAction"));
+
+        
     }
     
     /** This method is called from within the constructor to
