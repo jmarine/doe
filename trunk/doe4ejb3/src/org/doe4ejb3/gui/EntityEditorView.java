@@ -47,6 +47,9 @@ public class EntityEditorView extends javax.swing.JPanel
         
         JScrollPane scrollPaneForEditor = new JAutoScrollPaneOnComponentFocus(editor.getJComponent(), JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         this.add(scrollPaneForEditor, BorderLayout.CENTER);
+
+        // Define public actions (for Netbeans integration)
+        this.getActionMap().put("printAction", org.jdesktop.application.Application.getInstance().getContext().getActionMap(EntityEditorView.class, this).get("print"));
     }
     
     private void setEntity(Object entity) throws Exception 

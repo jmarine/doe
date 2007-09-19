@@ -28,5 +28,6 @@ public interface WindowManager
 
     EventListenerList getEventListenerList(Object window);
     
+    void setWindowTitle(Object window, String title);
     void showStatus(Object window, String msg);
 }
