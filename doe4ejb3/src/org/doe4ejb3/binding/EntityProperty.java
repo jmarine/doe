@@ -19,7 +19,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 
-public class EntityProperty extends PropertyExt 
+public class EntityProperty extends DoeProperty 
 {
     private String propertyName;
     
@@ -272,8 +272,8 @@ public class EntityProperty extends PropertyExt
     
     public boolean equals(Object obj)
     {
-        if( (obj != null) && (obj instanceof PropertyExt) ) {
-            PropertyExt p2 = (PropertyExt)obj;
+        if( (obj != null) && (obj instanceof DoeProperty) ) {
+            DoeProperty p2 = (DoeProperty)obj;
             return propertyName.equals(p2.getName());
         }
         return false;

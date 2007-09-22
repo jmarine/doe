@@ -15,7 +15,7 @@ import org.jdesktop.beansbinding.PropertyHelper;
 import org.jdesktop.beansbinding.PropertyStateListener;
 
 
-public abstract class PropertyExt extends PropertyHelper     
+public abstract class DoeProperty extends PropertyHelper     
 {
     
     public abstract String getName(); 
