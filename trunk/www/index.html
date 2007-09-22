@@ -60,7 +60,7 @@
         <li><b>Project Type:</b> Java Web Start application client</li>
         <li><b>License:</b> Common Development and Distribution License (CDDL) Version 1.0</li>
       </ul>
-The "Domain Object Explorer" is a rich desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without additional programming (althought it can also be customized by developers). The application can also be centrally managed from application server administrative console (for datasource configuration, deployment of persistence units, and delivery of application/updates via Java Web Start technology).
+The "Domain Object Explorer" is a rich desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without additional programming (althought it can be customized by developers). The application can also be centrally managed from application server administrative console (for datasource configuration, deployment of persistence units, and delivery of application/updates via Java Web Start technology).
       <!-- project info end -->
     </blockquote>
 
@@ -88,7 +88,7 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
     <ul>
       <li>Pros:</li>
       <ul>
-	<li>Easy management and testing of EJB3 entity beans.</li>
+	<li>Easy management and testing of simple EJB3 entity beans.</li>
         <li>Provides a rich user interface without any extra programming.</li>
 	<li>Auto-deployment of application and module updates via Java Web Start technology.</li>
         <li>Data sources can be centrally managed from application server administrative console</li>
@@ -111,17 +111,19 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
     <h3>Download</h3>
     </a>
     <blockquote>
-      There is no archived release, yet. But you can checkout the following "doe" projects from <a href="https://doe.dev.java.net/source/browse/doe/">CVS</a>.
-      <ol>
-	<li> "doe4ejb3" is the core library (it also contains custom annotations for EJB3 entities).</li>
+      There is no stable version, yet. But you can download preview releases from <a href="https://doe.dev.java.net/servlets/ProjectDocumentList?folderID=7649&expandFolder=7649&folderID=0">Document & files</a> or <a href="https://doe.dev.java.net/source/browse/doe/">CVS</a>.<br>
+      You will find the following projects:
+      <ul>
+	<li> "doe4ejb3" is the core library.</li>
  	<li> "doe4ejb3-app-client" is a Java EE 5 application client to be included in the users's enterprise application.</li>
-      </ol>
+      </ul>
  
       Also, there are the following example modules (based on "trails" demos):
- 	<ol>
+ 	<ul>
 	<li> "doe4ejb3-test-ejb3": sample EJB3 entity beans.</li>
  	<li> "doe4ejb3-test-app" : enterprise application with the "doe" application client to manage the previous "EJB3" entities.</li>
-  	</ol>
+	<li> "doe4nb6": simple integration module for Netbeans Platform 6.</li>
+  	</ul>
     </blockquote>
 
 
@@ -136,7 +138,7 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
         <li>Include the "doe4ejb3-app-client" into your Java EE 5 application.</li>
 	<li>Specify EJB3 entity class names in your "META-INF/persistence.xml" descriptors.</li>
 	<li>Assemble all modules into an EAR archive, and deploy to the application server.</li>
-	<li>Note: if you want to test "doe" with the sample EJB3 entities, you should have to create a database for the tests, configure the connection parameters in GlassFish administration console (the JDBC datasource should be named "jdbc/doe4ejb3"), then open the "doe4ejb3-test-app" project with NetBeans 5.5.1, and deploy into the application server.
+	<li>Note: if you want to test "doe" with the sample EJB3 entities, you should create a database for the tests, configure the connection parameters in GlassFish administration console (the JDBC datasource should be named "jdbc/doe4ejb3"), then open the "doe4ejb3-test-app" project with NetBeans 6.0, and deploy into the application server.
 	</li>
 	<li>Launch the new deployed "doe4ejb3-app-client" application from GlassFish administrative console.</li>
         <li>See the instructions below.</li>
@@ -170,9 +172,18 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
     </blockquote>
 
     <a name="screenshot">
-    <h3>Screenshot</h3>
+    <h3>Screenshots</h3>
     <blockquote>
-      <a href="images/screenshot.png" alt="Maximize screenshot"><img src="images/screenshot.png" alt="Screenshot" width="320" height="240" /></a>
+      <table border="0" cellpadding="5" cellspacing="5">
+      <tr>
+	<td>
+      	<a href="images/screenshot.png" alt="Maximize screenshot"><img src="images/screenshot.png" alt="Screenshot" width="320" height="240" /></a>
+	</td>
+	<td>
+	<a href="images/screenshot-nb6.png" alt="Maximize screenshot"><img src="images/screenshot-nb6.png" alt="Screenshot" width="320" height="240" /></a> 
+	</td>
+      </tr>
+      </table>
     </blockquote>
     </a>
 
@@ -209,6 +220,7 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
  <li>GUI API for customized actions in EJB3 entity beans.</li>
  <li>Load/unload of persistence units.</li>
  <li>More sample applications.</li>
+ <li>NetBeans Platform module.</li>
  </ul>
  </blockquote>
  
@@ -227,7 +239,9 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
 	    <li>Basic printing support.</li>
 	    <li>Custom queries in search panel.</li>
 	    <li>Custom actions in entity editor.</li>
+	    <li>Custom layout in entity editor (compiled components, or Abeille forms).</li>
  	    <li>Allows user authentication with database connections managed by client applications.</li>
+	    <li>API migration to jsr-295 (beans binding) and jsr-296 (swing application framework).</li>
 	    <li>Many bug fixes.</li>
 	  </ul>
         </li>
