@@ -56,7 +56,7 @@ import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.beans.TemporalTypeEditorSupport;
 import org.doe4ejb3.binding.EntityProperty;
 import org.doe4ejb3.binding.JComponentDataBinding;
-import org.doe4ejb3.binding.StatefulProperty;
+import org.doe4ejb3.binding.PropertyExt;
 import org.doe4ejb3.event.ClipboardAction;
 import org.doe4ejb3.event.EntityEvent;
 import org.doe4ejb3.event.EntityListener;
@@ -88,7 +88,7 @@ public class EditorFactory
         return entityEditor;
     }
     
-    public static JComponent getPropertyEditor(EditorLayoutInterface layout, final String puName, StatefulProperty property, int maxLength)
+    public static JComponent getPropertyEditor(EditorLayoutInterface layout, final String puName, Object source, PropertyExt property, int maxLength)
     {
         JComponent comp = null;
         java.beans.PropertyEditor editor = null;        
@@ -99,11 +99,11 @@ public class EditorFactory
         boolean isCollection = false;
         Class memberClass = null;
         try {
-            memberClass = property.getType();
+            memberClass = property.getWriteType(source);
             if(java.util.Collection.class.isAssignableFrom(memberClass)) {
                 isCollection = true;
                 System.out.println("EditorFactory: property " + property.getName() + " is a collection");
-                ParameterizedType paramType = (ParameterizedType)property.getGenericType();
+                ParameterizedType paramType = (ParameterizedType)property.getGenericType(source);
                 if(paramType != null) memberClass = (Class)(paramType.getActualTypeArguments()[0]);
             } else {
                 System.out.println("EditorFactory: property " + property.getName() + " is not a collection");
@@ -120,7 +120,7 @@ public class EditorFactory
                     try {
                         System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
                         Object bindingOutParam[] = new Object[1];
-                        comp = getCollectionEditor(layout, puName, property, memberClass, false, bindingOutParam);
+                        comp = getCollectionEditor(layout, puName, source, property, memberClass, false, bindingOutParam);
                         binding = bindingOutParam[0];
 
                     } catch(Exception ex) {
@@ -278,26 +278,26 @@ public class EditorFactory
                         }
 
 
-                        // Original binding (with setup of initial value):
+                        /* Original binding (with setup of initial value):
                         Method compGetter = combo.getClass().getMethod("getSelectedItem");
                         binding = new JComponentDataBinding(combo, compGetter, null, property);
 
                         Object value = property.getValue();
                         if(value != null) {
-                            combo.addItem(value);
+                            combo.addItem(value);  // FIXME: only when it doesn't exist, yet
                             combo.setSelectedItem(value);
                         } else {
                             combo.setSelectedIndex(0);
                         }
+                         */
 
                         
-                        /* Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
-                        // TODO? change StatefulProperty "property" --> source + beansbinding 1.0 stateless property
-                        System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JComboBox  (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
-                        Object value = property.getValue();
-                        if(value != null) combo.addItem(value);
-                        binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, property, BeanProperty.create("value"), combo, BeanProperty.create("selectedItem"));
-                        */
+                        // Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
+                        System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JComboBox");
+                        Object value = property.getValue(source);
+                        if(value != null) combo.addItem(value);  // FIXME: only when it doesn't exist, yet
+                        binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, combo, BeanProperty.create("selectedItem"));
+                        
                         
                     } catch(Exception ex) {
                         System.out.println("Error loading property: " + ex.getMessage());
@@ -346,16 +346,16 @@ public class EditorFactory
 
                         // Original binding (with setup of initial value):
                         Method editorGetter = propertyComponent.getClass().getMethod("getValue");
-                        Object value = property.getValue();
+                        Object value = property.getValue(source);
                         if(value != null) propertyComponent.setValue(value);
-                        binding = new JComponentDataBinding(propertyComponent, editorGetter, null, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).                
+                        binding = new JComponentDataBinding(propertyComponent, editorGetter, null, source, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).                
+
                         
-                    
-                        /* Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
-                        // TODO? change StatefulProperty "property" --> source + beansbinding 1.0 stateless property
-                        System.out.println("WARNING: jsr295 binding of PropertyDescriptor with editorClassName  (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
-                        binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, property, BeanProperty.create("value"), propertyComponent, BeanProperty.create("value"));
+                        /* Using beans binding 1.0 (the component must fire property changes)
+                        System.out.println("WARNING: jsr295 binding of PropertyDescriptor with editorClassName");
+                        binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, propertyComponent, BeanProperty.create("value"));
                         */
+
                         
                     } catch(Exception ex) {
                         comp = null;
@@ -398,11 +398,12 @@ public class EditorFactory
                         comp = panel;
                     }
 
-                    // Original binding (with setup of initial value):
+                    /* Original binding (with setup of initial value):
                     Method editorGetter = editor.getClass().getMethod("getValue");
                     Object value = property.getValue();
                     if(value != null) editor.setValue(value);
                     binding = new JComponentDataBinding(editor, editorGetter, null, property);  // the 3 parameter is null to get real value from "editor.getValue" method (no conversion to string representation).
+                    */
 
                     /** 
                      * Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
@@ -419,10 +420,10 @@ public class EditorFactory
                             }
                        }
                     });
-                    
-                    System.out.println("WARNING: jsr295 binding of PropertyEditor with custom control (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
-                    binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, property, BeanProperty.create("value"), editor, BeanProperty.create("value"));
                     */
+                    
+                    System.out.println("WARNING: jsr295 binding of PropertyEditor with custom control");
+                    binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, editor, BeanProperty.create("value"));
 
 
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
@@ -443,18 +444,17 @@ public class EditorFactory
 
                     // Original binding (with setup of initial value):
                     Method compGetter = checkBox.getClass().getMethod("isSelected");
-                    binding = new JComponentDataBinding(checkBox, compGetter, editor, property);
+                    binding = new JComponentDataBinding(checkBox, compGetter, editor, source, property);
 
-                    Object booleanObject = property.getValue();
+                    Object booleanObject = property.getValue(source);
                     Boolean value = (Boolean)booleanObject;
                     if(value != null) {
                         checkBox.setSelected(value.booleanValue());
                     }
                     
                     /* Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
-                    // TODO? change StatefulProperty "property" --> source + beansbinding 1.0 stateless property
-                    System.out.println("WARNING: jsr295 binding of boolean property (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");                    
-                    org.jdesktop.beansbinding.Binding stdBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, property, BeanProperty.create("value"), checkBox, BeanProperty.create("selected"));
+                    System.out.println("WARNING: jsr295 binding of boolean property");                    
+                    org.jdesktop.beansbinding.Binding stdBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, checkBox, BeanProperty.create("selected"));
                     stdBinding.setSourceNullValue(false);
                     binding = stdBinding;
                     */
@@ -508,8 +508,8 @@ public class EditorFactory
                     
                     
                     // Original binding (with setup of initial value):
-                    binding = new JComponentDataBinding(textField, compGetter, editor, property);                        
-                    Object value = property.getValue();
+                    binding = new JComponentDataBinding(textField, compGetter, editor, source, property);                        
+                    Object value = property.getValue(source);
                     if(value != null) {
                         if(editor != null) {
                             editor.setValue(value);
@@ -520,9 +520,8 @@ public class EditorFactory
                     }
                     
                     /* Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
-                    // TODO? change StatefulProperty "property" --> source + beansbinding 1.0 stateless property
-                    System.out.println("WARNING: jsr295 binding of text property (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");                    
-                    org.jdesktop.beansbinding.Binding stdBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, property, BeanProperty.create("value"), textField, BeanProperty.create("text"));
+                    System.out.println("WARNING: jsr295 binding of text property");
+                    org.jdesktop.beansbinding.Binding stdBinding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, textField, BeanProperty.create("text"));
                     stdBinding.setSourceNullValue("");
                     binding = stdBinding;
                     
@@ -579,7 +578,7 @@ public class EditorFactory
     /** 
      * Setup an editor for a multi-valued property 
      */
-    public static JComponent getCollectionEditor(EditorLayoutInterface layout, final String puName, final StatefulProperty property, final Class memberClass, final boolean isManagerWindow,Object bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(EditorLayoutInterface layout, final String puName, final Object source, final PropertyExt property, final Class memberClass, final boolean isManagerWindow,Object bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
         Object container = (property != null) ? layout.getComponentFromEditorLayout(JPanel.class, property.getName()) : null;  // search a JPanel holder for the relation and navigation commands.
         
         final JTable jTable = new JTable();
@@ -598,9 +597,9 @@ public class EditorFactory
         panel.putClientProperty("listSelectionModel", listSelectionModel);
         if(container != null) panel.putClientProperty("layout", layout);
         
-        if(property != null) {
+        if( (source != null) && (property != null) ) {
             // populate listmodel with property's values
-            Collection values = (Collection)property.getValue();
+            Collection values = (Collection)property.getValue(source);
             System.out.println("Property " + property.getName() + " collection size = " + values);
             if(values != null) {
                 Iterator iter = values.iterator();
@@ -612,13 +611,12 @@ public class EditorFactory
             
             // Original binding (with setup of initial value):
             Method modelGetter = listModel.getClass().getMethod("toArray");
-            bindingOutParam[0] = new JComponentDataBinding(listModel, modelGetter, null, property);
+            bindingOutParam[0] = new JComponentDataBinding(listModel, modelGetter, null, source, property);
 
             
             /* Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
-            // TODO? change StatefulProperty "property" --> source + beansbinding 1.0 stateless property
-            System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JTable (which requires beansbinding.jar endorsed in JavaWebStart's JRE)");
-            bindingOutParam[0] = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, property, BeanProperty.create("value"), entityTableModel, BeanProperty.create("values"));
+            System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JTable");
+            bindingOutParam[0] = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, entityTableModel, BeanProperty.create("values"));
             */
         }
 
@@ -735,8 +733,8 @@ public class EditorFactory
                                     if(listSelectionModel.isSelectedIndex(index)) {
                                         System.out.println("EditorFactory: removing selected index: " + index);
                                         if(isManagerWindow) {  // delete command from "EntityManagerPane"
-                                            Object entity = listModel.getElementAt(index);
-                                            JPAUtils.removeEntity(puName, entity);                                
+                                            Object entityToDelete = listModel.getElementAt(index);
+                                            JPAUtils.removeEntity(puName, entityToDelete);                                
                                         }
                                         listModel.removeElementAt(index);
                                     }
@@ -777,9 +775,8 @@ public class EditorFactory
         AbstractAction closeAction = new AbstractAction("Close", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cancel.png"))) {
                 public void actionPerformed(ActionEvent evt)  
                 {        
-                    JComponent source = (JComponent)evt.getSource();
                     WindowManager wm = DOEUtils.getWindowManager();
-                    Object window = wm.getWindowFromComponent(source);
+                    Object window = wm.getWindowFromComponent(evt.getSource());
                     if(window != null) wm.closeWindow(window);
                 }
         };

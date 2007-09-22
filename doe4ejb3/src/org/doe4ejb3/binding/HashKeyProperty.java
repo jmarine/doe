@@ -16,27 +16,19 @@ import java.util.HashMap;
  *
  * @author jordi
  */
-public class HashKeyProperty implements StatefulProperty 
+public class HashKeyProperty extends PropertyExt
 {
-    private HashMap hashMap;
     private String key;
     private Class type;
     private Type genericType;
     
-    public HashKeyProperty(HashMap hashMap, String key, Class type, Type genericType) throws IllegalArgumentException
+    public HashKeyProperty(String key, Class type, Type genericType) throws IllegalArgumentException
     {
-        this.hashMap = hashMap;
         this.key = key;
         this.type = type;
         this.genericType = genericType;
     }
 
-    
-    public Object getSource()
-    {
-        return hashMap;
-    }
-   
     
     public String getName()
     {
@@ -44,13 +36,13 @@ public class HashKeyProperty implements StatefulProperty
     }
     
     
-    public Class getType() // throws IllegalAccessException, InvocationTargetException
+    public Class getWriteType(Object ignoredObject) // throws IllegalAccessException, InvocationTargetException
     {
         Class returnType = type;
         if(java.util.Collection.class.isAssignableFrom(returnType)) {
             System.out.println("HashKeyProperty: property " + getName() + " is a collection, but only 1 item can be selected");
             try {
-                ParameterizedType paramType = (ParameterizedType)getGenericType();
+                ParameterizedType paramType = (ParameterizedType)getGenericType(ignoredObject);
                 if(paramType != null) returnType = (Class)(paramType.getActualTypeArguments()[0]);
             } catch(Exception ex) {
                 System.out.println("HashKeyProperty.getType(): ERROR = " + ex.getMessage());
@@ -68,21 +60,23 @@ public class HashKeyProperty implements StatefulProperty
     }
 
     
-    public Type getGenericType() throws IllegalAccessException, InvocationTargetException
+    public Type getGenericType(Object ignoredObject) throws IllegalAccessException, InvocationTargetException
     {
         return genericType;
     }
 
 
-    public Object getValue() throws IllegalAccessException, InvocationTargetException
+    public Object getValue(Object obj)
     {
-        return hashMap.get(key);
+        HashMap map = (HashMap)obj;
+        return map.get(key);
     }
 
     
-    public void setValue(Object value) throws IllegalAccessException, InvocationTargetException
+    public void setValue(Object obj, Object value)
     {
-        hashMap.put(key, value);
+        HashMap map = (HashMap)obj;
+        map.put(key, value);
     }
     
     

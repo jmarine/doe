@@ -52,7 +52,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
         try {
             // post initialization:
             Object outBinding[] = new Object[1];
-            entityListEditor = EditorFactory.getCollectionEditor(this, puName, null, entityClass, true, outBinding);
+            entityListEditor = EditorFactory.getCollectionEditor(this, puName, null, null, entityClass, true, outBinding);
             listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");
             listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");
 

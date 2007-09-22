@@ -19,9 +19,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 
-public class EntityProperty implements StatefulProperty 
+public class EntityProperty extends PropertyExt 
 {
-    private Object obj;
     private String propertyName;
     
     private Field  field;
@@ -33,17 +32,15 @@ public class EntityProperty implements StatefulProperty
     
 
     
-    public EntityProperty(Object obj, Field field) throws IllegalArgumentException
+    public EntityProperty(Class targetClass, Field field) throws IllegalArgumentException
     {
-        this.obj = obj;
         this.field = field;
         this.memberClass = field.getType();
         this.propertyName = decapitalize(field.getName());
     }
 
-    public EntityProperty(Object obj, PropertyDescriptor propertyDescriptor) throws IllegalArgumentException
+    public EntityProperty(Class targetClass, PropertyDescriptor propertyDescriptor) throws IllegalArgumentException
     {
-        this.obj = obj;
         this.propertyDescriptor = propertyDescriptor;
         this.memberClass = propertyDescriptor.getPropertyType();
         this.propertyName = decapitalize(propertyDescriptor.getName());
@@ -58,7 +55,7 @@ public class EntityProperty implements StatefulProperty
 
             if(name != null) {
                 name = "set" + name;  // exact setter name
-                for(Class inspectedClass = obj.getClass(); (writeMethod == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
+                for(Class inspectedClass = targetClass; (writeMethod == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
                     try { 
                         writeMethod = inspectedClass.getDeclaredMethod(name, this.propertyDescriptor.getReadMethod().getReturnType());
                         if(writeMethod != null) {
@@ -76,9 +73,9 @@ public class EntityProperty implements StatefulProperty
 
 
         // search possible field with the same property name (it may contain additional annotations)
-        for(Class inspectedClass = obj.getClass(); (field == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
+        for(Class inspectedClass = targetClass; (field == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
             try { 
-                this.field = obj.getClass().getDeclaredField(propertyName); 
+                this.field = targetClass.getDeclaredField(propertyName); 
                 System.out.println("EntityProperty: INFO: field attribute found for propertyDescriptor  " + propertyName);
             } catch(Exception ex) { }
         }
@@ -89,11 +86,6 @@ public class EntityProperty implements StatefulProperty
 
     }
     
-    public Object getSource()
-    {
-        return obj;
-    }
-
     
     public String getName()
     {
@@ -169,7 +161,7 @@ public class EntityProperty implements StatefulProperty
     }
     
     
-    public Class getType() // throws IllegalAccessException, InvocationTargetException
+    public Class getWriteType(Object ignoredObject) // throws IllegalAccessException, InvocationTargetException
     {
         Class retval = null;
         if(propertyDescriptor != null) {
@@ -184,7 +176,7 @@ public class EntityProperty implements StatefulProperty
     }
     
 
-    public Type getGenericType() throws IllegalAccessException, InvocationTargetException
+    public Type getGenericType(Object ignoredObject) throws IllegalAccessException, InvocationTargetException
     {
         Type retval = null;
 
@@ -200,9 +192,10 @@ public class EntityProperty implements StatefulProperty
     }
 
     
-    public Object getValue() throws IllegalAccessException, InvocationTargetException
+    public Object getValue(Object obj)
     {
-        Object retval = null;
+      Object retval = null;
+      try {
         if( (propertyDescriptor != null) && (propertyDescriptor.getReadMethod() != null) ) {
             retval = propertyDescriptor.getReadMethod().invoke(obj);
         } else if(field != null) {
@@ -210,12 +203,18 @@ public class EntityProperty implements StatefulProperty
         } else {
             throw new IllegalAccessException("Object without getter method/field");
         }
-        return retval;
+ 
+      } catch(Exception ex) {
+        throw new RuntimeException("EntityProperty.getValue: Error: " + ex.getMessage(), ex);
+      }
+
+      return retval;
     }
 
 
-    public void setValue(Object value) throws IllegalAccessException, InvocationTargetException
+    public void setValue(Object obj, Object value) 
     {
+      try {
         boolean convertToCollection = java.util.Collection.class.isAssignableFrom(memberClass);
         if( (convertToCollection) && (value.getClass().isArray()) ) {
                 Class collectionClass = memberClass;
@@ -244,6 +243,9 @@ public class EntityProperty implements StatefulProperty
         } else {
             throw new IllegalAccessException("Object without setter method/field");
         }
+      } catch(Exception ex) {
+        throw new RuntimeException("EntityProperty.setValue: Error: " + ex.getMessage(), ex);
+      }
     }
 
     
@@ -270,8 +272,8 @@ public class EntityProperty implements StatefulProperty
     
     public boolean equals(Object obj)
     {
-        if( (obj != null) && (obj instanceof StatefulProperty) ) {
-            StatefulProperty p2 = (StatefulProperty)obj;
+        if( (obj != null) && (obj instanceof PropertyExt) ) {
+            PropertyExt p2 = (PropertyExt)obj;
             return propertyName.equals(p2.getName());
         }
         return false;

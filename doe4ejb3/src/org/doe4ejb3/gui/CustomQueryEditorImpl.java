@@ -83,7 +83,8 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     
     private void addPropertySelector()
     {
-        JComboBox selector = new JComboBox(getProperties(entityClass).toArray());
+        HashMap target = new HashMap();
+        JComboBox selector = new JComboBox(getProperties(target, entityClass).toArray());
         JComboBox operator = new JComboBox(defaultOperators);
         JPanel editorContainer = new JPanel();
         editorContainer.setLayout(new BorderLayout());
@@ -91,16 +92,17 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         ((DefaultComboBoxModel)selector.getModel()).insertElementAt("", 0);
         selector.setSelectedIndex(0);
         selector.putClientProperty("operator", operator);
+        selector.putClientProperty("target", target);        
         selector.putClientProperty("editorContainer", editorContainer);
+        selector.putClientProperty("dataBinding", null);
         selector.addItemListener(this);
         propertySelectors.add(selector);
        
-        operator.putClientProperty("editorContainer", editorContainer);
+
         operator.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 JComboBox operator = (JComboBox)e.getSource();
-                JPanel editorContainer = (JPanel)operator.getClientProperty("editorContainer");
-                JComponent editor = (JComponent)editorContainer.getClientProperty("editor");
+                JComponent editor = (JComponent)operator.getClientProperty("editor");
                 if(editor != null) {
                     if((operator.getSelectedIndex() == 0) || (operator.getSelectedItem().toString().toUpperCase().startsWith("IS ")) ) {
                         editor.setVisible(false);  // unary operator or unselected
@@ -123,6 +125,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     {
         JComboBox selector = (JComboBox)event.getSource();
         JComboBox operator = (JComboBox)selector.getClientProperty("operator");
+        HashMap target = (HashMap)selector.getClientProperty("target");
         JPanel editorContainer = (JPanel)selector.getClientProperty("editorContainer");
 
         // clear previous bindings/editors
@@ -138,20 +141,20 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         if(selector.getSelectedIndex() == 0) {
 
             operator.setSelectedIndex(0);
-            editorContainer.putClientProperty("editor", null);
+            operator.putClientProperty("editor", null);
             editorContainer.revalidate();
             editorContainer.repaint();
 
         } else {
 
             HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
-            JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), property, 0);
+            JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), target, property, 0);
 
-            editorContainer.putClientProperty("editor", comp);
+            operator.putClientProperty("editor", comp);
             editorContainer.add("Center", comp);
             editorContainer.revalidate();
             
-            if(property.getType().getAnnotation(javax.persistence.Entity.class) != null) {
+            if(property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) {
                 operator.setModel(new DefaultComboBoxModel(property.isCollectionType() ? manyRelationOperators : oneRelationOperators));
             } else {
                 operator.setModel(new DefaultComboBoxModel(simpleFieldOperators));
@@ -217,27 +220,26 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         return borderInsets;
     }
 
-    private ArrayList<HashKeyProperty> getProperties(Class entityClass) 
+    private ArrayList<HashKeyProperty> getProperties(HashMap target, Class entityClass) 
     {
         ArrayList<HashKeyProperty> properties = new ArrayList<HashKeyProperty>();
-        return getProperties(properties, entityClass, ""); 
+        return getProperties(target, properties, entityClass, ""); 
     }
     
-    private ArrayList<HashKeyProperty> getProperties(ArrayList<HashKeyProperty> properties, Class entityClass, String prefix) 
+    private ArrayList<HashKeyProperty> getProperties(HashMap target, ArrayList<HashKeyProperty> properties, Class entityClass, String prefix) 
     {
-        HashMap map = new HashMap();
         try {
             BeanInfo bi = Introspector.getBeanInfo(entityClass);
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                 // FIXME: inherited properties are included?
                 if(pd.getName().equals("class")) continue;
-                HashKeyProperty property = new HashKeyProperty(map, prefix + pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
-                if(property.getType().getAnnotation(javax.persistence.Embeddable.class) != null) {
-                    getProperties(properties, property.getType(), prefix + property.getName() + ".");    // but don't directly search by embbedded entity
+                HashKeyProperty property = new HashKeyProperty(prefix + pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
+                if(property.getWriteType(target).getAnnotation(javax.persistence.Embeddable.class) != null) {
+                    getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + ".");    // but don't directly search by embbedded entity
                 } else if(!properties.contains(property)) {
                     properties.add(property);
-                    if( (prefix.indexOf(".") == -1) && (property.getType().getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
-                        getProperties(properties, property.getType(), prefix + property.getName() + "."); 
+                    if( (prefix.indexOf(".") == -1) && (property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
+                        getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + "."); 
                     }
                 }
             }
@@ -245,13 +247,13 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             for(Field field : entityClass.getFields()) {
                 // TODO: inherited fields
                 if(field.getName().equals("class")) continue;
-                HashKeyProperty property = new HashKeyProperty(map, prefix + field.getName(), field.getType(), field.getGenericType());
-                if(property.getType().getAnnotation(javax.persistence.Embeddable.class) != null) {
-                    getProperties(properties, property.getType(), prefix + property.getName() + ".");  // but don't directly search by embbedded entity
+                HashKeyProperty property = new HashKeyProperty(prefix + field.getName(), field.getType(), field.getGenericType());
+                if(property.getWriteType(target).getAnnotation(javax.persistence.Embeddable.class) != null) {
+                    getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + ".");  // but don't directly search by embbedded entity
                 } else if(!properties.contains(property)) {
                     properties.add(property);
-                    if( (prefix.indexOf(".") == -1) && (property.getType().getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
-                        getProperties(properties, property.getType(), prefix + property.getName() + "."); 
+                    if( (prefix.indexOf(".") == -1) && (property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
+                        getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + "."); 
                     }
                 }
             }
@@ -279,6 +281,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             count++;
             JComboBox operator = (JComboBox)selector.getClientProperty("operator");
             if( (selector.getSelectedIndex() > 0) && (operator.getSelectedIndex() > 0) ) {
+                HashMap target = (HashMap)selector.getClientProperty("target");
                 Object binding = selector.getClientProperty("dataBinding");
                 try {
                     HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
@@ -305,8 +308,10 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                             where.append(operator.getSelectedItem()); where.append(" ");
                             where.append("e."); where.append(property.getName()); 
                         }
-                        parameterValues.put(parameterName, property.getValue());
-                        System.out.println("DEBUG: Parameter " + parameterName + " = " + property.getValue());
+                        
+                        Object value = property.getValue(target);
+                        parameterValues.put(parameterName, value);
+                        System.out.println("DEBUG: Parameter " + parameterName + " = " + value);
                     }
 
                 } catch(Exception ex) {

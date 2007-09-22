@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.0" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.5" maxVersion="1.5" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
     <Component class="javax.swing.JFileChooser" name="jFileChooser">
     </Component>
@@ -54,7 +54,7 @@
         <Component class="javax.swing.JButton" name="jButtonLoad">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.ImagePropertyEditor" id="load"/>
+              <action class="org.doe4ejb3.gui.ImagePropertyEditor" id="load" methodName=""/>
             </Property>
             <Property name="mnemonic" type="int" value="108"/>
           </Properties>
@@ -62,7 +62,7 @@
         <Component class="javax.swing.JButton" name="jButtonSave">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.ImagePropertyEditor" id="save"/>
+              <action class="org.doe4ejb3.gui.ImagePropertyEditor" id="save" methodName=""/>
             </Property>
             <Property name="mnemonic" type="int" value="115"/>
           </Properties>
@@ -70,7 +70,7 @@
         <Component class="javax.swing.JButton" name="jButtonClear">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.ImagePropertyEditor" id="delete"/>
+              <action class="org.doe4ejb3.gui.ImagePropertyEditor" id="delete" methodName=""/>
             </Property>
             <Property name="mnemonic" type="int" value="99"/>
           </Properties>
