@@ -56,7 +56,7 @@ import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.beans.TemporalTypeEditorSupport;
 import org.doe4ejb3.binding.EntityProperty;
 import org.doe4ejb3.binding.JComponentDataBinding;
-import org.doe4ejb3.binding.PropertyExt;
+import org.doe4ejb3.binding.DoeProperty;
 import org.doe4ejb3.event.ClipboardAction;
 import org.doe4ejb3.event.EntityEvent;
 import org.doe4ejb3.event.EntityListener;
@@ -88,7 +88,7 @@ public class EditorFactory
         return entityEditor;
     }
     
-    public static JComponent getPropertyEditor(EditorLayoutInterface layout, final String puName, Object source, PropertyExt property, int maxLength)
+    public static JComponent getPropertyEditor(EditorLayoutInterface layout, final String puName, Object source, DoeProperty property, int maxLength)
     {
         JComponent comp = null;
         java.beans.PropertyEditor editor = null;        
@@ -578,7 +578,7 @@ public class EditorFactory
     /** 
      * Setup an editor for a multi-valued property 
      */
-    public static JComponent getCollectionEditor(EditorLayoutInterface layout, final String puName, final Object source, final PropertyExt property, final Class memberClass, final boolean isManagerWindow,Object bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
+    public static JComponent getCollectionEditor(EditorLayoutInterface layout, final String puName, final Object source, final DoeProperty property, final Class memberClass, final boolean isManagerWindow,Object bindingOutParam[]) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, Exception {
         Object container = (property != null) ? layout.getComponentFromEditorLayout(JPanel.class, property.getName()) : null;  // search a JPanel holder for the relation and navigation commands.
         
         final JTable jTable = new JTable();

@@ -25,10 +25,10 @@ public class JComponentDataBinding
     private Method  componentDataGetter;
     private PropertyEditor editor;
     private Object  entity;
-    private PropertyExt entityProperty;
+    private DoeProperty entityProperty;
     
     
-    public JComponentDataBinding(Object componentUI, Method componentDataGetter, PropertyEditor editor, Object entity, PropertyExt entityProperty) 
+    public JComponentDataBinding(Object componentUI, Method componentDataGetter, PropertyEditor editor, Object entity, DoeProperty entityProperty) 
     {
         this.active = false; 
         this.componentUI = componentUI;

@@ -16,7 +16,7 @@ import java.util.HashMap;
  *
  * @author jordi
  */
-public class HashKeyProperty extends PropertyExt
+public class HashKeyProperty extends DoeProperty
 {
     private String key;
     private Class type;
