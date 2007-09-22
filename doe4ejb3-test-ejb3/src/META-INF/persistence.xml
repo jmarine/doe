@@ -8,8 +8,10 @@
     <properties>
       <property name="toplink.logging.level" value="FINE"/>
       <property name="toplink.ddl-generation" value="create-tables"/>
+      <!--
       <property name="toplink.create-ddl-jdbc-file-name" value="doe4ejb3_recipe_create_javadb.jdbc"/>
       <property name="toplink.drop-ddl-jdbc-file-name" value="doe4ejb3_recipe_drop_javadb.jdbc"/>
+      -->
     </properties>
   </persistence-unit>
 
@@ -23,8 +25,10 @@
     <properties>
       <property name="toplink.logging.level" value="FINE"/>
       <property name="toplink.ddl-generation" value="create-tables"/>
+      <!--
       <property name="toplink.create-ddl-jdbc-file-name" value="doe4ejb3_academy_create_javadb.jdbc"/>
       <property name="toplink.drop-ddl-jdbc-file-name" value="doe4ejb3_academy_drop_javadb.jdbc"/>
+      -->
     </properties>
   </persistence-unit>
   
