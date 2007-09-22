@@ -48,6 +48,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 
 import org.jdesktop.beansbinding.BeanProperty;
+import org.jdesktop.beansbinding.Binding;
 import org.jdesktop.beansbinding.Bindings;
 import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.Converter;
@@ -55,7 +56,7 @@ import org.jdesktop.beansbinding.Converter;
 import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.beans.TemporalTypeEditorSupport;
 import org.doe4ejb3.binding.EntityProperty;
-import org.doe4ejb3.binding.JComponentDataBinding;
+import org.doe4ejb3.binding.DoeBinding;
 import org.doe4ejb3.binding.DoeProperty;
 import org.doe4ejb3.event.ClipboardAction;
 import org.doe4ejb3.event.EntityEvent;
@@ -92,7 +93,7 @@ public class EditorFactory
     {
         JComponent comp = null;
         java.beans.PropertyEditor editor = null;        
-        Object binding = null;
+        Binding binding = null;
 
         TemporalTypeEditorSupport.registerTemporalTypeEditors();
         
@@ -121,7 +122,7 @@ public class EditorFactory
                         System.out.println("EditorFactory: OneToMany or ManyToMany!!!");
                         Object bindingOutParam[] = new Object[1];
                         comp = getCollectionEditor(layout, puName, source, property, memberClass, false, bindingOutParam);
-                        binding = bindingOutParam[0];
+                        binding = (Binding)bindingOutParam[0];
 
                     } catch(Exception ex) {
                         System.out.println("Error loading property: " + ex.getMessage());
@@ -278,26 +279,24 @@ public class EditorFactory
                         }
 
 
-                        /* Original binding (with setup of initial value):
+                        // Original binding (with setup of initial value):
                         Method compGetter = combo.getClass().getMethod("getSelectedItem");
-                        binding = new JComponentDataBinding(combo, compGetter, null, property);
+                        binding = DoeBinding.createSaveBinding(source, property, combo, compGetter,null);
 
-                        Object value = property.getValue();
+                        Object value = property.getValue(source);
                         if(value != null) {
                             combo.addItem(value);  // FIXME: only when it doesn't exist, yet
                             combo.setSelectedItem(value);
                         } else {
                             combo.setSelectedIndex(0);
                         }
-                         */
-
                         
-                        // Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
+                        /* Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
                         System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JComboBox");
                         Object value = property.getValue(source);
                         if(value != null) combo.addItem(value);  // FIXME: only when it doesn't exist, yet
                         binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, combo, BeanProperty.create("selectedItem"));
-                        
+                        */
                         
                     } catch(Exception ex) {
                         System.out.println("Error loading property: " + ex.getMessage());
@@ -348,7 +347,7 @@ public class EditorFactory
                         Method editorGetter = propertyComponent.getClass().getMethod("getValue");
                         Object value = property.getValue(source);
                         if(value != null) propertyComponent.setValue(value);
-                        binding = new JComponentDataBinding(propertyComponent, editorGetter, null, source, property);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).                
+                        binding = DoeBinding.createSaveBinding(source, property, propertyComponent, editorGetter,null);  // editor is null to get real value from "editor.getValue" method (no conversion to string representation).                
 
                         
                         /* Using beans binding 1.0 (the component must fire property changes)
@@ -398,12 +397,11 @@ public class EditorFactory
                         comp = panel;
                     }
 
-                    /* Original binding (with setup of initial value):
+                    // Original binding (with setup of initial value):
                     Method editorGetter = editor.getClass().getMethod("getValue");
-                    Object value = property.getValue();
+                    Object value = property.getValue(source);
                     if(value != null) editor.setValue(value);
-                    binding = new JComponentDataBinding(editor, editorGetter, null, property);  // the 3 parameter is null to get real value from "editor.getValue" method (no conversion to string representation).
-                    */
+                    binding = DoeBinding.createSaveBinding(source, property, editor, editorGetter,null);  // the 3 parameter is null to get real value from "editor.getValue" method (no conversion to string representation).
 
                     /** 
                      * Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
@@ -420,10 +418,10 @@ public class EditorFactory
                             }
                        }
                     });
-                    */
                     
                     System.out.println("WARNING: jsr295 binding of PropertyEditor with custom control");
                     binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, editor, BeanProperty.create("value"));
+                    */
 
 
                 } else if( (editor != null) && ((memberClass == Boolean.TYPE) || (java.lang.Boolean.class.isAssignableFrom(memberClass))) ) { 
@@ -444,7 +442,7 @@ public class EditorFactory
 
                     // Original binding (with setup of initial value):
                     Method compGetter = checkBox.getClass().getMethod("isSelected");
-                    binding = new JComponentDataBinding(checkBox, compGetter, editor, source, property);
+                    binding = DoeBinding.createSaveBinding(source, property, checkBox, compGetter, editor);
 
                     Object booleanObject = property.getValue(source);
                     Boolean value = (Boolean)booleanObject;
@@ -508,7 +506,7 @@ public class EditorFactory
                     
                     
                     // Original binding (with setup of initial value):
-                    binding = new JComponentDataBinding(textField, compGetter, editor, source, property);                        
+                    binding = DoeBinding.createSaveBinding(source, property, textField, compGetter, editor);                        
                     Object value = property.getValue(source);
                     if(value != null) {
                         if(editor != null) {
@@ -611,7 +609,7 @@ public class EditorFactory
             
             // Original binding (with setup of initial value):
             Method modelGetter = listModel.getClass().getMethod("toArray");
-            bindingOutParam[0] = new JComponentDataBinding(listModel, modelGetter, null, source, property);
+            bindingOutParam[0] = DoeBinding.createSaveBinding(source, property, listModel, modelGetter,null);
 
             
             /* Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)

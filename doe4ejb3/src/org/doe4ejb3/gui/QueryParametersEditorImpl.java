@@ -19,6 +19,8 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+
+import org.jdesktop.beansbinding.Binding;
 import org.doe4ejb3.binding.BindingContext;
 
 
@@ -76,7 +78,7 @@ public class QueryParametersEditorImpl extends JPanel implements EditorLayoutInt
         int defaultLength = 20;
         JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), parameterValues, property, defaultLength);
         if(comp != null) {
-            Object binding = comp.getClientProperty("dataBinding");
+            Binding binding = (Binding)comp.getClientProperty("dataBinding");
             if(binding != null) bindingContext.addBinding(binding);
 
             add(new JLabel(capitalize(I18n.getLiteral(property.getName())) + ":"), gbcLabel);

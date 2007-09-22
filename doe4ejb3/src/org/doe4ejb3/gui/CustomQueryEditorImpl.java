@@ -26,6 +26,8 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import org.jdesktop.beansbinding.Binding;
+
 import org.doe4ejb3.binding.*;
 import org.doe4ejb3.util.JPAUtils;
 
@@ -129,10 +131,11 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         JPanel editorContainer = (JPanel)selector.getClientProperty("editorContainer");
 
         // clear previous bindings/editors
-        Object oldBinding = selector.getClientProperty("dataBinding");
+        Binding oldBinding = (Binding)selector.getClientProperty("dataBinding");
         if(oldBinding != null) 
         {
-            unbind(oldBinding);
+            oldBinding.unbind();
+            bindingContext.removeBinding(oldBinding);
             selector.putClientProperty("dataBinding", null);
         }
         editorContainer.removeAll();
@@ -161,9 +164,10 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
             }
             operator.setSelectedIndex(1);
 
-            Object binding = comp.getClientProperty("dataBinding");
+            Binding binding = (Binding)comp.getClientProperty("dataBinding");
             if(binding != null) {
-                bind(binding);
+                bindingContext.addBinding(binding);
+                binding.bind();
                 selector.putClientProperty("dataBinding", binding);
             }
 
@@ -185,27 +189,6 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         
     }
 
-    
-    private void bind(Object binding)
-    {
-        if(binding != null) {
-            bindingContext.addBinding(binding);
-            if(binding instanceof org.jdesktop.beansbinding.Binding) ((org.jdesktop.beansbinding.Binding)binding).bind();
-            else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).bind();
-            else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
-        }
-    }
-    
-    
-    private void unbind(Object binding)
-    {
-        if(binding != null) {
-            if(binding instanceof org.jdesktop.beansbinding.Binding) ((org.jdesktop.beansbinding.Binding)binding).unbind();
-            else if(binding instanceof JComponentDataBinding) ((JComponentDataBinding)binding).unbind();
-            else throw new RuntimeException("Unsupported binding type: " + binding.getClass().getName());
-            bindingContext.removeBinding(binding);
-        }
-    }
 
 
     private String capitalize(String name)

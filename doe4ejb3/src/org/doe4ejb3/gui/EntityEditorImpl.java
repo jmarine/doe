@@ -20,9 +20,11 @@ import java.util.Collections;
 import java.util.ResourceBundle;
 import javax.swing.*;
 
-import org.doe4ejb3.annotation.EntityDescriptor;
+import org.jdesktop.beansbinding.Binding;
 import org.doe4ejb3.binding.BindingContext;
+import org.doe4ejb3.binding.DoeBinding;
 import org.doe4ejb3.binding.EntityProperty;
+import org.doe4ejb3.annotation.EntityDescriptor;
 
 
 public class EntityEditorImpl extends JPanel implements EntityEditorInterface, EditorLayoutInterface, Printable
@@ -315,7 +317,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         Object relationType = null;
         GridBagConstraints gbc = gbcComponent;
         Component comp = null;
-        Object binding = null;
+        Binding binding = null;
         java.beans.PropertyEditor editor = null;
         org.doe4ejb3.annotation.PropertyDescriptor propertyDescriptor = null;
         
@@ -425,7 +427,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                  
                     EntityEditorInterface entityEditor = EditorFactory.getEntityEditor(this, puName, memberClass, getLayoutPath() + "." + entityProperty.getName());
                     compGetter = entityEditor.getClass().getMethod("getEntity");
-                    binding = new org.doe4ejb3.binding.JComponentDataBinding(entityEditor, compGetter, editor, entity, entityProperty);
+                    binding = DoeBinding.createSaveBinding(entity, entityProperty, entityEditor, compGetter, editor);
                     
                     Object value = entityProperty.getValue(entity);
                     if(value != null) entityEditor.setEntity(value);
@@ -462,7 +464,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                 
                 // Find the best editor for the property:
                 comp = EditorFactory.getPropertyEditor(this, puName, entity, entityProperty, maxLength);
-                binding = ((JComponent)comp).getClientProperty("dataBinding");
+                binding = (Binding)((JComponent)comp).getClientProperty("dataBinding");
                 isNewComponent = ((JComponent)comp).getClientProperty("layout") == null;
                 
             }
