@@ -21,18 +21,20 @@ import org.doe4ejb3.util.ReflectionUtils;
 public class JComponentDataBinding
 {
     private boolean active;
-     private Object  componentUI;
+    private Object  componentUI;
     private Method  componentDataGetter;
     private PropertyEditor editor;
-    private StatefulProperty entityProperty;
+    private Object  entity;
+    private PropertyExt entityProperty;
     
     
-    public JComponentDataBinding(Object componentUI, Method componentDataGetter, PropertyEditor editor, StatefulProperty entityProperty) 
+    public JComponentDataBinding(Object componentUI, Method componentDataGetter, PropertyEditor editor, Object entity, PropertyExt entityProperty) 
     {
         this.active = false; 
         this.componentUI = componentUI;
         this.componentDataGetter = componentDataGetter;
         this.editor = editor;
+        this.entity = entity;
         this.entityProperty = entityProperty;
      }
     
@@ -52,7 +54,7 @@ public class JComponentDataBinding
         
             Object value = ReflectionUtils.getMemberValue(componentUI, componentDataGetter); 
             
-            Class memberClass = entityProperty.getType();
+            Class memberClass = entityProperty.getWriteType(entity);
             boolean convertToCollection = java.util.Collection.class.isAssignableFrom(memberClass);
             if( (convertToCollection) && (value.getClass().isArray()) ) {  // Code has already been copied to EntityProperty.setValue method
                 Class collectionClass = memberClass;
@@ -76,7 +78,7 @@ public class JComponentDataBinding
                 value = editor.getValue();           // convert to editor's real type
             }
 
-            entityProperty.setValue(value);
+            entityProperty.setValue(entity, value);
 
         } catch(Exception ex) {
             System.out.println("JComponentDataBinding.commitUncommittedValues: ERROR: " + ex.getMessage());

@@ -7,17 +7,14 @@
 
 package org.doe4ejb3.gui;
 
-/**
- *
- * @author Jordi Marine Fort
- */
+
 public class I18n 
 {
     
     /** Creates a new instance of I18n */
     public static String getLiteral(String key) 
     {
-        // TODO: get localization for key
+        // TODO: get localized message
         return key;
     }
     

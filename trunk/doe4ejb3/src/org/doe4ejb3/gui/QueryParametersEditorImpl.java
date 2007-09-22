@@ -8,7 +8,7 @@
 package org.doe4ejb3.gui;
 
 import org.doe4ejb3.binding.HashKeyProperty;
-import org.doe4ejb3.binding.StatefulProperty;
+import org.doe4ejb3.binding.PropertyExt;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -63,7 +63,7 @@ public class QueryParametersEditorImpl extends JPanel implements EditorLayoutInt
         for(Object parameterName : parameterTypes.keySet()) 
         {
             // TODO: implement generic type (i.e.: entity has property relation with some value?)
-            HashKeyProperty property = new HashKeyProperty(parameterValues, (String)parameterName, (Class)parameterTypes.get(parameterName), null);
+            HashKeyProperty property = new HashKeyProperty((String)parameterName, (Class)parameterTypes.get(parameterName), null);
             handleParameterProperty(property);
         }
         
@@ -71,10 +71,10 @@ public class QueryParametersEditorImpl extends JPanel implements EditorLayoutInt
     }
 
     
-    private void handleParameterProperty(StatefulProperty property)
+    private void handleParameterProperty(PropertyExt property)
     {
         int defaultLength = 20;
-        JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), property, defaultLength);
+        JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), parameterValues, property, defaultLength);
         if(comp != null) {
             Object binding = comp.getClientProperty("dataBinding");
             if(binding != null) bindingContext.addBinding(binding);

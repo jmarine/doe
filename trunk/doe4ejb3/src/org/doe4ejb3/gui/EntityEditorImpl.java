@@ -250,13 +250,13 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
             BeanInfo bi = Introspector.getBeanInfo(entityClass);
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
                 // TODO: inherited properties?
-                EntityProperty entityProperty = new EntityProperty(entity, pd);
+                EntityProperty entityProperty = new EntityProperty(entity.getClass(), pd);
                 if(!properties.contains(entityProperty)) properties.add(entityProperty);
             }
             
             for(Field field : entityClass.getFields()) {
                 // TODO: inherited fields
-                EntityProperty entityProperty = new EntityProperty(entity, field);
+                EntityProperty entityProperty = new EntityProperty(entity.getClass(), field);
                 if(!properties.contains(entityProperty)) properties.add(entityProperty);
             }
             
@@ -270,7 +270,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         Collections.sort(properties, orderComparator);
         for(EntityProperty property : properties) 
         {
-            handlePersistenceAnnotations(property);
+            handlePersistenceAnnotations(entity, property);
         }
         
 
@@ -284,7 +284,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         bindingContext.bind();
     }
     
-    public void handlePersistenceAnnotations(EntityProperty entityProperty)
+    public void handlePersistenceAnnotations(Object entity, EntityProperty entityProperty)
     {
         // TODO: @Embedable --> new EntityEditorImpl(field.getType() || method.getReturnType())
         // (with "getEntity" method as "getter")
@@ -294,9 +294,9 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         
         Class memberClass = null;
         try {
-            memberClass = entityProperty.getType();
+            memberClass = entityProperty.getWriteType(entity);
             if(java.util.Collection.class.isAssignableFrom(memberClass)) {
-                ParameterizedType paramType = (ParameterizedType)entityProperty.getGenericType();
+                ParameterizedType paramType = (ParameterizedType)entityProperty.getGenericType(entity);
                 memberClass = (Class)(paramType.getActualTypeArguments()[0]);
             }
         } catch(Exception ex) {
@@ -425,9 +425,9 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                  
                     EntityEditorInterface entityEditor = EditorFactory.getEntityEditor(this, puName, memberClass, getLayoutPath() + "." + entityProperty.getName());
                     compGetter = entityEditor.getClass().getMethod("getEntity");
-                    binding = new org.doe4ejb3.binding.JComponentDataBinding(entityEditor, compGetter, editor, entityProperty);
+                    binding = new org.doe4ejb3.binding.JComponentDataBinding(entityEditor, compGetter, editor, entity, entityProperty);
                     
-                    Object value = entityProperty.getValue();
+                    Object value = entityProperty.getValue(entity);
                     if(value != null) entityEditor.setEntity(value);
                     else entityEditor.newEntity(memberClass);
                     
@@ -461,7 +461,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
             } else {
                 
                 // Find the best editor for the property:
-                comp = EditorFactory.getPropertyEditor(this, puName, entityProperty, maxLength);
+                comp = EditorFactory.getPropertyEditor(this, puName, entity, entityProperty, maxLength);
                 binding = ((JComponent)comp).getClientProperty("dataBinding");
                 isNewComponent = ((JComponent)comp).getClientProperty("layout") == null;
                 
