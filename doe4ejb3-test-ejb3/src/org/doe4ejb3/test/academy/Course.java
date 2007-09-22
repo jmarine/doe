@@ -68,8 +68,8 @@ public class Course implements Serializable {
     }
     
     
-    
-    
+    /*
+    @JoinTable(name="COURSE_TEACHER")
     @ManyToMany(cascade = { CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE })  // don't delete ingredients used in other recipes
     public Set<Teacher> getTeachers()
     {
@@ -80,6 +80,7 @@ public class Course implements Serializable {
     {
         this.teachers = teachers;
     }
+     */
 
     
     public boolean equals(Object obj)
