@@ -25,6 +25,7 @@ public interface WindowManager
     
     void   showMessageDialog(String msg, String title, int dialogType);
     int    showConfirmDialog(String msg, String title, int buttonOptions);
+    Object showInputDialog(String msg, String title, Object[] selectionValues, Object initialSelectionValue);
 
     EventListenerList getEventListenerList(Object window);
     

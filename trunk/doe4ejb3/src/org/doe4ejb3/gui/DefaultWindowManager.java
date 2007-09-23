@@ -148,6 +148,10 @@ public class DefaultWindowManager implements WindowManager
         return JOptionPane.showInternalConfirmDialog(mdiDesktopPane, msg, title, buttonOptions);
     }
 
+    public Object showInputDialog(String msg, String title, Object[] selectionValues, Object initialSelectionValue) {
+        return JOptionPane.showInternalInputDialog(mdiDesktopPane, msg, title, JOptionPane.QUESTION_MESSAGE, (javax.swing.Icon)null, selectionValues, initialSelectionValue);
+    }
+
 
     public EventListenerList getEventListenerList(Object window) 
     {
@@ -172,5 +176,6 @@ public class DefaultWindowManager implements WindowManager
         if(msg == null) msg = "";
         jLabelStatusBar.setText(" " + msg);
     }
+
 
 }
