@@ -648,7 +648,7 @@ public class EditorFactory
                     try {
                         panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                         List allValues = JPAUtils.findAllEntities(puName, memberClass);
-                        Object newItem = JOptionPane.showInternalInputDialog(panel, "Select new item:", "Add new " + I18n.getEntityName(memberClass), JOptionPane.QUESTION_MESSAGE, null, allValues.toArray(), null);
+                        Object newItem = DOEUtils.getWindowManager().showInputDialog("Select new item:", "Add new " + I18n.getEntityName(memberClass), allValues.toArray(), null);
                         if(newItem != null) {
                             // FIXME: caution with duplicated relations and "Set" collection types.
                             if(!listModel.contains(newItem)) {  
