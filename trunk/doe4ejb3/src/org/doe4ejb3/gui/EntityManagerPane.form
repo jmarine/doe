@@ -42,6 +42,7 @@
   </NonVisualComponents>
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
@@ -138,7 +139,7 @@
         <Component class="javax.swing.JButton" name="jButtonSearch">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.EntityManagerPane" id="searchInstances" methodName=""/>
+              <action class="org.doe4ejb3.gui.EntityManagerPane" id="searchInstances"/>
             </Property>
             <Property name="mnemonic" type="int" value="115"/>
           </Properties>

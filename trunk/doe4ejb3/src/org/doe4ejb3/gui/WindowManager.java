@@ -13,7 +13,7 @@ import javax.swing.event.EventListenerList;
 
 public interface WindowManager 
 {
-    Object createWindow(final Object key, String title, ImageIcon icon);
+    Object createWindow(final Object key, String title, ImageIcon icon, Object contentPane);
     Object findWindow(Object key);
     Object getActiveWindow();
     Object getWindowFromComponent(Object source);

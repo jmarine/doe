@@ -176,7 +176,7 @@ public class EditorFactory
                                     if(combo.getSelectedIndex() >= 0) {
                                         Object entity = comboBoxModel.getSelectedItem();
                                         WindowManager wm = DOEUtils.getWindowManager();
-                                        Object window = DOEUtils.openInternalFrameEntityEditor(puName, optionClass, entity);
+                                        Object window = DOEUtils.openEntityEditor(puName, optionClass, entity);
                                         final EventListenerList listenerList = wm.getEventListenerList(window);
                                         listenerList.add(EntityListener.class, relationshipListener);
                                     }
@@ -192,7 +192,7 @@ public class EditorFactory
                             public void actionPerformed(ActionEvent evt)  {
                                 try { 
                                     WindowManager wm = DOEUtils.getWindowManager();
-                                    Object window = DOEUtils.openInternalFrameEntityEditor(puName, optionClass, null);
+                                    Object window = DOEUtils.openEntityEditor(puName, optionClass, null);
                                     final EventListenerList listenerList = wm.getEventListenerList(window);
                                     listenerList.add(EntityListener.class, relationshipListener);
                                 } catch(ApplicationException ex) { 
@@ -623,7 +623,7 @@ public class EditorFactory
             public void actionPerformed(ActionEvent evt)  {
                 try { 
                     WindowManager wm = DOEUtils.getWindowManager();
-                    Object window = DOEUtils.openInternalFrameEntityEditor(puName, memberClass, null);
+                    Object window = DOEUtils.openEntityEditor(puName, memberClass, null);
                     if(!isManagerWindow) {
                         final EventListenerList listenerList = wm.getEventListenerList(window);
                         listenerList.add(EntityListener.class, new EntityListener() {
@@ -672,7 +672,7 @@ public class EditorFactory
                         for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
                             if(listSelectionModel.isSelectedIndex(index)) {
                                 WindowManager wm = DOEUtils.getWindowManager();
-                                Object window = DOEUtils.openInternalFrameEntityEditor(puName, memberClass, listModel.getElementAt(index)); 
+                                Object window = DOEUtils.openEntityEditor(puName, memberClass, listModel.getElementAt(index)); 
                                 EventListenerList listenerList = wm.getEventListenerList(window);
                                 listenerList.add(EntityListener.class, new EntityListener() {
                                     public void entityChanged(EntityEvent event) {

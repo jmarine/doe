@@ -39,32 +39,27 @@ public class DOEUtils
     
     
     
-    public static void openInternalFrameEntityManager(String puName, Class entityClass) throws Exception
+    public static void openEntityManager(String puName, Class entityClass) throws Exception
     {
         Object key = entityClass.getName() + "Manager";
-        JComponent window = (JComponent)windowManager.findWindow(key);
+        Object window = (Object)windowManager.findWindow(key);
         if(window != null) {
             windowManager.bringToFront(window);
         } else {
             EntityManagerPane manager = new EntityManagerPane(puName, entityClass);
             String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass) + " manager";
-            window = (JComponent)windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
-            window.setLayout(new BorderLayout());
-            window.add(manager, BorderLayout.CENTER);
+            window = (JComponent)windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass), manager);
             
-            // Define public actions (for Netbeans integration)
-            window.getActionMap().put("printAction", manager.getActionMap().get("printAction"));
-
             windowManager.showWindow(window, false);
         }
 
     }
 
 
-    public static Object openInternalFrameEntityEditor(String puName, Class entityClass, Object entity) throws Exception
+    public static Object openEntityEditor(String puName, Class entityClass, Object entity) throws Exception
     {
         Object key = (entity != null) ? entity : entityClass.getName() + "Editor";
-        JComponent window = (JComponent)windowManager.findWindow(key);
+        Object window = windowManager.findWindow(key);
 
         if(window != null) {
             windowManager.bringToFront(window);
@@ -74,13 +69,8 @@ public class DOEUtils
             if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
             else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
             
-            window = (JComponent)windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass));
-            window.setLayout(new BorderLayout());            
-            window.add(editorViewer, BorderLayout.CENTER);
+            window = (JComponent)windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass), editorViewer);
 
-            // Define public actions (for Netbeans integration)
-            window.getActionMap().put("printAction", editorViewer.getActionMap().get("printAction"));
-           
             windowManager.showWindow(window, false);
         }
 

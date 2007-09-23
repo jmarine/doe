@@ -485,7 +485,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                         String puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
                         Class  entityClass = (Class)list.getSelectedValue();
                         if( (evt.getClickCount() > 1) && (entityClass != null) ) {
-                            DOEUtils.openInternalFrameEntityManager(puName, entityClass);
+                            DOEUtils.openEntityManager(puName, entityClass);
                         }
                     } catch(Exception ex) {
                         DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Error: " + ex.getMessage());
@@ -559,7 +559,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             }
 
-            DOEUtils.openInternalFrameEntityManager(puName, entityClass);
+            DOEUtils.openEntityManager(puName, entityClass);
             
         } catch(ApplicationException ex) {
             
@@ -597,7 +597,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                 }
             }
             
-            DOEUtils.openInternalFrameEntityEditor(puName, entityClass, null);
+            DOEUtils.openEntityEditor(puName, entityClass, null);
             
         } catch(ApplicationException ex) {
             
