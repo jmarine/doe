@@ -88,7 +88,6 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                     }
                 }
             }
-
             
         } catch(Exception ex) {
             DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
@@ -266,7 +265,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             } else {
                 Object entity = listModel.getElementAt(selectedIndexToEdit);
                 Class entityClass = entity.getClass();  // (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-                DOEUtils.openInternalFrameEntityEditor(puName, entityClass, entity);
+                DOEUtils.openEntityEditor(puName, entityClass, entity);
             }
             
         } catch(ApplicationException ex) {
@@ -288,7 +287,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             Object invoker = ((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
             JComponent sourceControl = (JComponent)invoker;
             Class entityClass = (Class)sourceControl.getClientProperty("org.doe4ejb3.entityClass");
-            DOEUtils.openInternalFrameEntityEditor(puName, entityClass, null);
+            DOEUtils.openEntityEditor(puName, entityClass, null);
             
         } catch(ApplicationException ex) {
             

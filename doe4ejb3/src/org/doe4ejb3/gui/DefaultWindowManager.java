@@ -36,10 +36,11 @@ public class DefaultWindowManager implements WindowManager
         this.openedInternalFrames = new HashMap<Object,JInternalFrame>();
     }
     
-    public Object createWindow(final Object key, String title, ImageIcon icon)
+    public Object createWindow(final Object key, String title, ImageIcon icon, Object contentPane)
     {
         JInternalFrame window = new JInternalFrame(title, true, true, true, false );
 
+        openedInternalFrames.put(key, window);
         window.addInternalFrameListener(new InternalFrameAdapter() {
             public void internalFrameClosed(InternalFrameEvent evt) {
                 openedInternalFrames.remove(key);
@@ -47,8 +48,11 @@ public class DefaultWindowManager implements WindowManager
         });
 
         if(icon != null) window.setFrameIcon(icon);
-
-        openedInternalFrames.put(key, window);
+        
+        window.setLayout(new BorderLayout());            
+        if(contentPane != null) {
+            window.add((Component)contentPane, BorderLayout.CENTER);
+        }
         
         return window;
     }
