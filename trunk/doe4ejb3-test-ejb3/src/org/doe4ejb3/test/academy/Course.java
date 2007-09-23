@@ -67,9 +67,8 @@ public class Course implements Serializable {
         this.price = price;
     }
     
-    
-    /*
-    @JoinTable(name="COURSE_TEACHER")
+
+    @JoinTable(name = "COURSE_TEACHER", joinColumns = @JoinColumn(name = "course_id"), inverseJoinColumns = @JoinColumn(name = "teacher_ssn")) 
     @ManyToMany(cascade = { CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE })  // don't delete ingredients used in other recipes
     public Set<Teacher> getTeachers()
     {
@@ -80,7 +79,6 @@ public class Course implements Serializable {
     {
         this.teachers = teachers;
     }
-     */
 
     
     public boolean equals(Object obj)
