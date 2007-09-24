@@ -7,12 +7,6 @@
 
 package org.doe4ejb3.util;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.beans.PropertyChangeListener;
-import javax.swing.JComponent;
-
 import org.jdesktop.application.Application;
 import org.jdesktop.application.TaskMonitor;
 
@@ -82,13 +76,13 @@ public class DOEUtils
     public static void openEntityManager(String puName, Class entityClass) throws Exception
     {
         Object key = entityClass.getName() + "Manager";
-        Object window = (Object)windowManager.findWindow(key);
+        Object window = windowManager.findWindow(key);
         if(window != null) {
             windowManager.bringToFront(window);
         } else {
             EntityManagerPane manager = new EntityManagerPane(puName, entityClass);
             String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass) + " manager";
-            window = (JComponent)windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass), manager);
+            window = windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass), manager);
             
             windowManager.showWindow(window, false);
         }
@@ -109,7 +103,7 @@ public class DOEUtils
             if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
             else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
             
-            window = (JComponent)windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass), editorViewer);
+            window = windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass), editorViewer);
 
             windowManager.showWindow(window, false);
         }
