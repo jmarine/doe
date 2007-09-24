@@ -79,7 +79,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jProgressBar.setVisible(false);
 
 
-        taskMonitor = new org.jdesktop.application.TaskMonitor(Application.getInstance().getContext());
+        taskMonitor = DOEUtils.getTaskMonitor();
         taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 taskMonitorPropertyChange(evt);
@@ -454,16 +454,18 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             jProgressBar.setValue(0);
             setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
         }
-        else if ("message".equals(propertyName)) {
-            String text = (String)(evt.getNewValue());
-            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, (text == null) ? "" : text);
-        }
         else if ("progress".equals(propertyName)) {
             int value = (Integer)(evt.getNewValue());
             jProgressBar.setVisible(true);
             jProgressBar.setIndeterminate(false);
             jProgressBar.setValue(value);
         }
+        /*
+        else if ("message".equals(propertyName)) {
+            String text = (String)(evt.getNewValue());
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, (text == null) ? "" : text);
+        } 
+        */
     }      
     
     

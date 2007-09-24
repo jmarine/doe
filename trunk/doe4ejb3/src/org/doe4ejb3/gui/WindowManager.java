@@ -31,4 +31,5 @@ public interface WindowManager
     
     void setWindowTitle(Object window, String title);
     void showStatus(Object window, String msg);
+    
 }

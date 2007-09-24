@@ -9,7 +9,12 @@ package org.doe4ejb3.util;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Cursor;
+import java.beans.PropertyChangeListener;
 import javax.swing.JComponent;
+
+import org.jdesktop.application.Application;
+import org.jdesktop.application.TaskMonitor;
 
 import org.doe4ejb3.gui.WindowManager;
 import org.doe4ejb3.gui.EntityClassListCellRenderer;
@@ -23,11 +28,13 @@ public class DOEUtils
 
 
     private static WindowManager windowManager = null;
+    private static TaskMonitor   taskMonitor = null;
 
 
     public static void setWindowManager(WindowManager wm)
     {
         windowManager = wm;
+        if(taskMonitor == null) taskMonitor = getTaskMonitor();
     }
     
     public static WindowManager getWindowManager()
@@ -36,7 +43,40 @@ public class DOEUtils
         return windowManager;
     }    
     
+    public static TaskMonitor getTaskMonitor()
+    {
+        if(taskMonitor == null) {
+            taskMonitor = new org.jdesktop.application.TaskMonitor(Application.getInstance().getContext());        
+            taskMonitor.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+                public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                    taskMonitorPropertyChange(evt);
+                }
+            });
+        }
+        return taskMonitor;
+    }
     
+    private static void taskMonitorPropertyChange(java.beans.PropertyChangeEvent evt) {
+        String propertyName = evt.getPropertyName();
+        if ("message".equals(propertyName)) {
+            String text = (String)(evt.getNewValue());
+            if(windowManager != null) {
+                windowManager.showStatus(DOEUtils.APPLICATION_WINDOW, (text == null) ? "" : text);
+            }
+        } 
+        else if ("started".equals(propertyName)) {
+            // setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+        }
+        else if ("done".equals(propertyName)) {
+            // setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+        }
+        else if ("progress".equals(propertyName)) {
+            // int value = (Integer)(evt.getNewValue());
+            // jProgressBar.setVisible(true);
+            // jProgressBar.setIndeterminate(false);
+            // jProgressBar.setValue(value);
+        }
+    }  
     
     
     public static void openEntityManager(String puName, Class entityClass) throws Exception

@@ -20,6 +20,8 @@ import javax.swing.event.EventListenerList;
 import javax.swing.event.InternalFrameAdapter;
 import javax.swing.event.InternalFrameEvent;
 
+import org.doe4ejb3.util.DOEUtils;
+
 
 public class DefaultWindowManager implements WindowManager 
 {
@@ -176,6 +178,5 @@ public class DefaultWindowManager implements WindowManager
         if(msg == null) msg = "";
         jLabelStatusBar.setText(" " + msg);
     }
-
 
 }
