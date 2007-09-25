@@ -294,18 +294,6 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         Annotation annotations[] = entityProperty.getAnnotations();
         System.out.println("handlePersistenceAnnotations: Processing property: " + entityProperty.getName());
         
-        Class memberClass = null;
-        try {
-            memberClass = entityProperty.getWriteType(entity);
-            if(java.util.Collection.class.isAssignableFrom(memberClass)) {
-                ParameterizedType paramType = (ParameterizedType)entityProperty.getGenericType(entity);
-                memberClass = (Class)(paramType.getActualTypeArguments()[0]);
-            }
-        } catch(Exception ex) {
-            return;
-        }
-
-        
         // Only assume setter/getters to be persistence members, except those annotated with javax.persistence.Transient
         // (public fields must be annotated with persistence annotations, to be considered also as persistence members)
         boolean persistent = (entityProperty.getPropertyDescriptor() != null) 
@@ -423,8 +411,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
             if(embedded) {
                 // TO TEST:
                 try {
-                    container = this.getComponentFromEditorLayout(JPanel.class, entityProperty.getName());  // search a JPanel holder for the relation and navigation commands.
-                 
+                    Class memberClass = entityProperty.getWriteType(entity);
                     EntityEditorInterface entityEditor = EditorFactory.getEntityEditor(this, puName, memberClass, getLayoutPath() + "." + entityProperty.getName());
                     compGetter = entityEditor.getClass().getMethod("getEntity");
                     binding = DoeBinding.createSaveBinding(entity, entityProperty, entityEditor, compGetter, editor);
@@ -440,6 +427,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                         isNewComponent = false;
                         comp = null;
                     } else {
+                        container = this.getComponentFromEditorLayout(JPanel.class, entityProperty.getName());  // search a JPanel holder for the relation and navigation commands.
                         if(container == null) {
                             entityEditorUI.setBorder(javax.swing.BorderFactory.createTitledBorder(I18n.getEntityName(memberClass)));
                             comp = entityEditorUI;
