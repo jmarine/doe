@@ -41,7 +41,6 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     private final static String manyRelationOperators[] = { "" , "MEMBER", "NOT MEMBER", "IS EMPTY", "IS NOT EMPTY" }; 
     private final static String oneRelationOperators[] = { "" , "=", "<>", "IS NULL", "IS NOT NULL" };
 
-
     private final static GridBagConstraints gbcProperty = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, new Insets(0,4,2,4), 0,0);
     private final static GridBagConstraints gbcOperator = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 1, 1, 0.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.HORIZONTAL, new Insets(0,4,2,4), 0,0);
     private final static GridBagConstraints gbcComponent = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 0.0, GridBagConstraints.NORTHWEST, GridBagConstraints.BOTH, new Insets(0,4,6,4), 0,0);
@@ -152,25 +151,26 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
             HashKeyProperty property = (HashKeyProperty)selector.getSelectedItem();
             JComponent comp = EditorFactory.getPropertyEditor(this, manager.getPersistenceUnitName(), target, property, 0);
-
-            operator.putClientProperty("editor", comp);
-            editorContainer.add("Center", comp);
-            editorContainer.revalidate();
+            if(comp != null) {
+                operator.putClientProperty("editor", comp);
+                editorContainer.add("Center", comp);
+                editorContainer.revalidate();
             
-            if(property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) {
-                operator.setModel(new DefaultComboBoxModel(property.isCollectionType() ? manyRelationOperators : oneRelationOperators));
-            } else {
-                operator.setModel(new DefaultComboBoxModel(simpleFieldOperators));
-            }
-            operator.setSelectedIndex(1);
+                if(property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) {
+                    operator.setModel(new DefaultComboBoxModel(property.isCollectionType() ? manyRelationOperators : oneRelationOperators));
+                } else {
+                    operator.setModel(new DefaultComboBoxModel(simpleFieldOperators));
+                }
+                operator.setSelectedIndex(1);
 
-            Binding binding = (Binding)comp.getClientProperty("dataBinding");
-            if(binding != null) {
-                bindingContext.addBinding(binding);
-                binding.bind();
-                selector.putClientProperty("dataBinding", binding);
-            }
+                Binding binding = (Binding)comp.getClientProperty("dataBinding");
+                if(binding != null) {
+                    bindingContext.addBinding(binding);
+                    binding.bind();
+                    selector.putClientProperty("dataBinding", binding);
+                }
 
+            } 
         }
         
         // Add a new condition (when may be needed)
@@ -214,33 +214,43 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
         try {
             BeanInfo bi = Introspector.getBeanInfo(entityClass);
             for(java.beans.PropertyDescriptor pd : bi.getPropertyDescriptors()) {
-                // FIXME: inherited properties are included?
-                if(pd.getName().equals("class")) continue;
-                HashKeyProperty property = new HashKeyProperty(prefix + pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
-                if(property.getWriteType(target).getAnnotation(javax.persistence.Embeddable.class) != null) {
-                    getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + ".");    // but don't directly search by embbedded entity
-                } else if(!properties.contains(property)) {
-                    properties.add(property);
-                    if( (prefix.indexOf(".") == -1) && (property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
-                        getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + "."); 
+                try {             
+                    // FIXME: inherited properties are included?
+                    if(pd.getName().equals("class")) continue;
+                    HashKeyProperty property = new HashKeyProperty(prefix + pd.getName(), pd.getPropertyType(), pd.getReadMethod().getGenericReturnType());
+                    if(property.getWriteType(target).getAnnotation(javax.persistence.Embeddable.class) != null) {
+                        getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + ".");    // but don't directly search by embbedded entity
+                    } else if(!properties.contains(property)) {
+                        properties.add(property);
+                        if( (prefix.indexOf(".") == -1) && (property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
+                            getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + "."); 
+                        }
                     }
+                    
+                } catch(Exception ex) {
+                    System.out.println("CustomQueryEditorImpl.getProperties: ERROR: " + ex.getMessage());
                 }
             }
             
             for(Field field : entityClass.getFields()) {
-                // TODO: inherited fields
-                if(field.getName().equals("class")) continue;
-                HashKeyProperty property = new HashKeyProperty(prefix + field.getName(), field.getType(), field.getGenericType());
-                if(property.getWriteType(target).getAnnotation(javax.persistence.Embeddable.class) != null) {
-                    getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + ".");  // but don't directly search by embbedded entity
-                } else if(!properties.contains(property)) {
-                    properties.add(property);
-                    if( (prefix.indexOf(".") == -1) && (property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
-                        getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + "."); 
+                try {
+                    // TODO: inherited fields
+                    if(field.getName().equals("class")) continue;
+                    HashKeyProperty property = new HashKeyProperty(prefix + field.getName(), field.getType(), field.getGenericType());
+                    if(property.getWriteType(target).getAnnotation(javax.persistence.Embeddable.class) != null) {
+                        getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + ".");  // but don't directly search by embbedded entity
+                    } else if(!properties.contains(property)) {
+                        properties.add(property);
+                        if( (prefix.indexOf(".") == -1) && (property.getWriteType(target).getAnnotation(javax.persistence.Entity.class) != null) && (!property.isCollectionType()) ) {  // 1 level navigation
+                            getProperties(target, properties, property.getWriteType(target), prefix + property.getName() + "."); 
+                        }
                     }
+                
+                } catch(Exception ex) {
+                    System.out.println("CustomQueryEditorImpl.getProperties: ERROR: " + ex.getMessage());
                 }
             }
-            
+
         } catch(Exception ex) {
             System.out.println("CustomQueryEditorImpl.getProperties: ERROR: " + ex.getMessage());
         }
