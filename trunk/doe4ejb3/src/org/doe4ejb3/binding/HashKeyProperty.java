@@ -42,13 +42,22 @@ public class HashKeyProperty extends DoeProperty
         if(java.util.Collection.class.isAssignableFrom(returnType)) {
             System.out.println("HashKeyProperty: property " + getName() + " is a collection, but only 1 item can be selected");
             try {
-                ParameterizedType paramType = (ParameterizedType)getGenericType(ignoredObject);
-                if(paramType != null) returnType = (Class)(paramType.getActualTypeArguments()[0]);
+                Type type = getGenericType(ignoredObject);
+                if(type instanceof ParameterizedType) {
+                    ParameterizedType paramType = (ParameterizedType)type;
+                    if(paramType != null) returnType = (Class)(paramType.getActualTypeArguments()[0]);
+                } 
+                
             } catch(Exception ex) {
                 System.out.println("HashKeyProperty.getType(): ERROR = " + ex.getMessage());
-                System.err.println("HashKeyProperty.getType(): ERROR = " + ex.getMessage());
                 ex.printStackTrace();
             }
+            
+            if( (java.util.Collection.class.isAssignableFrom(returnType)) 
+                    || (returnType.isAssignableFrom(Object.class)) )  {
+                throw new RuntimeException("Undefined target entity type on generic collection.");
+            }
+            
         }
         return returnType;
     }
