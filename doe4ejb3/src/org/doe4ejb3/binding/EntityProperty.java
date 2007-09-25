@@ -32,14 +32,14 @@ public class EntityProperty extends DoeProperty
     
 
     
-    public EntityProperty(Class targetClass, Field field) throws IllegalArgumentException
+    public EntityProperty(Class sourceClass, Field field) throws IllegalArgumentException
     {
         this.field = field;
         this.memberClass = field.getType();
         this.propertyName = decapitalize(field.getName());
     }
 
-    public EntityProperty(Class targetClass, PropertyDescriptor propertyDescriptor) throws IllegalArgumentException
+    public EntityProperty(Class sourceClass, PropertyDescriptor propertyDescriptor) throws IllegalArgumentException
     {
         this.propertyDescriptor = propertyDescriptor;
         this.memberClass = propertyDescriptor.getPropertyType();
@@ -55,7 +55,7 @@ public class EntityProperty extends DoeProperty
 
             if(name != null) {
                 name = "set" + name;  // exact setter name
-                for(Class inspectedClass = targetClass; (writeMethod == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
+                for(Class inspectedClass = sourceClass; (writeMethod == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
                     try { 
                         writeMethod = inspectedClass.getDeclaredMethod(name, this.propertyDescriptor.getReadMethod().getReturnType());
                         if(writeMethod != null) {
@@ -73,9 +73,9 @@ public class EntityProperty extends DoeProperty
 
 
         // search possible field with the same property name (it may contain additional annotations)
-        for(Class inspectedClass = targetClass; (field == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
+        for(Class inspectedClass = sourceClass; (field == null) && (inspectedClass != null); inspectedClass = inspectedClass.getSuperclass()) {
             try { 
-                this.field = targetClass.getDeclaredField(propertyName); 
+                this.field = inspectedClass.getDeclaredField(propertyName); 
                 System.out.println("EntityProperty: INFO: field attribute found for propertyDescriptor  " + propertyName);
             } catch(Exception ex) { }
         }
@@ -163,7 +163,8 @@ public class EntityProperty extends DoeProperty
     
     public Class getWriteType(Object ignoredObject) // throws IllegalAccessException, InvocationTargetException
     {
-        Class retval = null;
+        Class retval = memberClass;
+        /*
         if(propertyDescriptor != null) {
             retval = propertyDescriptor.getReadMethod().getReturnType();
         } 
@@ -171,6 +172,7 @@ public class EntityProperty extends DoeProperty
         if( (retval == null) && (field != null) ) {
             retval = field.getType();
         } 
+        */
         
         return retval;
     }

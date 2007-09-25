@@ -19,10 +19,13 @@ import java.beans.PropertyEditorSupport;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -104,13 +107,30 @@ public class EditorFactory
             if(java.util.Collection.class.isAssignableFrom(memberClass)) {
                 isCollection = true;
                 System.out.println("EditorFactory: property " + property.getName() + " is a collection");
-                ParameterizedType paramType = (ParameterizedType)property.getGenericType(source);
-                if(paramType != null) memberClass = (Class)(paramType.getActualTypeArguments()[0]);
-            } else {
-                System.out.println("EditorFactory: property " + property.getName() + " is not a collection");
-            }
+                Type type = property.getGenericType(source);
+                if(type instanceof ParameterizedType) {
+                    ParameterizedType paramType = (ParameterizedType)type;
+                    if(paramType != null) memberClass = (Class)(paramType.getActualTypeArguments()[0]);
+                } else if(property instanceof EntityProperty) {
+                    EntityProperty ep = (EntityProperty)property;
+                    if(ep.hasAnnotation(OneToMany.class)) {
+                        OneToMany o2m = (OneToMany)ep.getAnnotation(OneToMany.class);
+                        memberClass = o2m.targetEntity();
+                    } else if(ep.hasAnnotation(ManyToMany.class)) {
+                        ManyToMany m2m = (ManyToMany)ep.getAnnotation(ManyToMany.class);
+                        memberClass = m2m.targetEntity();
+                    }
+                }
+
+                if( (java.util.Collection.class.isAssignableFrom(memberClass)) 
+                        || (memberClass.isAssignableFrom(Object.class)) )  {
+                    throw new Exception("Undefined target entity class for " + property.getName() + " relationship.");
+                }
+            } 
         } catch(Exception ex) {
-            throw new RuntimeException("Property type error: " + ex.getMessage());
+            System.out.println("ERROR: " + ex.getMessage());
+            ex.printStackTrace();
+            return null;
         }
         
         // relations editors
