@@ -7,12 +7,15 @@
 
 package org.doe4ejb3.gui;
 
+import java.awt.Frame;
 import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 
 
 public interface WindowManager 
 {
+    Frame  getMainWindow();
+    
     Object createWindow(final Object key, String title, ImageIcon icon, Object contentPane);
     Object findWindow(Object key);
     Object getActiveWindow();

@@ -9,6 +9,7 @@ package org.doe4ejb3.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Frame;
 import java.util.HashMap;
 
 import javax.swing.ImageIcon;
@@ -25,17 +26,24 @@ import org.doe4ejb3.util.DOEUtils;
 
 public class DefaultWindowManager implements WindowManager 
 {
+    private Frame mainWindow;
     private JDesktopPane mdiDesktopPane;
     private JLabel jLabelStatusBar;
     
     private HashMap<Object,JInternalFrame> openedInternalFrames;
 
     
-    public DefaultWindowManager(JDesktopPane mdiDesktopPane, JLabel jLabelStatusBar)
+    public DefaultWindowManager(Frame mainWindow, JDesktopPane mdiDesktopPane, JLabel jLabelStatusBar)
     {
+        this.mainWindow = mainWindow;
         this.mdiDesktopPane = mdiDesktopPane;
         this.jLabelStatusBar = jLabelStatusBar;
         this.openedInternalFrames = new HashMap<Object,JInternalFrame>();
+    }
+    
+    public Frame getMainWindow()
+    {
+        return mainWindow;
     }
     
     public Object createWindow(final Object key, String title, ImageIcon icon, Object contentPane)

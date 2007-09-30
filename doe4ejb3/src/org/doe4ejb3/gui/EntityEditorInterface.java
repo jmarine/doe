@@ -12,6 +12,7 @@
 
 package org.doe4ejb3.gui;
 
+import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import javax.swing.JComponent;
 
@@ -61,11 +62,12 @@ public interface EntityEditorInterface
     /**
      * Get the edited object
      */
-    Object getEntity() throws IllegalAccessException, InvocationTargetException;
+    Object getEntity() throws IllegalAccessException, InvocationTargetException, PropertyVetoException;
 
     /**
      * Returns true when editing a new object, o false when editing an existing object.
      */
     boolean isNew();
+
     
 }

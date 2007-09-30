@@ -34,7 +34,9 @@ public abstract class DoeProperty extends PropertyHelper
         return true;
     }
     
-
-
+    public String toString()
+    {
+        return getName();
+    }
      
 }

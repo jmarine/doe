@@ -12,6 +12,7 @@ import org.doe4ejb3.binding.DoeProperty;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
+import java.beans.PropertyVetoException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
@@ -51,7 +52,7 @@ public class QueryParametersEditorImpl extends JPanel implements EditorLayoutInt
     }    
 
     
-    public HashMap getParameterValues() throws IllegalAccessException, InvocationTargetException
+    public HashMap getParameterValues() throws IllegalAccessException, InvocationTargetException, PropertyVetoException
     {
         bindingContext.commitUncommittedValues();
         return parameterValues;

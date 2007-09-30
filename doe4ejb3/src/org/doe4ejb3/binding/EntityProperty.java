@@ -8,6 +8,7 @@
 package org.doe4ejb3.binding;
 
 import java.beans.PropertyDescriptor;
+import java.beans.PropertyVetoException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

@@ -8,6 +8,7 @@
 package org.doe4ejb3.binding;
 
 import java.beans.PropertyEditor;
+import java.beans.PropertyVetoException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
@@ -96,8 +97,9 @@ class EditorReaderProperty extends PropertyHelper
                 }
 
                 return value;
+
             } catch(Exception ex) {
-                throw new PropertyResolverException("Error: " + ex.getMessage(), source, componentValueGetter.getName());
+                throw new PropertyResolverException("Error: " + ex.getMessage(), source, componentValueGetter.getName(), ex);
             }
         }
 
