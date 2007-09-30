@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.test.academy;
 
+import java.beans.PropertyVetoException;
 import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.*;
@@ -41,7 +42,12 @@ public class Person implements Serializable {
         return ssn;
     }
 
-    protected void setSsn(String ssn) {
+    protected void setSsn(String ssn) throws IllegalArgumentException {
+        try {
+            Integer.parseInt(ssn);
+        } catch(Exception ex) {
+            throw new IllegalArgumentException("SSN must be a number");
+        }
         this.ssn = ssn;
     }
 
