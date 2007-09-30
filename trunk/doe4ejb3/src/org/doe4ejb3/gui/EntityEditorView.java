@@ -11,6 +11,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
 import java.awt.print.*;
+import java.beans.PropertyVetoException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.*;
 
 import javax.swing.*;
@@ -70,6 +72,27 @@ public class EntityEditorView extends javax.swing.JPanel
         repaint();
     }
     
+    private Object getEntity() throws Exception
+    {
+        try {
+            return editor.getEntity();
+        } catch(Exception error) {
+            
+            for(Exception cause = error; (cause != null); cause = (Exception)cause.getCause()) {
+                if( (cause != null) && (cause.getCause() != null) && (cause.getCause() instanceof InvocationTargetException) ) {
+                    InvocationTargetException invocationException = (InvocationTargetException)cause.getCause();
+                    cause = (Exception)invocationException.getTargetException();
+                }
+                if( (cause != null) && (cause instanceof PropertyVetoException) ) {
+                    PropertyVetoException veto = (PropertyVetoException)cause;
+                    EditorValidationErrorPopup.showErrorPopup(DOEUtils.getWindowManager().getMainWindow(), (javax.swing.JComponent)veto.getPropertyChangeEvent().getSource(), veto.getMessage());
+                    throw cause;
+                }
+            }
+            throw error;
+        }
+    }    
+    
     private void updateActions()
     {
         clearCustomActions();
@@ -97,6 +120,8 @@ public class EntityEditorView extends javax.swing.JPanel
             jButtonsPanel.remove(defaultActionsCount-1);  // before "Close" button
         }
     }
+    
+
     
     /** This method is called from within the constructor to
      * initialize the form.
@@ -205,6 +230,14 @@ public class EntityEditorView extends javax.swing.JPanel
         WindowManager wm = DOEUtils.getWindowManager();
         Object window = wm.getWindowFromComponent(this);
         wm.closeWindow(window);
+        
+        // FIXME: pending to move this code to its window close event handler:
+        if( (!editor.isNew()) && (window != null) && (window instanceof JComponent) ) {
+            Object dirtyEntity = ((JComponent)window).getClientProperty("dirtyEntity");
+            if(dirtyEntity != null) {
+                DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "WARNING: Entity has been modified for validations, but there was a problem while restoring original value, so it should be refreshed from database.");  // rollback problem
+            }
+        }
     }
 
 
@@ -235,7 +268,7 @@ public class EntityEditorView extends javax.swing.JPanel
             EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             
             setMessage(MessageFormat.format("Saving {0}.", JPAUtils.getEntityName(entityClass)));                    
-            Object oldEntity = editor.getEntity();
+            Object oldEntity = getEntity();
             Object newEntity = JPAUtils.saveEntity(puName, oldEntity);
                 
             try {
@@ -292,10 +325,10 @@ public class EntityEditorView extends javax.swing.JPanel
         }
 
         @Override
-        protected void failed(Throwable cause) 
+        protected void failed(Throwable error) 
         {
-            setMessage("Error: " + cause.getClass().getName() + ":" + getMessage());
-            cause.printStackTrace();
+            setMessage("Error: " + error.getMessage());
+            error.printStackTrace();
         }
         
         @Override
@@ -318,7 +351,6 @@ public class EntityEditorView extends javax.swing.JPanel
         {        
             EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             setMessage(MessageFormat.format("Deleting {0}.", JPAUtils.getEntityName(entityClass)));                    
-            Object entity = editor.getEntity();
             JPAUtils.removeEntity(puName, entity);
             setMessage(MessageFormat.format("{0} removed.", JPAUtils.getEntityName(entityClass)));
 

@@ -25,6 +25,7 @@ import org.doe4ejb3.binding.BindingContext;
 import org.doe4ejb3.binding.DoeBinding;
 import org.doe4ejb3.binding.EntityProperty;
 import org.doe4ejb3.annotation.EntityDescriptor;
+import org.doe4ejb3.util.DOEUtils;
 
 
 public class EntityEditorImpl extends JPanel implements EntityEditorInterface, EditorLayoutInterface, Printable
@@ -215,8 +216,9 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
     {
         return this.objIsNew;
     }
+    
 
-    public Object getEntity() throws IllegalAccessException, InvocationTargetException
+    public Object getEntity() throws IllegalAccessException, InvocationTargetException, PropertyVetoException
     {
         bindingContext.commitUncommittedValues();
         return this.entity;

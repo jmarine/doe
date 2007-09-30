@@ -41,7 +41,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         Exception error = null;
         initComponents();
         
-        DOEUtils.setWindowManager(new DefaultWindowManager(mdiDesktopPane, jLabelStatus));
+        DOEUtils.setWindowManager(new DefaultWindowManager(this, mdiDesktopPane, jLabelStatus));
 
         try {
             initPersistenceEntities();

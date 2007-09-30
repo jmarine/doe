@@ -16,6 +16,7 @@ import java.awt.Insets;
 import java.awt.event.ItemListener;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
+import java.beans.PropertyVetoException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -260,7 +261,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
 
 
     
-    public String getEJBQL()
+    public String getEJBQL() throws PropertyVetoException
     {
         bindingContext.commitUncommittedValues();
         
@@ -327,7 +328,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
     }
 
     
-    public HashMap getParameterValues() throws IllegalAccessException, InvocationTargetException
+    public HashMap getParameterValues() throws IllegalAccessException, InvocationTargetException, PropertyVetoException
     {
         if(parameterValues == null) getEJBQL();
         return parameterValues;
