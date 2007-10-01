@@ -85,7 +85,7 @@ public class EntityEditorView extends javax.swing.JPanel
                 }
                 if( (cause != null) && (cause instanceof PropertyVetoException) ) {
                     PropertyVetoException veto = (PropertyVetoException)cause;
-                    EditorValidationErrorPopup.showErrorPopup(DOEUtils.getWindowManager().getMainWindow(), (javax.swing.JComponent)veto.getPropertyChangeEvent().getSource(), veto.getMessage());
+                    ValidationErrorPopup.showErrorPopup((javax.swing.JComponent)veto.getPropertyChangeEvent().getSource(), veto.getMessage());
                     throw cause;
                 }
             }
