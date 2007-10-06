@@ -20,7 +20,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -123,8 +122,8 @@ public class Recipe implements java.io.Serializable
     }
 
 
+    @OneToMany
     @PropertyDescriptor(index=5)
-    @OneToMany(cascade = { CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE })  // don't delete ingredients used in other recipes
     //@Collection(child = true)
     public Set<Ingredient> getIngredients()
     {

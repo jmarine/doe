@@ -20,8 +20,8 @@ public class Teacher extends Person
 {
     private Set<Course> courses = new HashSet<Course>();
     
-    @JoinTable(name = "COURSE_TEACHER", joinColumns = @JoinColumn(name = "teacher_ssn"), inverseJoinColumns = @JoinColumn(name = "course_id")) 
-    @ManyToMany(cascade = { CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE })  // don't delete ingredients used in other recipes
+    @ManyToMany
+    @JoinTable(name = "COURSE_TEACHER", joinColumns = @JoinColumn(name = "teacher_ssn"), inverseJoinColumns = @JoinColumn(name = "course_id"))
     public Set<Course> getCourses()
     {
         return courses;
