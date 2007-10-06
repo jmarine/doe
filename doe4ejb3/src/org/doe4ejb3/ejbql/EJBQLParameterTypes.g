@@ -22,7 +22,7 @@
 // This code is based on "EJBQLParser.g" from Oracle TopLink-Essentials
 // (Copyright (c) 1998, 2006, Oracle. All rights reserved.)
 // (Added 20/12/2000 JED. Define the package for the class)
-// (Modified 24/09/2006 jmarine. Get parameter information from EJBQL statement)
+// (Modified 24/09/2006 <jmarine@dev.java.net>. Get parameter information from EJBQL statement)
 header {
     package org.doe4ejb3.ejbql;
 

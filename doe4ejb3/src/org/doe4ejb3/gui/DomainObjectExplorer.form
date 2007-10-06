@@ -11,7 +11,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemNew">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="createNewEntity" methodName=""/>
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="createNewEntity"/>
             </Property>
             <Property name="mnemonic" type="int" value="110"/>
           </Properties>
@@ -19,7 +19,7 @@
         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemManager">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="manageEntityClass" methodName=""/>
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="manageEntityClass"/>
             </Property>
             <Property name="mnemonic" type="int" value="109"/>
             <Property name="text" type="java.lang.String" resourceKey="managerMenu.text"/>
@@ -58,7 +58,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemExit">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="exit" methodName=""/>
+                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="exit"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="120"/>
               </Properties>
@@ -74,7 +74,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemCut">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="cut" methodName=""/>
+                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="cut"/>
                 </Property>
               </Properties>
               <Events>
@@ -84,7 +84,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemCopy">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="copy" methodName=""/>
+                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="copy"/>
                 </Property>
               </Properties>
               <Events>
@@ -94,7 +94,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemPaste">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="paste" methodName=""/>
+                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="paste"/>
                 </Property>
               </Properties>
               <Events>
@@ -106,7 +106,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemConnectionProperties">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="openConnectionManager" methodName=""/>
+                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="openConnectionManager"/>
                 </Property>
               </Properties>
               <Events>
@@ -124,7 +124,7 @@
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemAbout">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="about" methodName=""/>
+                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="about"/>
                 </Property>
                 <Property name="mnemonic" type="int" value="97"/>
               </Properties>
@@ -170,7 +170,7 @@
         <Component class="javax.swing.JButton" name="jButtonConnectionProperties">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="openConnectionManager" methodName=""/>
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="openConnectionManager"/>
             </Property>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -190,7 +190,7 @@
         <Component class="javax.swing.JButton" name="jButtonCut">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="cut" methodName=""/>
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="cut"/>
             </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -204,7 +204,7 @@
         <Component class="javax.swing.JButton" name="jButtonCopy">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="copy" methodName=""/>
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="copy"/>
             </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -217,7 +217,7 @@
         <Component class="javax.swing.JButton" name="jButtonPaste">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="paste" methodName=""/>
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="paste"/>
             </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>

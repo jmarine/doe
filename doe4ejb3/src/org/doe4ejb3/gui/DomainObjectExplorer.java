@@ -511,7 +511,27 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     
     @org.jdesktop.application.Action
     public void about() {
-        DOEUtils.getWindowManager().showMessageDialog("Domain Object Explorer for EJB3 - version 0.2 alpha\nDevelopers: Jordi Marine Fort <jmarine@dev.java.net>", "About", JOptionPane.INFORMATION_MESSAGE);
+        StringBuffer info = new StringBuffer();
+        info.append("Domain Object Explorer for EJB3 - version 0.2 alpha\n");
+        info.append("\n");
+        info.append("Developers:\n");
+        info.append("   Jordi Marine Fort <jmarine@dev.java.net>\n");
+        info.append("\n");
+        info.append("Special thanks to:\n");
+        info.append("   SUN Microsystems, Inc.\n");
+        info.append("   NetBeans team.\n");
+        info.append("   GlassFish comunity.\n");
+        info.append("   Oracle TopLink Essentials team.\n");
+        info.append("   Trails framework team.\n");
+        info.append("   ANTLR project team.\n");
+        info.append("   Beans binding project team.\n");
+        info.append("   Swing application framework team.\n");
+        info.append("   JAXB framework team.\n");
+        info.append("   Java tutorial and demo writers.\n");
+        info.append("   Gerald Nunn (MDIDesktopPane/WindowMenu article)\n");
+        info.append("   Michael Urban (AbstractValidator article)\n");
+        info.append("\n");
+        DOEUtils.getWindowManager().showMessageDialog(info.toString(), "About", JOptionPane.INFORMATION_MESSAGE);
     }
 
     
