@@ -20,6 +20,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.swing.JOptionPane;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -33,6 +35,7 @@ import javax.persistence.TemporalType;
 import javax.persistence.NamedQuery;
 
 import org.doe4ejb3.annotation.PropertyDescriptor;
+import org.doe4ejb3.util.DOEUtils;
 
 
 @Entity
@@ -197,7 +200,7 @@ public class Recipe implements java.io.Serializable
     @Action
     public void cookIt()
     {
-        System.out.println("CookIt action is not implemented");
+        DOEUtils.getWindowManager().showMessageDialog("Ready", "CookIt result", JOptionPane.INFORMATION_MESSAGE);
     }
 
 }
