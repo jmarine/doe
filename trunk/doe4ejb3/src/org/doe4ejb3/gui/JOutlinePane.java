@@ -1,17 +1,13 @@
-/*
+/**
  * JOutlinePane.java
  *
  * Created on 4 / juny / 2005, 18:31
- *
- * To change this template, choose Tools | Options and locate the template under
- * the Source Creation and Management node. Right-click the template and choose
- * Open. You can then make changes to the template in the Source Editor.
+ * @author Jordi Marine Fort
  */
 
 package org.doe4ejb3.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Graphics;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;

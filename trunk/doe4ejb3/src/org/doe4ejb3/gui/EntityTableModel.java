@@ -2,7 +2,7 @@
  * EntityTableModel.java
  *
  * Created on 15 October 2006, 17:32
- * @author jordi
+ * @author Jordi Marine Fort
  */
 
 package org.doe4ejb3.gui;
