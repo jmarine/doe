@@ -1,6 +1,5 @@
 package org.doe4ejb3.test.invoice;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue; import javax.persistence.GenerationType;
@@ -8,7 +7,6 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Id;
-import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,7 +53,7 @@ public class Order implements java.io.Serializable
       total += quantity * price;
    }
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy="order")
+   @OneToMany(fetch = FetchType.EAGER, mappedBy="order")
    public Collection<LineItem> getLineItems()
    {
       return lineItems;

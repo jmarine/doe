@@ -1,22 +1,12 @@
 
 import javax.persistence.Entity;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.Version;
 import javax.persistence.GenerationType;
 import javax.persistence.GeneratedValue;
 
 
-import java.util.Collection;
-import java.util.Set;
-
-@Entity()
+@Entity
 public class Provincia implements java.io.Serializable
 {
    Integer id;

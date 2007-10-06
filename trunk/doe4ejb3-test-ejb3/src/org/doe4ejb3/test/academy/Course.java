@@ -68,8 +68,8 @@ public class Course implements Serializable {
     }
     
 
-    @JoinTable(name = "COURSE_TEACHER", joinColumns = @JoinColumn(name = "course_id"), inverseJoinColumns = @JoinColumn(name = "teacher_ssn")) 
-    @ManyToMany(cascade = { CascadeType.REFRESH, CascadeType.PERSIST, CascadeType.MERGE })  // don't delete ingredients used in other recipes
+    @ManyToMany
+    @JoinTable(name = "COURSE_TEACHER", joinColumns = @JoinColumn(name = "course_id"), inverseJoinColumns = @JoinColumn(name = "teacher_ssn"))
     public Set<Teacher> getTeachers()
     {
         return teachers;
