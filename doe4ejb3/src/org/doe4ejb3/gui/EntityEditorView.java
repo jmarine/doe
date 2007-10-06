@@ -269,7 +269,12 @@ public class EntityEditorView extends javax.swing.JPanel
             
             setMessage(MessageFormat.format("Saving {0}.", JPAUtils.getEntityName(entityClass)));                    
             Object oldEntity = getEntity();
-            Object newEntity = JPAUtils.saveEntity(puName, oldEntity);
+            Object newEntity = oldEntity;
+            if(editor.isNew()) {
+                newEntity = JPAUtils.createEntity(puName, oldEntity);  // safer than "saveEntity" method.
+            } else {
+                newEntity = JPAUtils.saveEntity(puName, oldEntity);  
+            }
                 
             try {
                 EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
