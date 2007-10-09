@@ -1,7 +1,7 @@
 /**
  * EditorValidationErrorPopup.java
  * 
- * This class is based on org.javalobby.validation.AbstractValidator,
+ * This class was based on org.javalobby.validation.AbstractValidator,
  * developed by Michael Urban (Beta 1)
  */
 package org.doe4ejb3.gui;
@@ -40,13 +40,13 @@ public class ValidationErrorPopup
         container.add(image);
         container.add(messageLabel);
 
-        popup.getContentPane().setLayout(new FlowLayout(FlowLayout.LEFT, 0,0));
+        popup.setLayout(new FlowLayout(FlowLayout.LEFT, 0,0));
+        popup.add(container);
         popup.setUndecorated(true);
-        popup.getContentPane().setBackground(POPUP_COLOR);
-        popup.getContentPane().add(container);
+        popup.setBackground(POPUP_COLOR);
         popup.setFocusableWindowState(false);        
         
-        c.setBackground(Color.PINK);
+        c.setBackground(Color.RED);
         c.requestFocus();                            // may move scrollbars for component visibility
         SwingUtilities.invokeLater(new Runnable() {  // so, delay to open popup on new position
             public void run() {
@@ -63,7 +63,4 @@ public class ValidationErrorPopup
         });
     }
         
-    
-
-
 }
