@@ -274,6 +274,7 @@ public class EditorFactory
                             if(container != null) panel.putClientProperty("layout", layout);  // existing JComboBox or JPanel
                             panel.setLayout(new BorderLayout());
                             panel.add(combo, BorderLayout.CENTER);
+                            panel.putClientProperty("printableContent", combo);
                             comp = panel;
 
                             if(property instanceof EntityProperty) {
