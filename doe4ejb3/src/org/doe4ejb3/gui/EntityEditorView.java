@@ -1,5 +1,5 @@
 /**
- * EntityEditorFrame.java
+ * EntityEditorView.java
  *
  * Created on July 5, 2007, 1:02 PM
  * @author Jordi Marine Fort
@@ -30,7 +30,7 @@ public class EntityEditorView extends javax.swing.JPanel
     private EntityEditorInterface editor = null;
     private int defaultActionsCount = 0;
     
-    /** Creates new form EntityEditorFrame */
+    /** Creates new EntityEditorView */
     public EntityEditorView(String puName, Class entityClass, Object entity) throws Exception {
         
         initComponents();

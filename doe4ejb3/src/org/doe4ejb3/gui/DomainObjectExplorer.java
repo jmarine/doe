@@ -39,6 +39,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     protected DomainObjectExplorer() 
     {
         Exception error = null;
+        initI18n();
         initComponents();
         
         DOEUtils.setWindowManager(new DefaultWindowManager(this, mdiDesktopPane, jLabelStatus));
@@ -435,6 +436,31 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     
     
     // <editor-fold defaultstate="collapsed" desc=" Private/protected methods ">
+    private void initI18n()
+    {
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this);        
+        actionMap.get("cut").putValue(Action.NAME, I18n.getLiteral("cut.Action.text"));
+        actionMap.get("cut").putValue(Action.SHORT_DESCRIPTION, I18n.getLiteral("cut.Action.shortDescription"));
+        //actionMap.get("cut").putValue(Action.LONG_DESCRIPTION, I18n.getLiteral("cut.Action.longDescription"));
+
+        actionMap.get("copy").putValue(Action.NAME, I18n.getLiteral("copy.Action.text"));
+        actionMap.get("copy").putValue(Action.SHORT_DESCRIPTION, I18n.getLiteral("copy.Action.shortDescription"));
+        //actionMap.get("copy").putValue(Action.LONG_DESCRIPTION, I18n.getLiteral("copy.Action.longDescription"));
+
+        actionMap.get("paste").putValue(Action.NAME, I18n.getLiteral("paste.Action.text"));
+        actionMap.get("paste").putValue(Action.SHORT_DESCRIPTION, I18n.getLiteral("paste.Action.shortDescription"));
+        //actionMap.get("paste").putValue(Action.LONG_DESCRIPTION, I18n.getLiteral("paste.Action.longDescription"));
+
+        actionMap.get("delete").putValue(Action.NAME, I18n.getLiteral("delete.Action.text"));
+        actionMap.get("delete").putValue(Action.SHORT_DESCRIPTION, I18n.getLiteral("delete.Action.shortDescription"));
+        //actionMap.get("delete").putValue(Action.LONG_DESCRIPTION, I18n.getLiteral("delete.Action.longDescription"));
+
+        actionMap.get("quit").putValue(Action.NAME, I18n.getLiteral("exit.Action.text"));
+        actionMap.get("quit").putValue(Action.SHORT_DESCRIPTION, I18n.getLiteral("exit.Action.shortDescription"));
+        //actionMap.get("quit").putValue(Action.LONG_DESCRIPTION, I18n.getLiteral("exit.Action.longDescription"));
+    }
+    
+    
     private void taskMonitorPropertyChange(java.beans.PropertyChangeEvent evt) {                                     
         String propertyName = evt.getPropertyName();
         if ("started".equals(propertyName)) {
@@ -512,15 +538,15 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     @org.jdesktop.application.Action
     public void about() {
         StringBuffer info = new StringBuffer();
-        info.append("Domain Object Explorer for EJB3 - version 0.2 alpha\n");
+        info.append(I18n.getLiteral(Application.class, "Application.title") + " - v" + I18n.getLiteral(Application.class, "Application.version")); info.append("\n");
         info.append("\n");
-        info.append("Developers:\n");
+        info.append(I18n.getLiteral("msg.developers")); info.append("\n");
         info.append("   Jordi Marine Fort <jmarine@dev.java.net>\n");
         info.append("\n");
-        info.append("Special thanks to:\n");
+        info.append(I18n.getLiteral("msg.thanksTo")); info.append("\n");
         info.append("   SUN Microsystems, Inc.\n");
         info.append("   NetBeans team.\n");
-        info.append("   GlassFish comunity.\n");
+        info.append("   GlassFish community.\n");
         info.append("   Oracle TopLink Essentials team.\n");
         info.append("   Trails framework team.\n");
         info.append("   ANTLR project team.\n");
@@ -531,7 +557,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         info.append("   Gerald Nunn (MDIDesktopPane/WindowMenu article)\n");
         info.append("   Michael Urban (AbstractValidator article)\n");
         info.append("\n");
-        DOEUtils.getWindowManager().showMessageDialog(info.toString(), "About", JOptionPane.INFORMATION_MESSAGE);
+        DOEUtils.getWindowManager().showMessageDialog(info.toString(), I18n.getLiteral("about.Action.text"), JOptionPane.INFORMATION_MESSAGE);
     }
 
     
