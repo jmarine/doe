@@ -43,21 +43,21 @@
         <Component class="javax.swing.JButton" name="jButtonAccept">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.EntityEditorFrame" id="accept"/>
+              <action class="org.doe4ejb3.gui.EntityEditorView" id="accept"/>
             </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonSave">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.EntityEditorFrame" id="save"/>
+              <action class="org.doe4ejb3.gui.EntityEditorView" id="save"/>
             </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JButton" name="jButtonDelete">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.EntityEditorFrame" id="delete"/>
+              <action class="org.doe4ejb3.gui.EntityEditorView" id="delete"/>
             </Property>
             <Property name="mnemonic" type="int" value="100"/>
           </Properties>
@@ -65,7 +65,7 @@
         <Component class="javax.swing.JButton" name="jButtonPrint">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.EntityEditorFrame" id="print"/>
+              <action class="org.doe4ejb3.gui.EntityEditorView" id="print"/>
             </Property>
             <Property name="mnemonic" type="int" value="112"/>
           </Properties>
@@ -73,7 +73,7 @@
         <Component class="javax.swing.JButton" name="jButtonClose">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.EntityEditorFrame" id="close"/>
+              <action class="org.doe4ejb3.gui.EntityEditorView" id="close"/>
             </Property>
             <Property name="mnemonic" type="int" value="99"/>
           </Properties>

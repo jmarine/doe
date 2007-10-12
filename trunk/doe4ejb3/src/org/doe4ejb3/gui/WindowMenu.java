@@ -20,12 +20,12 @@ import java.beans.*;
 
 public class WindowMenu extends JMenu {
     private MDIDesktopPane desktop;
-    private JMenuItem cascade=new JMenuItem("Cascade", 'c');
-    private JMenuItem tile=new JMenuItem("Tile", 't');
+    private JMenuItem cascade=new JMenuItem(I18n.getLiteral("cascadeMenuItem.text"), 'c');
+    private JMenuItem tile=new JMenuItem(I18n.getLiteral("tileMenuItem.text"), 't');
 
     public WindowMenu(MDIDesktopPane desktop) {
         this.desktop=desktop;
-        setText("Window");
+        setText(I18n.getLiteral("windowMenu.text"));
         setMnemonic('w');
         cascade.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent ae) {

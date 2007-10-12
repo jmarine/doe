@@ -11,6 +11,7 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -640,7 +641,7 @@ public class EditorFactory
         }
 
         // configure actions:
-        AbstractAction newAction = new AbstractAction("New", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
+        AbstractAction newAction = new AbstractAction(I18n.getLiteral("newMenu.text"), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/new.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
                     WindowManager wm = DOEUtils.getWindowManager();
@@ -664,7 +665,7 @@ public class EditorFactory
             }
         };
         
-        AbstractAction addExistingAction = new AbstractAction("Add", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/add.png"))) {
+        AbstractAction addExistingAction = new AbstractAction(I18n.getLiteral("add.Action.text"), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/add.png"))) {
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
@@ -684,7 +685,7 @@ public class EditorFactory
                }
         };
         
-        final AbstractAction editAction = new AbstractAction("Edit", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/edit.png"))) {
+        final AbstractAction editAction = new AbstractAction(I18n.getLiteral("editMenu.text"), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/edit.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try { 
                     if(listSelectionModel.isSelectionEmpty()) {
@@ -737,7 +738,7 @@ public class EditorFactory
            }
         };
         
-        final AbstractAction deleteAction = new AbstractAction("Delete", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/delete.png"))) {
+        final AbstractAction deleteAction = new AbstractAction(I18n.getLiteral("delete.Action.text"), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/delete.png"))) {
             public void actionPerformed(ActionEvent evt)  {
                 try {
                     if(listSelectionModel.isSelectionEmpty()) {
@@ -773,7 +774,7 @@ public class EditorFactory
             }
         };         
 
-        AbstractAction printAction = new AbstractAction("Print", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/print.png"))) {
+        AbstractAction printAction = new AbstractAction(I18n.getLiteral("print.Action.text"), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/print.png"))) {
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         if(entityTableModel.getRowCount() == 0) {
@@ -791,7 +792,7 @@ public class EditorFactory
                 }
         };
         
-        AbstractAction closeAction = new AbstractAction("Close", new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cancel.png"))) {
+        AbstractAction closeAction = new AbstractAction(I18n.getLiteral("close.Action.text"), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cancel.png"))) {
                 public void actionPerformed(ActionEvent evt)  
                 {        
                     WindowManager wm = DOEUtils.getWindowManager();
@@ -801,9 +802,9 @@ public class EditorFactory
         };
 
         // cut, copy & paste actions
-        final AbstractAction cutAction = new ClipboardAction("Cut", 't', TransferHandler.getCutAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cut.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("cut"));
-        final AbstractAction copyAction = new ClipboardAction("Copy", 'c', TransferHandler.getCopyAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/copy.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("copy"));
-        final AbstractAction pasteAction = new ClipboardAction("Paste", 'p', TransferHandler.getPasteAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/paste.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("paste"));
+        final AbstractAction cutAction = new ClipboardAction(I18n.getLiteral("cut.Action.text"), 't', TransferHandler.getCutAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cut.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("cut"));
+        final AbstractAction copyAction = new ClipboardAction(I18n.getLiteral("copy.Action.text"), 'c', TransferHandler.getCopyAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/copy.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("copy"));
+        final AbstractAction pasteAction = new ClipboardAction(I18n.getLiteral("paste.Action.text"), 'p', TransferHandler.getPasteAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/paste.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("paste"));
         
         // setup enable state, and enable change listeners:
         editAction.setEnabled(false);
