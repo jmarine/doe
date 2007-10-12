@@ -17,7 +17,7 @@ import org.doe4ejb3.gui.EntityTableModel;
 public class EntityTransferHandler extends TransferHandler 
 {
     JComponent sourceControl;
-    Object items[];
+    //Object items[];
     Class entityClass;
     DataFlavor entityFlavor;
     boolean shouldRemove;
@@ -48,6 +48,14 @@ public class EntityTransferHandler extends TransferHandler
 
     public boolean importData(JComponent c, Transferable t) {
         if (canImport(c, t.getTransferDataFlavors())) {
+            
+            // JScrollPane allows to drop content into an empty JTable
+            if(c instanceof JScrollPane) {
+                JScrollPane scroll = (JScrollPane)c;
+                c = (JComponent) scroll.getViewport().getView();
+            }
+            
+            
             //Don't drop on myself.
             if (sourceControl == c) {
                 shouldRemove = false;
@@ -65,21 +73,16 @@ public class EntityTransferHandler extends TransferHandler
                 
                 //Set the component to the new entity.
                 if(items != null) {
-                    if(c instanceof JScrollPane) {
-                        JScrollPane scroll = (JScrollPane)c;
-                        c = (JComponent) scroll.getViewport().getView();
-                    }
-                        
                     if(c instanceof JComboBox) {
                         JComboBox combo = (JComboBox)c;
-                        for(int index = 0; index < items.length; index++) {
+                        for(int index = 0; (items != null) && (index < items.length); index++) {
                             combo.addItem(items[index]);
                             if(index == 0) combo.setSelectedItem(items[index]);
                         }
                     } else if(c instanceof JTable) {
                         JTable table = (JTable)c;
                         EntityTableModel model = (EntityTableModel)table.getModel();
-                        for(int index = 0; index < items.length; index++) {
+                        for(int index = 0; (items != null) && (index < items.length); index++) {
                             if(!model.getListModel().contains(items[index])) {
                                 model.getListModel().addElement(items[index]);
                             }
@@ -108,25 +111,34 @@ public class EntityTransferHandler extends TransferHandler
     }
 
     protected void exportDone(JComponent c, Transferable data, int action) {
-        if (shouldRemove && (action == MOVE)) {
-            if(sourceControl instanceof JComboBox) {
-                JComboBox combo = (JComboBox)sourceControl;
-                for(int index = 0; (items != null) && (index < items.length); index++) {
-                    combo.removeItem(items[index]);
-                }
-            } else if(sourceControl instanceof JTable) {
-                JTable table = (JTable)sourceControl;
-                EntityTableModel model = (EntityTableModel)table.getModel();
-                for(int index = 0; index < items.length; index++) {
-                    int position = model.getListModel().indexOf(items[index]);
-                    if(position != -1) {
-                         model.getListModel().removeElementAt(position);
+        if(shouldRemove && (action == MOVE) 
+                && (data != null) && (data.getTransferDataFlavors() != null) && (data.getTransferDataFlavors().length > 0) ) {
+            Object items[] = null;
+            try {
+                items = (Object[])data.getTransferData(getEntityDataFlavor());
+                if(sourceControl instanceof JComboBox) {
+                    JComboBox combo = (JComboBox)sourceControl;
+                    for(int index = 0; (items != null) && (index < items.length); index++) {
+                        combo.removeItem(items[index]);
+                    }
+                } else if(sourceControl instanceof JTable) {
+                    JTable table = (JTable)sourceControl;
+                    EntityTableModel model = (EntityTableModel)table.getModel();
+                    for(int index = 0; (items != null) && (index < items.length); index++) {
+                        int position = model.getListModel().indexOf(items[index]);
+                        if(position != -1) {
+                             model.getListModel().removeElementAt(position);
+                        }
                     }
                 }
+            } catch(Exception ex) {
+                System.out.println("Error: " + ex.getMessage());
+                System.err.println("Error: " + ex.getMessage());
+                ex.printStackTrace();
             }
         }
         sourceControl = null;
-        items = null;
+        //items = null;
     }
 
     public boolean canImport(JComponent c, DataFlavor[] flavors) {
