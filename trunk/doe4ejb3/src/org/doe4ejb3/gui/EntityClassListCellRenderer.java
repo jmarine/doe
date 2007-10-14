@@ -39,13 +39,16 @@ public class EntityClassListCellRenderer extends DefaultListCellRenderer
         JLabel retValue = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         Class clazz = (Class)value;
         
-        //setHorizontalAlignment(SwingConstants.CENTER);
-        //setVerticalAlignment(SwingConstants.CENTER);
-        //setHorizontalTextPosition(SwingConstants.CENTER);
-        //setVerticalTextPosition(SwingConstants.BOTTOM);
+        //retValue.setHorizontalAlignment(SwingConstants.CENTER);
+        //retValue.setVerticalAlignment(SwingConstants.CENTER);
+        //retValue.setHorizontalTextPosition(SwingConstants.CENTER);
+        //retValue.setVerticalTextPosition(SwingConstants.BOTTOM);
+        //retValue.setBorder(javax.swing.BorderFactory.createEmptyBorder(10, 0, 10, 0));
         
-        setIcon(getEntityIcon(clazz));
-        setText(I18n.getEntityName(clazz));
+        retValue.setIcon(getEntityIcon(clazz));
+        retValue.setText(I18n.getEntityName(clazz));
+        if(isSelected) retValue.setForeground(java.awt.Color.WHITE);  // avoid nimbus bug
+
         return retValue;
     }
     

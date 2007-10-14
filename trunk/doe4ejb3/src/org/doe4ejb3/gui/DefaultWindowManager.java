@@ -57,7 +57,7 @@ public class DefaultWindowManager implements WindowManager
             }
         });
 
-        if(icon != null) window.setFrameIcon(icon);
+        // if(icon != null) window.setFrameIcon(icon);  // avoid nimbus bug
         
         window.setLayout(new BorderLayout());            
         if(contentPane != null) {
