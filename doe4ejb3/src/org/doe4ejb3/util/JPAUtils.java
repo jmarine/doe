@@ -317,9 +317,9 @@ public class JPAUtils
     }
     
     
-    public static EntityManager getEntityManager(String puName)
+    public static synchronized EntityManager getEntityManager(String puName)
     {    
-        // TODO: the EntityManagerFactory should be pooled and create redefined EntityManager with specific user/password?
+        // This method is now synchronized to avoid Persistence.class concurrency problems
         String providerClass = getPersistenceProvider(puName);
         HashMap<String,String> providerConnectionParams = new HashMap<String,String>();
         String username = getConnectionParam(puName, GENERIC_USER_PROPERTY_NAME);
