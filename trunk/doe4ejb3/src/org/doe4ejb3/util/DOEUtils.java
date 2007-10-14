@@ -14,6 +14,7 @@ import org.doe4ejb3.gui.WindowManager;
 import org.doe4ejb3.gui.EntityClassListCellRenderer;
 import org.doe4ejb3.gui.EntityManagerPane;
 import org.doe4ejb3.gui.EntityEditorView;
+import org.doe4ejb3.gui.I18n;
 
 
 public class DOEUtils
@@ -81,7 +82,7 @@ public class DOEUtils
             windowManager.bringToFront(window);
         } else {
             EntityManagerPane manager = new EntityManagerPane(puName, entityClass);
-            String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass) + " manager";
+            String title = I18n.getLiteral("entityManager.title", I18n.getEntityName(entityClass));
             window = windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass), manager);
             
             windowManager.showWindow(window, false);
@@ -100,8 +101,8 @@ public class DOEUtils
         } else {
             EntityEditorView editorViewer = new EntityEditorView(puName, entityClass, entity);
             String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass);
-            if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
-            else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
+            if(entity == null) title = I18n.getLiteral("entityCreator.title", title.toLowerCase());
+            else title = I18n.getLiteral("entityEditor.title", title) + ": " + entity.toString();
             
             window = windowManager.createWindow(key, title, EntityClassListCellRenderer.getInstance().getEntityIcon(entityClass), editorViewer);
 

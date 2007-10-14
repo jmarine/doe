@@ -25,8 +25,7 @@ public class Application extends SingleFrameApplication {
        setMainFrame(DomainObjectExplorer.getInstance());
        addExitListener(new ExitListener() {
             public boolean canExit(EventObject e) {
-                int option = DOEUtils.getWindowManager().showConfirmDialog( 
-                                "Do you really want to exit?", "Exit confirmation", JOptionPane.YES_NO_OPTION) ;
+                int option = DOEUtils.getWindowManager().showConfirmDialog( I18n.getLiteral("exitDialog.message"), I18n.getLiteral("exitDialog.title"), JOptionPane.YES_NO_OPTION) ;
                 return option == JOptionPane.YES_OPTION;
             }
           
