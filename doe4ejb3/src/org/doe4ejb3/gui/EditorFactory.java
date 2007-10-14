@@ -744,7 +744,7 @@ public class EditorFactory
                     if(listSelectionModel.isSelectionEmpty()) {
                         throw new ApplicationException("No items selected");
                     } else {
-                        int confirm = DOEUtils.getWindowManager().showConfirmDialog( "Do you really want to delete selected objects?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+                        int confirm = DOEUtils.getWindowManager().showConfirmDialog( I18n.getLiteral("deleteDialog.message.selected"), I18n.getLiteral("deleteDialog.title"), JOptionPane.OK_CANCEL_OPTION);
                         if(confirm == JOptionPane.OK_OPTION) 
                         {
                             try {

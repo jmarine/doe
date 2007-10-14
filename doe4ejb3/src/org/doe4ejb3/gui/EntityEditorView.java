@@ -39,11 +39,8 @@ public class EntityEditorView extends javax.swing.JPanel
         this.entityClass = entityClass;
         this.defaultActionsCount = jButtonsPanel.getComponentCount();
         
-        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
+        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");  // NOI18N
         
-        System.out.println("Creating internal frame");
-        
-        System.out.println("Preparing editor ");
         editor = EditorFactory.getEntityEditor(null, puName, entityClass, "");
         setEntity(entity);
         
@@ -51,16 +48,12 @@ public class EntityEditorView extends javax.swing.JPanel
         this.add(scrollPaneForEditor, BorderLayout.CENTER);
 
         // Define public actions (for Netbeans integration)
-        this.getActionMap().put("printAction", org.jdesktop.application.Application.getInstance().getContext().getActionMap(EntityEditorView.class, this).get("print"));
+        this.getActionMap().put("printAction", org.jdesktop.application.Application.getInstance().getContext().getActionMap(EntityEditorView.class, this).get("print"));  // NOI18N
     }
     
     private void setEntity(Object entity) throws Exception 
     {
         this.entity = entity;
-        String title = org.doe4ejb3.gui.I18n.getEntityName(entityClass);
-        if(entity == null) title = org.doe4ejb3.gui.I18n.getLiteral("New") + " " + title.toLowerCase();
-        else title = org.doe4ejb3.gui.I18n.getLiteral("Edit") + " " + title + ": " + entity.toString();
-
         if(entity == null) {
             editor.newEntity(entityClass);
         } else {
@@ -189,7 +182,7 @@ public class EntityEditorView extends javax.swing.JPanel
     @org.jdesktop.application.Action
     public org.jdesktop.application.Task delete() 
     {
-        int confirm = DOEUtils.getWindowManager().showConfirmDialog( "Do you really want to delete this object?", "Confirm operation", JOptionPane.OK_CANCEL_OPTION);
+        int confirm = DOEUtils.getWindowManager().showConfirmDialog( I18n.getLiteral("deleteDialog.message.current"), I18n.getLiteral("deleteDialog.title"), JOptionPane.OK_CANCEL_OPTION);  // NOI18N
         if(confirm != JOptionPane.OK_OPTION) {                
             return null;
         } else {
