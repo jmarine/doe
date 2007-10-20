@@ -21,14 +21,13 @@ import org.doe4ejb3.annotation.PropertyDescriptor;
 //@EntityDescriptor(layoutClassName="org.doe4ejb3.test.academy.PersonEditor")
 public class Person implements Serializable {
 
-    
     private String ssn;
     
     private String firstName;
     
     private String lastName;
 
-    private String gender;
+    private Gender gender;
     
     private java.util.Date bornDay;
     
@@ -72,13 +71,13 @@ public class Person implements Serializable {
         this.lastName = lastName;
     }
 
-
+    @Enumerated(EnumType.STRING)
     @Column(name="gender", length=10)
-    public String getGender() {
+    public Gender getGender() {
         return gender;
     }
 
-    public void setGender(String gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
