@@ -89,13 +89,18 @@ class EditorReaderProperty extends PropertyHelper
                     // FIXME: Is this cast really needed?
                     value = collectionClass.cast(list);
                 } 
+                else
+                if(value instanceof ListItem) {
+                    ListItem listItem = (ListItem)value;
+                    value = listItem.getValue();
+                }
                 else 
                 if(componentValueConverter != null) {
                     System.out.println("- Converting value with editor " + componentValueConverter);
                     componentValueConverter.setAsText(value.toString());  // string representation
                     value = componentValueConverter.getValue();           // convert to editor's real type
                 }
-
+                
                 return value;
 
             } catch(Exception ex) {

@@ -329,6 +329,48 @@ public class EditorFactory
             } 
         }
 
+        // enumeration editor
+        if(comp == null) {
+            if(memberClass.isEnum()) {
+                Object values[] = memberClass.getEnumConstants();
+                if(values != null) {
+                    try {
+                        Object container = layout.getComponentFromEditorLayout(JComboBox.class, property.getName());
+                        JComboBox combo = ((container != null) && (JComboBox.class.isAssignableFrom(container.getClass())))? (JComboBox)container : new JComboBox();
+                        comp = combo;
+                        comp.putClientProperty("fixedSize", "true");
+
+                        // set combobox model
+                        combo.addItem(null);  // TODO: check if nullable?
+                        for(Object value : values) {
+                            java.lang.Enum enumOption = (java.lang.Enum)value;
+                            String text = enumOption.toString();  // TODO: try to load i18n description from resource bundle
+                            ListItem item = new ListItem(enumOption, I18n.getLiteral(memberClass, text));
+                            combo.addItem(item);
+                        }
+                    
+                        // TODO FIX BINDING: Original binding (with setup of initial value):
+                        Method compGetter = combo.getClass().getMethod("getSelectedItem");
+                        binding = DoeBinding.createSaveBinding(source, property, combo, compGetter,null);
+
+                        Object value = property.getValue(source);
+                        if(value != null) {
+                            combo.setSelectedItem(new ListItem(value));
+                        } else {
+                            combo.setSelectedIndex(0);
+                        }
+                        
+                        /* FIX BINDING: Using beans binding 1.0 (previous version 0.6.1 didn't work with Glassfish v2)
+                        System.out.println("WARNING: jsr295 binding of PropertyDescriptor with JComboBox");
+                        binding = Bindings.createAutoBinding(AutoBinding.UpdateStrategy.READ_ONCE, source, property, combo, BeanProperty.create("selectedItem"));
+                        */
+                    } catch(Exception ex) {
+                        System.out.println("Error loading property: " + ex.getMessage());
+                        ex.printStackTrace();
+                    }                    
+                }
+            }
+        }
         
         // custom property editors
         if(comp == null) {
