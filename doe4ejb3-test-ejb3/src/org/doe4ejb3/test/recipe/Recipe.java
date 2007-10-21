@@ -24,6 +24,7 @@ import javax.swing.JOptionPane;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -125,7 +126,7 @@ public class Recipe implements java.io.Serializable
     }
 
 
-    @OneToMany
+    @OneToMany(fetch=FetchType.EAGER)
     @PropertyDescriptor(index=5)
     //@Collection(child = true)
     public Set<Ingredient> getIngredients()
