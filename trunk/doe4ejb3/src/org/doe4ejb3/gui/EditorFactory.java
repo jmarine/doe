@@ -651,7 +651,7 @@ public class EditorFactory
         final ListSelectionModel listSelectionModel = jTable.getSelectionModel();
         final EntityTableModel entityTableModel = new EntityTableModel(memberClass, listModel);
         final EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, !isManagerWindow);
-
+        
         panel.putClientProperty("printableContent", scrollableItems);
         panel.putClientProperty("scrollPane", scrollableItems);
         panel.putClientProperty("table", jTable);
@@ -735,29 +735,30 @@ public class EditorFactory
                     } else {
                         for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
                             if(listSelectionModel.isSelectedIndex(index)) {
+                                int modelIndex = jTable.convertRowIndexToModel(index);
                                 WindowManager wm = DOEUtils.getWindowManager();
-                                Object window = DOEUtils.openEntityEditor(puName, memberClass, listModel.getElementAt(index)); 
+                                Object window = DOEUtils.openEntityEditor(puName, memberClass, listModel.getElementAt(modelIndex)); 
                                 EventListenerList listenerList = wm.getEventListenerList(window);
                                 listenerList.add(EntityListener.class, new EntityListener() {
                                     public void entityChanged(EntityEvent event) {
-                                        int index;
+                                        int position;
                                         switch(event.getEventType())
                                         { 
                                             case EntityEvent.ENTITY_UPDATE:
                                                 // update JTable
-                                                System.out.println("EditorFactory: searching index of OldEntity = " + event.getOldEntity());
-                                                System.out.println("EditorFactory: searching index of NewEntity = " + event.getNewEntity());
-                                                index = listModel.indexOf(event.getOldEntity());
-                                                System.out.println("EditorFactory: index found =  " + index);
-                                                if(index != -1) listModel.setElementAt(event.getNewEntity(), index);
+                                                System.out.println("EditorFactory: searching position of OldEntity = " + event.getOldEntity());
+                                                System.out.println("EditorFactory: searching position of NewEntity = " + event.getNewEntity());
+                                                position = listModel.indexOf(event.getOldEntity());
+                                                System.out.println("EditorFactory: position found =  " + position);
+                                                if(position != -1) listModel.setElementAt(event.getNewEntity(), position);
                                                 else if(listModel.size() > 0) listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
                                                 break;
                                                 
                                             case EntityEvent.ENTITY_DELETE:
-                                                System.out.println("EditorFactory: searching index of OldEntity = " + event.getOldEntity());
-                                                index = listModel.indexOf(event.getOldEntity());
-                                                System.out.println("EditorFactory: index found =  " + index);
-                                                if(index != -1) listModel.removeElementAt(index);
+                                                System.out.println("EditorFactory: searching position of OldEntity = " + event.getOldEntity());
+                                                position = listModel.indexOf(event.getOldEntity());
+                                                System.out.println("EditorFactory: position found =  " + position);
+                                                if(position != -1) listModel.removeElementAt(position);
                                                 else if(listModel.size() > 0) listModel.setElementAt(listModel.getElementAt(0), 0);  // refresh rows/columns
                                                 break;
                                             
@@ -791,15 +792,14 @@ public class EditorFactory
                         {
                             try {
                                 panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                                for(int index = listSelectionModel.getMaxSelectionIndex(); index >= listSelectionModel.getMinSelectionIndex(); index--) {
-                                    if(listSelectionModel.isSelectedIndex(index)) {
-                                        System.out.println("EditorFactory: removing selected index: " + index);
-                                        if(isManagerWindow) {  // delete command from "EntityManagerPane"
-                                            Object entityToDelete = listModel.getElementAt(index);
-                                            JPAUtils.removeEntity(puName, entityToDelete);                                
-                                        }
-                                        listModel.removeElementAt(index);
+                                while( jTable.getSelectedRow() != -1) {
+                                    int modelIndex = jTable.convertRowIndexToModel(jTable.getSelectedRow());
+                                    System.out.println("EditorFactory: removing selected index: " + modelIndex);
+                                    if(isManagerWindow) {  // delete command from "EntityManagerPane"
+                                        Object entityToDelete = listModel.getElementAt(modelIndex);
+                                        JPAUtils.removeEntity(puName, entityToDelete);                                
                                     }
+                                    listModel.removeElementAt(modelIndex);
                                 }
                             } finally {
                                 panel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
@@ -942,8 +942,9 @@ public class EditorFactory
         scrollableItems.setComponentPopupMenu(popupMenu);
 
         jTable.setModel(entityTableModel);
+        jTable.setAutoCreateRowSorter(true);
         jTable.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        jTable.setCellSelectionEnabled(false);
+        jTable.setColumnSelectionAllowed(false);
         jTable.setRowSelectionAllowed(true);
         jTable.setComponentPopupMenu(popupMenu);
 
