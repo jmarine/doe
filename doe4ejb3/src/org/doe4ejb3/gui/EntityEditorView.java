@@ -49,6 +49,7 @@ public class EntityEditorView extends javax.swing.JPanel
 
         // Define public actions (for Netbeans integration)
         this.getActionMap().put("printAction", org.jdesktop.application.Application.getInstance().getContext().getActionMap(EntityEditorView.class, this).get("print"));  // NOI18N
+        this.getActionMap().put("saveAction", org.jdesktop.application.Application.getInstance().getContext().getActionMap(EntityEditorView.class, this).get("save"));  // NOI18N
     }
     
     private void setEntity(Object entity) throws Exception 
