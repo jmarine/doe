@@ -73,18 +73,16 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
 
     public int getRowCount() {
         int rows = listModel.getSize();
-        System.out.println("EntityTableModel: RowCount =" + rows);
         return rows;
     }
 
     public int getColumnCount() {
         int cols = Math.max(1,columnMembers.size());
-        System.out.println("EntityTableModel: Num columns =" + cols);
         return cols;
     }
 
     public String getColumnName(int columnIndex) {
-        String columnName = "";
+        String columnName = I18n.getLiteral("msg.sort");
         try {
             if( (columnIndex >= 0) && (columnIndex < columnMembers.size()) ) {
                 Member member = columnMembers.get(columnIndex);
@@ -107,11 +105,10 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
                         else if(columnName.startsWith("is")) columnName = columnName.substring(2);
                     }
                 }
-            } else {
-                return I18n.getLiteral("msg.sort");
-            }
+            } 
         } catch(Exception ex) {
-            columnName = "N/A";
+            System.out.println("Error: " + ex.getMessage());
+            ex.printStackTrace();
         }
         return columnName;
     }
@@ -165,10 +162,9 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
                     else if(member instanceof Method) retval = ((Method)member).invoke(obj);
                 }
             }        
-            System.out.println("Object " + rowIndex + ", property " + columnIndex + " = " + retval);
             return retval;
         } catch(Exception ex) {
-            return "N/A";
+            return "ERROR";
         }
     }
 
