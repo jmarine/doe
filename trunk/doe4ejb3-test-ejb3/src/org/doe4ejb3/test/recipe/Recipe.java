@@ -179,6 +179,7 @@ public class Recipe implements java.io.Serializable
     }
 
 
+    @Override
     public boolean equals(Object obj)
     {
         if( (obj != null) && (obj instanceof Recipe) ) {
@@ -188,11 +189,13 @@ public class Recipe implements java.io.Serializable
         return false;
     }  
 
+    @Override
     public int hashCode()
     {
         return id.hashCode();
     }
     
+    @Override
     public String toString()
     {
         return title;
@@ -201,7 +204,7 @@ public class Recipe implements java.io.Serializable
     @Action
     public void cookIt()
     {
-        DOEUtils.getWindowManager().showMessageDialog("Ready", "CookIt result", JOptionPane.INFORMATION_MESSAGE);
+        DOEUtils.getWindowManager().showMessageDialog("Ready to eat.", "CookIt result", JOptionPane.INFORMATION_MESSAGE);
     }
 
 }
