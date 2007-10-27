@@ -107,6 +107,8 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
                         else if(columnName.startsWith("is")) columnName = columnName.substring(2);
                     }
                 }
+            } else {
+                return I18n.getLiteral("msg.sort");
             }
         } catch(Exception ex) {
             columnName = "N/A";
