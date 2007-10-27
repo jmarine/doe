@@ -14,7 +14,7 @@ is divided into following sections:
   - cleanup
 
 -->
-<project xmlns:ear2="http://www.netbeans.org/ns/j2ee-earproject/2" basedir=".." default="build" name="doe4ejb3-test-app-impl">
+<project xmlns:ear2="http://www.netbeans.org/ns/j2ee-earproject/2" basedir=".." default="default" name="doe4ejb3-test-app-impl">
     <import file="ant-deploy.xml"/>
     <target depends="dist" description="Build whole project." name="default"/>
     <!-- 
