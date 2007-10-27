@@ -60,7 +60,7 @@
         <li><b>Project Type:</b> Java Web Start application client</li>
         <li><b>License:</b> Common Development and Distribution License (CDDL) Version 1.0</li>
       </ul>
-The "Domain Object Explorer" is a rich desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without additional programming (althought it can be customized by developers). The application can also be centrally managed from application server administrative console (for datasource configuration, deployment of persistence units, and delivery of application/updates via Java Web Start technology).
+The "Domain Object Explorer" is a desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without needing of UI programming (like <a href="http://www.nakedobjects.org">Naked Objects</a>, <a href="http://www.jmatter.org">JMatter</a>, ...). It can be deployed as a JavaEE 5 application client into <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">GlassFish v2</a> application server to centrally manage datasource configuration, update persistence units, and deliver application to users via Java Web Start technology.
       <!-- project info end -->
     </blockquote>
 
@@ -88,19 +88,16 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
     <ul>
       <li>Pros:</li>
       <ul>
-	<li>Easy management and testing of simple EJB3 entity beans.</li>
-        <li>Provides a rich user interface without any extra programming.</li>
-	<li>Auto-deployment of application and module updates via Java Web Start technology.</li>
+	<li>Rich user interface to manage and testing your JPA/EJB3 entity beans.</li>
+	<li>Auto-delivery of application and persistence units via Java Web Start technology.</li>
         <li>Data sources can be centrally managed from application server administrative console</li>
 	<li>Doesn't need complex HTML, JavaScript, nor AJAX handlers on server-side...</li>
 	<li>...</li>
       </ul>
       <li>Cons:</li>
       <ul>
-	<li>Only runs on <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">GlassFish v2</a>.</li>
 	<li>Deployed aplications are really big (about 45Mb).</li>
 	<li>Rude printing support.</li>
-	<li>No stable version, yet.</li>
 	<li>...</li>
       </ul>
     </ul>
@@ -116,13 +113,13 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
       <ul>
 	<li> "doe4ejb3" is the core library.</li>
  	<li> "doe4ejb3-app-client" is a Java EE 5 application client to be included in the users's enterprise application.</li>
+	<li> "doe4nb6": simple integration module for NetBeans Platform 6.</li>
       </ul>
  
-      Also, there are the following example modules (based on "trails" demos):
+      Also, there are the following example modules:
  	<ul>
-	<li> "doe4ejb3-test-ejb3": sample EJB3 entity beans.</li>
+	<li> "doe4ejb3-test-ejb3": sample EJB3 entity beans (some are based on  "<a href="http://www.trailsframework.org">trails</a>" demos).</li>
  	<li> "doe4ejb3-test-app" : enterprise application with the "doe" application client to manage the previous "EJB3" entities.</li>
-	<li> "doe4nb6": simple integration module for NetBeans Platform.</li>
   	</ul>
     </blockquote>
 
@@ -194,14 +191,14 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
     <h3>Support</h3>
     </a>
     <blockquote>
-      I hope the "doe" project will be a community-supported open-source product, and you could find support by subscribing to <a href="servlets/ProjectMailingListList">user mailing list</a> offered in this java.net project.
+      I hope the "doe" project will be a community-supported open-source product, and you could find support by subscribing to <a href="servlets/ProjectMailingListList">user mailing list</a>.
     </blockquote>
 
     <a name="participate">
     <h3>Participation</h3>
     </a>
     <blockquote>
-      Everybody is welcome to participate in the "doe" project.<br>
+      Everybody is welcome to participate with "doe" project.<br>
       The application can sure be improved in many ways.<br>
       Any volunteers and suggestions?<br>
       <br>
@@ -214,15 +211,14 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
  Future roadmap for the "doe" application ("to do" task list):
  <ul>
  <li>English corrections and better i18n support (but I don't speak English ;-).</li>
- <li>Improve "GUI" (menus, toolbars, icons, better navigation, allow to create/edit/delete related objects from comboboxes, better custom queries support, fix some copy&paste operations, more drag&drop operations, ...).</li>
- <li>Lazy and bidirectional relations suport (automatic load and linking in both sides)</li>
+ <li>Improve "GUI" (menus, toolbars, icons, better navigation, better custom queries support, fix some copy&paste operations, more drag&drop operations, ...).</li>
  <li>Allow user extensions/plugins to add new actions/menus for entity objects.</li>
  <li>Create custom editors for common property types (image viewers/loaders, dates, etc.)</li>
  <li>Better printing support.</li>
  <li>GUI API for customized actions in EJB3 entity beans.</li>
  <li>Load/unload of persistence units.</li>
  <li>More sample applications.</li>
- <li>NetBeans Platform module.</li>
+ <li>NetBeans Platform module improvements.</li>
  </ul>
  </blockquote>
  
@@ -241,8 +237,8 @@ The "Domain Object Explorer" is a rich desktop application that auto-generates t
 	    <li>Basic printing support.</li>
 	    <li>Custom queries in search panel.</li>
 	    <li>Custom actions in entity editor.</li>
-	    <li>Custom layout in entity editor (compiled components, or Abeille forms).</li>
- 	    <li>Allows user authentication with database connections managed by client applications.</li>
+	    <li>Custom layout in entity editor (compiled Swing UI, or Abeille forms).</li>
+ 	    <li>Allows client authentication with databases.</li>
 	    <li>API migration to jsr-295 (beans binding) and jsr-296 (swing application framework).</li>
 	    <li>Many bug fixes.</li>
 	  </ul>
