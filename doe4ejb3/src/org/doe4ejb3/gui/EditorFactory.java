@@ -58,6 +58,8 @@ import org.jdesktop.beansbinding.AutoBinding;
 import org.jdesktop.beansbinding.Converter;
 
 import org.doe4ejb3.annotation.EntityDescriptor;
+import org.doe4ejb3.beans.CustomCalendarEditor;
+import org.doe4ejb3.beans.CustomDateEditor;
 import org.doe4ejb3.beans.TemporalTypeEditorSupport;
 import org.doe4ejb3.binding.EntityProperty;
 import org.doe4ejb3.binding.DoeBinding;
@@ -435,8 +437,28 @@ public class EditorFactory
         if(comp == null) {
             try {
                 editor = findEditor(memberClass);
-                System.out.println("EditorFactory: property editor for " + memberClass.getName() + "=" + editor);
 
+                // support for "java.util.Date" and "java.util.Calendar"
+                if( (editor == null) 
+                    && (  (java.util.Date.class.isAssignableFrom(memberClass)) 
+                       || (java.util.Calendar.class.isAssignableFrom(memberClass))) ) {
+
+                    javax.persistence.TemporalType temporalType = javax.persistence.TemporalType.TIMESTAMP;
+                    if(property instanceof EntityProperty) {
+                        EntityProperty entityProperty = (EntityProperty)property;
+                        javax.persistence.Temporal temporal = entityProperty.getAnnotation(javax.persistence.Temporal.class);
+                        if(temporal != null) temporalType = temporal.value();
+                    }
+                        
+                    if(java.util.Calendar.class.isAssignableFrom(memberClass)) {
+                        editor = new CustomCalendarEditor(temporalType);
+                    } else {
+                        editor = new CustomDateEditor(temporalType);
+                    }
+                    
+                } 
+                    
+                System.out.println("EditorFactory: property editor for " + memberClass.getName() + "=" + editor);
                 Component customComponent = null;
                 try {
                     if( (editor != null) && (editor.supportsCustomEditor()) ) {
