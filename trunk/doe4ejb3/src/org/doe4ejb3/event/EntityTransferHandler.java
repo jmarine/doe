@@ -172,7 +172,7 @@ public class EntityTransferHandler extends TransferHandler
                 if(selection != null) {
                     items = (Object[])Array.newInstance(EntityTransferHandler.this.getEntityClass(), selection.length);
                     for(int index = 0; index < items.length; index++) {
-                        items[index] = model.getListModel().getElementAt(selection[index]);
+                        items[index] = model.getListModel().getElementAt(table.convertRowIndexToModel(selection[index]));
                     }
                 }
             
