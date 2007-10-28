@@ -8,11 +8,11 @@
 package org.doe4ejb3.beans;
 
 
-public class CustomSqlDateEditor extends TemporalTypeEditorSupport
+public class CustomSqlDateEditor extends CustomDateEditor
 {
     public CustomSqlDateEditor() 
     {
-        super(java.sql.Date.class);
+        super(javax.persistence.TemporalType.DATE);
     }
     
 }

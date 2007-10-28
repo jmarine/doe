@@ -10,9 +10,9 @@ package org.doe4ejb3.beans;
 
 public class CustomDateEditor extends TemporalTypeEditorSupport
 {
-    public CustomDateEditor() 
+    public CustomDateEditor(javax.persistence.TemporalType temporalType) 
     {
-        super(java.util.Date.class);
+        super(temporalType);
     }
     
 }
