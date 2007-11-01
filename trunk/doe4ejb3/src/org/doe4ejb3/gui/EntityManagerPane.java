@@ -52,8 +52,8 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             // post initialization:
             Object outBinding[] = new Object[1];
             entityListEditor = EditorFactory.getCollectionEditor(this, puName, null, null, entityClass, true, outBinding);
-            listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");
-            listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");
+            listModel = (DefaultListModel)entityListEditor.getClientProperty("listModel");  // NOI18N
+            listSelectionModel = (ListSelectionModel)entityListEditor.getClientProperty("listSelectionModel");  // NOI18N
 
             jComboBoxNamedQuery.removeAllItems();                                           
             jPanelQueryParams.setVisible(false);
@@ -63,14 +63,14 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
 
 
             // load queries in combobox:
-            jComboBoxNamedQuery.addItem(I18n.getLiteral(EntityManagerPane.class, "jComboBoxNamedQuery.option.all"));
-            jComboBoxNamedQuery.addItem(I18n.getLiteral(EntityManagerPane.class, "jComboBoxNamedQuery.option.customized"));
+            jComboBoxNamedQuery.addItem(I18n.getLiteral(EntityManagerPane.class, "jComboBoxNamedQuery.option.all"));  // NOI18N
+            jComboBoxNamedQuery.addItem(I18n.getLiteral(EntityManagerPane.class, "jComboBoxNamedQuery.option.customized"));  // NOI18N
             if(entityClass.getAnnotations() != null) {                                          
                 for(Annotation annotation : entityClass.getAnnotations()) {                         
                     if(annotation instanceof NamedQuery) {                                              
                         NamedQuery namedQuery = (NamedQuery)annotation;                                 
                         String ejbql = namedQuery.query();                                              
-                        if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {                                                                                               
+                        if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {  // NOI18N
                             ListItem item = new ListItem(namedQuery, namedQuery.name());                                                                                                    
                             jComboBoxNamedQuery.addItem(item);
                         }
@@ -79,7 +79,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                         NamedQueries namedQueries = (NamedQueries)annotation;
                         for(NamedQuery namedQuery : namedQueries.value()) {
                             String ejbql = namedQuery.query();                                              
-                            if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {                                                                                               
+                            if( (ejbql != null) && (ejbql.toUpperCase().startsWith("SELECT")) ) {  // NOI18N                                                                                              
                                 ListItem item = new ListItem(namedQuery, namedQuery.name());                                                                                                    
                                 jComboBoxNamedQuery.addItem(item);
                             }
@@ -89,7 +89,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             }
             
         } catch(Exception ex) {
-            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);            
+            DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);            
             ex.printStackTrace();
         }
         
@@ -326,7 +326,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             @Override
             protected void failed(Throwable cause) 
             {
-                setMessage("Error: " + cause.getClass().getName() + ":" + getMessage());
+                setMessage( I18n.getLiteral("msg.error") + cause.getClass().getName() + ":" + getMessage());
                 cause.printStackTrace();
             }         
         };

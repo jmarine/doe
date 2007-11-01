@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import org.doe4ejb3.gui.I18n;
 
 
 public class EntityProperty extends DoeProperty 
@@ -208,7 +209,7 @@ public class EntityProperty extends DoeProperty
         }
  
       } catch(Exception ex) {
-        throw new RuntimeException("EntityProperty.getValue: Error: " + ex.getMessage(), ex);
+        throw new RuntimeException("EntityProperty.getValue: " + I18n.getLiteral("msg.error") + ex.getMessage(), ex);
       }
 
       return retval;
@@ -247,7 +248,7 @@ public class EntityProperty extends DoeProperty
             throw new IllegalAccessException("Object without setter method/field");
         }
       } catch(Exception ex) {
-        throw new RuntimeException("EntityProperty.setValue: Error: " + ex.getMessage(), ex);
+        throw new RuntimeException("EntityProperty.setValue: " + I18n.getLiteral("msg.error") + ex.getMessage(), ex);
       }
     }
 

@@ -12,6 +12,7 @@ import java.lang.reflect.*;
 import javax.swing.*;
 
 import org.doe4ejb3.gui.EntityTableModel;
+import org.doe4ejb3.gui.I18n;
 
 
 public class EntityTransferHandler extends TransferHandler 
@@ -132,8 +133,8 @@ public class EntityTransferHandler extends TransferHandler
                     }
                 }
             } catch(Exception ex) {
-                System.out.println("Error: " + ex.getMessage());
-                System.err.println("Error: " + ex.getMessage());
+                System.out.println(I18n.getLiteral("msg.error") + ex.getMessage());
+                System.err.println(I18n.getLiteral("msg.error") + ex.getMessage());
                 ex.printStackTrace();
             }
         }

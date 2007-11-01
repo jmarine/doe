@@ -95,7 +95,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         // if(jComboBoxEntityClass.getItemCount() == 0) error = new ApplicationException("No persistent entities found.");
         
         if(error != null) {
-           DOEUtils.getWindowManager().showMessageDialog("Error: " + error.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+           DOEUtils.getWindowManager().showMessageDialog(I18n.getLiteral("msg.error") + error.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
         }
         
     }
@@ -516,7 +516,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                             DOEUtils.openEntityManager(puName, entityClass);
                         }
                     } catch(Exception ex) {
-                        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Error: " + ex.getMessage());
+                        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral("msg.error") + ex.getMessage());
                     }
                 }
             });
@@ -611,11 +611,11 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             
         } catch(ApplicationException ex) {
             
-            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }
@@ -649,11 +649,11 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             
         } catch(ApplicationException ex) {
             
-            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             
         } catch(Exception ex) {
             
-            DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
             
         }

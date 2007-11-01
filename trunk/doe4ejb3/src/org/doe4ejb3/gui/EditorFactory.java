@@ -131,7 +131,7 @@ public class EditorFactory
                 }
             } 
         } catch(Exception ex) {
-            System.out.println("ERROR: " + ex.getMessage());
+            System.out.println(I18n.getLiteral("msg.error")  + ex.getMessage());
             ex.printStackTrace();
             return null;
         }
@@ -204,9 +204,9 @@ public class EditorFactory
                                         listenerList.add(EntityListener.class, relationshipListener);
                                     }
                                 } catch(ApplicationException ex) { 
-                                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);                
                                 } catch(Exception ex) { 
-                                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);                
                                 }
                             }
                         };         
@@ -219,9 +219,9 @@ public class EditorFactory
                                     final EventListenerList listenerList = wm.getEventListenerList(window);
                                     listenerList.add(EntityListener.class, relationshipListener);
                                 } catch(ApplicationException ex) { 
-                                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);                
                                 } catch(Exception ex) { 
-                                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);                
                                 }
                             }
                         };
@@ -633,7 +633,7 @@ public class EditorFactory
                     
                 }
             } catch(Exception ex) {
-                System.out.println("Error: " + ex.getMessage());
+                System.out.println(I18n.getLiteral("msg.error")  + ex.getMessage());
                 ex.printStackTrace();
             }
         }
@@ -721,9 +721,9 @@ public class EditorFactory
                         });
                     }
                 } catch(ApplicationException ex) { 
-                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);                
+                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);                
                 } catch(Exception ex) { 
-                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);  
+                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);  
                     ex.printStackTrace();
                 }
             }
@@ -740,7 +740,7 @@ public class EditorFactory
                             if(!listModel.contains(newItem)) {  
                                 listModel.addElement(newItem);
                             } else {
-                                DOEUtils.getWindowManager().showMessageDialog( "Selected item already exists!", "Error:", JOptionPane.ERROR_MESSAGE);
+                                DOEUtils.getWindowManager().showMessageDialog( "Selected item already exists!", I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     } finally {
@@ -797,7 +797,7 @@ public class EditorFactory
                     DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
                     
                 } catch(Exception ex) { 
-                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
+                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);                
                     ex.printStackTrace();
                 }
            }
@@ -833,7 +833,7 @@ public class EditorFactory
                     DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
                     
                 } catch(Exception ex) { 
-                    DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
+                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
                 }
             }
         };         
@@ -851,7 +851,7 @@ public class EditorFactory
                     } catch(ApplicationException ex) { 
                         DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);                
                     } catch(Exception ex) {
-                        DOEUtils.getWindowManager().showMessageDialog( "Error: " + ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);
+                        DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
                     }
                 }
         };

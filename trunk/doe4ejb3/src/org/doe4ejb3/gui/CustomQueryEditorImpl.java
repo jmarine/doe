@@ -229,7 +229,7 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                     }
                     
                 } catch(Exception ex) {
-                    System.out.println("CustomQueryEditorImpl.getProperties: ERROR: " + ex.getMessage());
+                    System.out.println("CustomQueryEditorImpl.getProperties: " + I18n.getLiteral("msg.error") + ex.getMessage());
                 }
             }
             
@@ -248,12 +248,12 @@ public class CustomQueryEditorImpl extends JPanel implements java.awt.event.Item
                     }
                 
                 } catch(Exception ex) {
-                    System.out.println("CustomQueryEditorImpl.getProperties: ERROR: " + ex.getMessage());
+                    System.out.println("CustomQueryEditorImpl.getProperties: " + I18n.getLiteral("msg.error") + ex.getMessage());
                 }
             }
 
         } catch(Exception ex) {
-            System.out.println("CustomQueryEditorImpl.getProperties: ERROR: " + ex.getMessage());
+            System.out.println("CustomQueryEditorImpl.getProperties: " + I18n.getLiteral("msg.error") + ex.getMessage());
         }
         
         return properties;
