@@ -229,7 +229,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
         @Override
         protected void failed(Throwable cause) 
         {
-            setMessage("Error: " + cause.getMessage());
+            setMessage(I18n.getLiteral("msg.error") + cause.getMessage());
         }
     }
 
@@ -299,7 +299,7 @@ public class ImagePropertyEditor extends javax.swing.JPanel implements org.doe4e
         @Override
         protected void failed(Throwable cause) 
         {
-            setMessage("Error: " + cause.getMessage());
+            setMessage(I18n.getLiteral("msg.error") + cause.getMessage());
         }
     }
 

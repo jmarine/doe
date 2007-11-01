@@ -36,6 +36,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
+import org.doe4ejb3.gui.I18n;
 import org.doe4ejb3.jaxb.persistence.Persistence;
 
 
@@ -234,7 +235,7 @@ public class JPAUtils
                    excludeUnlistedClasses = pu.isExcludeUnlistedClasses();
                    if(!excludeUnlistedClasses) defaultPUName = pu.getName();
                 } catch(Exception ex) {
-                    System.out.println("> WARN: excludeUnlistedClasses not defined: ERROR: " + ex.getMessage());
+                    System.out.println("> WARN: excludeUnlistedClasses not defined: " + I18n.getLiteral("msg.error") + ex.getMessage());
                 }
 
                 for( String className : pu.getClazz() ) {

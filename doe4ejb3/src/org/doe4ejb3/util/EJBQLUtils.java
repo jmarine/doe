@@ -32,6 +32,7 @@ import antlr.ParserSharedInputState;
 import antlr.collections.impl.BitSet;
 
 import org.doe4ejb3.ejbql.*;
+import org.doe4ejb3.gui.I18n;
 
 /**
  *
@@ -70,7 +71,7 @@ public class EJBQLUtils {
             return paramTypesByName;
 
         } catch(Exception ex) {
-            System.out.println("EJBUtils.parseEJBQLParameterTypes: ERROR: " + ex.getMessage());
+            System.out.println("EJBUtils.parseEJBQLParameterTypes: " + I18n.getLiteral("msg.error") + ex.getMessage());
         } finally {
             System.out.println("");
         }

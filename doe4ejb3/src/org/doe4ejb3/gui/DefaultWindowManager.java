@@ -108,7 +108,7 @@ public class DefaultWindowManager implements WindowManager
             iFrame.setSelected(true);
 
         } catch(Exception ex) {
-            showMessageDialog("Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            showMessageDialog(I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }
@@ -119,7 +119,7 @@ public class DefaultWindowManager implements WindowManager
             JInternalFrame iFrame = (JInternalFrame)window;
             iFrame.setVisible(false);
         } catch(Exception ex) {
-            showMessageDialog("Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            showMessageDialog(I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();                
         }
     }
@@ -131,7 +131,7 @@ public class DefaultWindowManager implements WindowManager
             iFrame.setVisible(false);
             iFrame.dispose();
         } catch(Exception ex) {
-            showMessageDialog("Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            showMessageDialog(I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();                
         }
     }
@@ -143,7 +143,7 @@ public class DefaultWindowManager implements WindowManager
             if(iFrame.isIcon()) iFrame.setIcon(false);                
             iFrame.setSelected(true);
         } catch(Exception ex) {
-            showMessageDialog("Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            showMessageDialog(I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();
         }
     }

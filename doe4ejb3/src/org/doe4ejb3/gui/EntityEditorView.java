@@ -211,8 +211,8 @@ public class EntityEditorView extends javax.swing.JPanel
                 printJob.print();
                 DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Printing job has been submited");
             } catch(PrinterException pe) {
-                DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Printing error: " + pe.getMessage());
-                System.out.println("Printing error: " + pe.getMessage());
+                DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral("msg.error")  + pe.getMessage());
+                System.out.println("EntityEditorView.print: " + I18n.getLiteral("msg.error") + pe.getMessage());
                 pe.printStackTrace();
             }                    
         }
@@ -326,7 +326,7 @@ public class EntityEditorView extends javax.swing.JPanel
         @Override
         protected void failed(Throwable error) 
         {
-            setMessage("Error: " + error.getMessage());
+            setMessage(I18n.getLiteral("msg.error")  + error.getMessage());
             error.printStackTrace();
         }
         
@@ -395,7 +395,7 @@ public class EntityEditorView extends javax.swing.JPanel
         @Override
         protected void failed(Throwable cause) 
         {
-            setMessage("Error: " + cause.getClass().getName() + ":" + getMessage());
+            setMessage(I18n.getLiteral("msg.error") + cause.getClass().getName() + ":" + getMessage());
             cause.printStackTrace();
         }
                 

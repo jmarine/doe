@@ -9,6 +9,7 @@ package org.doe4ejb3.beans;
 
 import java.util.Calendar;
 import java.util.Date;
+import org.doe4ejb3.gui.I18n;
 
 
 public class CustomCalendarEditor extends TemporalTypeEditorSupport
@@ -24,7 +25,7 @@ public class CustomCalendarEditor extends TemporalTypeEditorSupport
             Calendar cal = (Calendar)value;
             super.setValue(cal.getTime());
         } catch(Exception ex) {
-            System.out.println("CustomCalendarEditor.setValue: Error: " + ex.getMessage());
+            System.out.println("CustomCalendarEditor.setValue: " + I18n.getLiteral("msg.error") + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -36,7 +37,7 @@ public class CustomCalendarEditor extends TemporalTypeEditorSupport
             cal.setTime(date);
             return cal;
         } catch(Exception ex) {
-            System.out.println("CustomCalendarEditor.getValue: Error: " + ex.getMessage());
+            System.out.println("CustomCalendarEditor.getValue: " + I18n.getLiteral("msg.error") + ex.getMessage());
             ex.printStackTrace();
             return null;
         }

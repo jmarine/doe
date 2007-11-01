@@ -265,7 +265,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
             }
             
         } catch(Exception ex) {
-            System.out.println("EntityEditorImpl: ERROR: " + ex.getMessage());
+            System.out.println("EntityEditorImpl: " + I18n.getLiteral("msg.error") + ex.getMessage());
         }
         
 
@@ -446,7 +446,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                   
                     
                 } catch(Exception ex) {
-                    System.out.println("Error: " + ex.getMessage());
+                    System.out.println(I18n.getLiteral("msg.error")  + ex.getMessage());
                     ex.printStackTrace();
                 }
                 

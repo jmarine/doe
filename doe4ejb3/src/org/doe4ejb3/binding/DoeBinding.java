@@ -104,7 +104,7 @@ class EditorReaderProperty extends PropertyHelper
                 return value;
 
             } catch(Exception ex) {
-                throw new PropertyResolverException("Error: " + ex.getMessage(), source, componentValueGetter.getName(), ex);
+                throw new PropertyResolverException(I18n.getLiteral("msg.error") + ex.getMessage(), source, componentValueGetter.getName(), ex);
             }
         }
 

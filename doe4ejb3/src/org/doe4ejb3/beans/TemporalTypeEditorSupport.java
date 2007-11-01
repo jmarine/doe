@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import javax.persistence.TemporalType;
+import org.doe4ejb3.gui.I18n;
 
 
 public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport implements PropertyChangeListener
@@ -91,7 +92,7 @@ public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport 
             spinner.setValue((java.util.Date)value);
             firePropertyChange();
         } catch(Exception ex) {
-            System.out.println("TemporalTypeEditorSupport.setValue: Error: " + ex.getMessage());
+            System.out.println("TemporalTypeEditorSupport.setValue: " + I18n.getLiteral("msg.error") + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -107,7 +108,7 @@ public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport 
             polymorphicTemporalTypeValue.setTime(time);
             return polymorphicTemporalTypeValue;
         } catch(Exception ex) {
-            System.out.println("TemporalTypeEditorSupport.getValue: Error: " + ex.getMessage());
+            System.out.println("TemporalTypeEditorSupport.getValue: " + I18n.getLiteral("msg.error")  + ex.getMessage());
             ex.printStackTrace();
             return null;
         }

@@ -107,7 +107,7 @@ public class EntityTableModel implements javax.swing.table.TableModel, javax.swi
                 }
             } 
         } catch(Exception ex) {
-            System.out.println("Error: " + ex.getMessage());
+            System.out.println(I18n.getLiteral("msg.error") + ex.getMessage());
             ex.printStackTrace();
         }
         return columnName;
