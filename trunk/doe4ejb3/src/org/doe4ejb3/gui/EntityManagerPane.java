@@ -10,7 +10,6 @@ package org.doe4ejb3.gui;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.lang.annotation.Annotation;
-import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.List;
 
@@ -233,7 +232,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             
         }
         
-        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral("msg.done"));  // NOI18N
+        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral("msg.ready"));  // NOI18N
         revalidate();
 
     }//GEN-LAST:event_jComboBoxNamedQueryItemStateChanged
