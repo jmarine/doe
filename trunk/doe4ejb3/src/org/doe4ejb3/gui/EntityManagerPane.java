@@ -197,7 +197,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(0,0,0,0));
 
         } else {
-            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Searching parameter types...");
+            DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral(EntityManagerPane.class, "msg.searchingParameterTypes"));
             
             ListItem listItem = (ListItem)jComboBoxNamedQuery.getSelectedItem();
             NamedQuery namedQuery = (NamedQuery)listItem.getValue();
@@ -223,16 +223,17 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                 
             } catch(Exception ex) {
                 jPanelQueryParams.setLayout(new FlowLayout());
-                jPanelQueryParams.add(new JLabel("Unknown parameter types"));
+                jPanelQueryParams.add(new JLabel(I18n.getLiteral(EntityManagerPane.class, "msg.unknownParameterTypes")));  // NOI18N
                 jPanelQueryParams.setVisible(true);
                 jPanelResults.setBorder(javax.swing.BorderFactory.createEmptyBorder(0,0,0,0));
             } finally {
                 this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral("msg.ready"));                
             }
             
         }
         
-        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Ready");            
+        DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral("msg.done"));  // NOI18N
         revalidate();
 
     }//GEN-LAST:event_jComboBoxNamedQueryItemStateChanged
@@ -264,7 +265,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                 List entities = null;
                 try {
                     EntityManagerPane.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-                    DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "Searching...");
+                    DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral(EntityManagerPane.class, "msg.searchingEntities"));
                     if(jComboBoxNamedQuery.getSelectedIndex() == 0) {   // ALL
                         entities = JPAUtils.findAllEntities(puName, entityClass);
 
@@ -291,7 +292,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
             @Override
             protected void cancelled() 
             {
-                setMessage("Search cancelled.");
+                setMessage(I18n.getLiteral(EntityManagerPane.class, "msg.searchCancelled"));  // NOI18N
             }        
 
             @Override
@@ -312,21 +313,21 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
                     //table.repaint();
                 }
 
-                setMessage(MessageFormat.format("Search done: {0} entities found", count));
+                setMessage(I18n.getLiteral(EntityManagerPane.class, "msg.searchDone", count));  // NOI18N
             }
 
 
             @Override
             protected void interrupted(InterruptedException ex) 
             {
-                setMessage("Search interrupted: " + ex.getMessage());
+                setMessage(I18n.getLiteral(EntityManagerPane.class, "msg.searchInterrupted") + ex.getMessage());  // NOI18N
                 ex.printStackTrace();
             }
 
             @Override
             protected void failed(Throwable cause) 
             {
-                setMessage( I18n.getLiteral("msg.error") + cause.getClass().getName() + ":" + getMessage());
+                setMessage(I18n.getLiteral("msg.error") + cause.getClass().getName() + ":" + getMessage());  // NOI18N
                 cause.printStackTrace();
             }         
         };
@@ -338,9 +339,9 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
     }
     
     public JComponent getComponentFromEditorLayout(Class componentType, String componentName) {
-        if(componentName.equalsIgnoreCase("params")) {
+        if(componentName.equalsIgnoreCase("params")) {  // NOI18N
             return jPanelQueryParams;
-        } else if(componentName.equalsIgnoreCase("results")) {
+        } else if(componentName.equalsIgnoreCase("results")) {  // NOI18N
             return jPanelResults;
         }
         return null;
