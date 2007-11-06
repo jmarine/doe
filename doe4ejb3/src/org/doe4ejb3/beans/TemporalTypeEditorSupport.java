@@ -22,7 +22,7 @@ import java.text.DateFormat;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerDateModel;
 import javax.persistence.TemporalType;
-import org.doe4ejb3.gui.I18n;
+import org.doe4ejb3.util.I18n;
 
 
 public class TemporalTypeEditorSupport extends java.beans.PropertyEditorSupport implements PropertyChangeListener

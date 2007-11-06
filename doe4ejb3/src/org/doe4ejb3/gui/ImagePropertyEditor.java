@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.util.I18n;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.io.BufferedInputStream;

@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.util.I18n;
 import org.doe4ejb3.binding.HashKeyProperty;
 import org.doe4ejb3.binding.DoeProperty;
 import java.awt.GridBagLayout;

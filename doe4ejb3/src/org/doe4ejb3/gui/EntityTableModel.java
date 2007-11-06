@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.util.I18n;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;

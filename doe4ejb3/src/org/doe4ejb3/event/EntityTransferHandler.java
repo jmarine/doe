@@ -12,7 +12,7 @@ import java.lang.reflect.*;
 import javax.swing.*;
 
 import org.doe4ejb3.gui.EntityTableModel;
-import org.doe4ejb3.gui.I18n;
+import org.doe4ejb3.util.I18n;
 
 
 public class EntityTransferHandler extends TransferHandler 

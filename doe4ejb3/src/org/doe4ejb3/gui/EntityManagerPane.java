@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.util.I18n;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.lang.annotation.Annotation;

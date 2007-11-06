@@ -18,7 +18,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import org.doe4ejb3.gui.I18n;
+import org.doe4ejb3.util.I18n;
 
 
 public class EntityProperty extends DoeProperty 

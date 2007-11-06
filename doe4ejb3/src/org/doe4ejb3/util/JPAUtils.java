@@ -36,7 +36,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Query;
 
-import org.doe4ejb3.gui.I18n;
+import org.doe4ejb3.util.I18n;
 import org.doe4ejb3.jaxb.persistence.Persistence;
 
 
