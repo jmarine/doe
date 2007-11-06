@@ -7,6 +7,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.util.I18n;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Cursor;
@@ -734,13 +735,13 @@ public class EditorFactory
                     try {
                         panel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
                         List allValues = JPAUtils.findAllEntities(puName, memberClass);
-                        Object newItem = DOEUtils.getWindowManager().showInputDialog("Select new item:", "Add new " + I18n.getEntityName(memberClass), allValues.toArray(), null);
+                        Object newItem = DOEUtils.getWindowManager().showInputDialog(I18n.getLiteral("addExistingItemDialog.message"), I18n.getLiteral("addExistingItemDialog.title", I18n.getEntityName(memberClass)), allValues.toArray(), null);
                         if(newItem != null) {
                             // FIXME: caution with duplicated relations and "Set" collection types.
                             if(!listModel.contains(newItem)) {  
                                 listModel.addElement(newItem);
                             } else {
-                                DOEUtils.getWindowManager().showMessageDialog( "Selected item already exists!", I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
+                                DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("addExistingItemDialog.selectedItemAlreadyExists"), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     } finally {
@@ -794,7 +795,7 @@ public class EditorFactory
                     }
                     
                 } catch(ApplicationException ex) { 
-                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Edit error", JOptionPane.ERROR_MESSAGE);                
+                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(),  I18n.getLiteral("msg.error"), JOptionPane.ERROR_MESSAGE);                
                     
                 } catch(Exception ex) { 
                     DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);                
@@ -819,7 +820,9 @@ public class EditorFactory
                                     System.out.println("EditorFactory: removing selected index: " + modelIndex);
                                     if(isManagerWindow) {  // delete command from "EntityManagerPane"
                                         Object entityToDelete = listModel.getElementAt(modelIndex);
+                                        DOEUtils.getWindowManager().showStatus( DOEUtils.APPLICATION_WINDOW, I18n.getLiteral(EntityEditorView.class, "msg.deletingEntity", JPAUtils.getEntityName(entityToDelete.getClass())));  // NOI18N
                                         JPAUtils.removeEntity(puName, entityToDelete);                                
+                                        DOEUtils.getWindowManager().showStatus( DOEUtils.APPLICATION_WINDOW, I18n.getLiteral(EntityEditorView.class, "msg.entityDeleted", JPAUtils.getEntityName(entityToDelete.getClass())));   // NOI18N
                                     }
                                     listModel.removeElementAt(modelIndex);
                                 }
@@ -830,10 +833,10 @@ public class EditorFactory
                     }
 
                 } catch(ApplicationException ex) { 
-                    DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Delete error", JOptionPane.ERROR_MESSAGE);
+                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
                     
                 } catch(Exception ex) { 
-                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
+                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
                 }
             }
         };         
@@ -842,16 +845,18 @@ public class EditorFactory
                 public void actionPerformed(ActionEvent evt)  {
                     try {
                         if(entityTableModel.getRowCount() == 0) {
-                            throw new ApplicationException("There aren't rows to print.");
+                            throw new ApplicationException(I18n.getLiteral("msg.emptyPrinting"));
                         } else {
-                            MessageFormat headerFormat = new MessageFormat(I18n.getEntityName(memberClass) + " list:");
-                            MessageFormat footerFormat = new MessageFormat("Page {0}");
-                            jTable.print(JTable.PrintMode.FIT_WIDTH, headerFormat, footerFormat);
+                            MessageFormat headerFormat = new MessageFormat(I18n.getLiteral(EntityManagerPane.class, "msg.headerToPrint", I18n.getEntityName(memberClass)));
+                            MessageFormat footerFormat = new MessageFormat(I18n.getLiteral(EntityManagerPane.class, "msg.footerToPrint"));
+                            if(jTable.print(JTable.PrintMode.FIT_WIDTH, headerFormat, footerFormat)) {
+                                DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral("msg.printJobSubmitted"));
+                            }
                         }
                     } catch(ApplicationException ex) { 
-                        DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(), "Printing error", JOptionPane.ERROR_MESSAGE);                
+                        DOEUtils.getWindowManager().showMessageDialog( ex.getMessage(),  I18n.getLiteral("msg.error"), JOptionPane.ERROR_MESSAGE);                
                     } catch(Exception ex) {
-                        DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error")  + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
+                        DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
                     }
                 }
         };
@@ -862,6 +867,7 @@ public class EditorFactory
                     WindowManager wm = DOEUtils.getWindowManager();
                     Object window = wm.getWindowFromComponent(evt.getSource());
                     if(window != null) wm.closeWindow(window);
+                    wm.showStatus( DOEUtils.APPLICATION_WINDOW, "");  // NOI18N
                 }
         };
 

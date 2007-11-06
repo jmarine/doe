@@ -6,6 +6,7 @@
  */
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.util.I18n;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
@@ -538,16 +539,16 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     @org.jdesktop.application.Action
     public void about() {
         StringBuffer info = new StringBuffer();
-        info.append(I18n.getLiteral(Application.class, "Application.title") + " - v" + I18n.getLiteral(Application.class, "Application.version")); info.append("\n");
+        info.append(I18n.getLiteral(Application.class, "Application.name") + " - v" + I18n.getLiteral(Application.class, "Application.version")); info.append("\n");
         info.append("\n");
         info.append(I18n.getLiteral("msg.developers")); info.append("\n");
         info.append("   Jordi Marine Fort <jmarine@dev.java.net>\n");
         info.append("\n");
         info.append(I18n.getLiteral("msg.thanksTo")); info.append("\n");
         info.append("   SUN Microsystems, Inc.\n");
-        info.append("   NetBeans team.\n");
+        info.append("   NetBeans community.\n");
         info.append("   GlassFish community.\n");
-        info.append("   Oracle TopLink Essentials team.\n");
+        info.append("   TopLink Essentials team.\n");
         info.append("   Trails framework team.\n");
         info.append("   ANTLR project team.\n");
         info.append("   Beans binding project team.\n");

@@ -9,7 +9,7 @@ package org.doe4ejb3.beans;
 
 import java.util.Calendar;
 import java.util.Date;
-import org.doe4ejb3.gui.I18n;
+import org.doe4ejb3.util.I18n;
 
 
 public class CustomCalendarEditor extends TemporalTypeEditorSupport

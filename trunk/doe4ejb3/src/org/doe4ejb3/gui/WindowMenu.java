@@ -12,6 +12,7 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.util.I18n;
 import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.event.*;

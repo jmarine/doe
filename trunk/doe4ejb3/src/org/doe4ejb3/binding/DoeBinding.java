@@ -7,18 +7,18 @@
 
 package org.doe4ejb3.binding;
 
+import org.doe4ejb3.util.I18n;
 import java.beans.PropertyEditor;
 import java.beans.PropertyVetoException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
-import javax.swing.plaf.ComponentUI;
 
 import org.jdesktop.beansbinding.Binding;
 
 import org.doe4ejb3.gui.*;
-import org.doe4ejb3.util.ReflectionUtils;
 import org.jdesktop.beansbinding.Property;
 import org.jdesktop.beansbinding.PropertyHelper;
 
@@ -71,7 +71,8 @@ class EditorReaderProperty extends PropertyHelper
         public Object getValue(Object source) {
             try {
                 // TODO? Migrate to a jsr295 converter?
-                Object value = ReflectionUtils.getMemberValue(source, componentValueGetter); 
+                componentValueGetter.setAccessible(true);
+                Object value = componentValueGetter.invoke(source); 
 
                 boolean convertToCollection = java.util.Collection.class.isAssignableFrom(entityPropertyClass);
                 if( (convertToCollection) && (value.getClass().isArray()) ) {  // Code has already been copied to EntityProperty.setValue method

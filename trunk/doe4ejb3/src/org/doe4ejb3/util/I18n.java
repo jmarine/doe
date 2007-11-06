@@ -5,8 +5,9 @@
  * @author Jordi Marine Fort
  */
 
-package org.doe4ejb3.gui;
+package org.doe4ejb3.util;
 
+import org.doe4ejb3.gui.*;
 import org.jdesktop.application.ResourceMap;
 
 
