@@ -60,7 +60,7 @@
         <li><b>Project Type:</b> Java Web Start application client</li>
         <li><b>License:</b> Common Development and Distribution License (CDDL) Version 1.0</li>
       </ul>
-The "Domain Object Explorer" is a desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without needing of UI programming (like <a href="http://www.nakedobjects.org">Naked Objects</a>, <a href="http://www.jmatter.org">JMatter</a>, ...). It can be deployed as a JavaEE 5 application client into <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">GlassFish v2</a> application server to centrally manage datasource configuration, update persistence units, and deliver application to users via Java Web Start technology.
+The "Domain Object Explorer" is a desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without needing of UI programming (like <a href="http://www.nakedobjects.org">Naked Objects</a>, <a href="http://www.jmatter.org">JMatter</a>, ...). It can also be deployed as a JavaEE 5 application client into <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">GlassFish v2</a> application server to centrally manage datasource configuration, update persistence units, and deliver application to users via Java Web Start technology.
       <!-- project info end -->
     </blockquote>
 
@@ -74,6 +74,7 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
 	<dd><a href="#install">Installation guide</a></dd>
 	<dd><a href="#usage">Usage Instructions</a></dd>
 	<dd><a href="#screenshot">Screenshot</a></dd>
+	<dd><a href="#development">Developer's guide</a></dd>
 	<dd><a href="#support">Support</a></dd>
 	<dd><a href="#participate">Participation</a></dd>
 	<dd><a href="#roadmap">Roadmap</a></dd>
@@ -88,7 +89,7 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
     <ul>
       <li>Pros:</li>
       <ul>
-	<li>Rich user interface to manage and testing your JPA/EJB3 entity beans.</li>
+	<li>Rich user interface to manage and test your JPA/EJB3 entity beans.</li>
 	<li>Application and persistence units updates can be delivered to users via Java Web Start technology.</li>
 	<li>Data sources can be centrally configured from application server administrative console.</li>
 	<li>Doesn't need complex HTML, JavaScript, nor AJAX handlers on server-side.</li>
@@ -97,7 +98,7 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
       <li>Cons:</li>
       <ul>
 	<li>Deployed aplications are really big (about 45Mb).</li>
-	<li>Basic printing support.</li>
+	<li>Rude printing support.</li>
 	<li>...</li>
       </ul>
     </ul>
@@ -108,18 +109,17 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
     <h3>Download</h3>
     </a>
     <blockquote>
-      There is no stable version, yet. But you can download preview releases from <a href="https://doe.dev.java.net/servlets/ProjectDocumentList?folderID=7649&expandFolder=7649&folderID=0">Document & files</a> or <a href="https://doe.dev.java.net/source/browse/doe/">CVS</a>.<br>
-      You can get the following projects:
+      There is no stable version, yet. But you can download preview releases from <a href="https://doe.dev.java.net/servlets/ProjectDocumentList?folderID=7649&expandFolder=7649&folderID=0">Document & files</a> or <a href="https://doe.dev.java.net/source/browse/doe/">CVS</a>, where you will find the following projects for NetBeans IDE 6:<br>
       <ul>
-	<li> "doe4ejb3" is the core library.</li>
- 	<li> "doe4ejb3-app-client" is a Java EE 5 application client to be included in the users's enterprise application.</li>
+	<li> "doe4ejb3": it's the core library.</li>
+ 	<li> "doe4ejb3-app-client": it's a Java EE 5 application client (that can be included in the users's enterprise application).</li>
 	<li> "doe4nb6": simple integration module for NetBeans Platform 6.</li>
       </ul>
  
       Also, there are the following example modules:
  	<ul>
 	<li> "doe4ejb3-test-ejb3": sample EJB3 entity beans (some are based on  "<a href="http://www.trailsframework.org">trails</a>" demos).</li>
- 	<li> "doe4ejb3-test-app" : enterprise application with the "doe" application client to manage the previous "EJB3" entities.</li>
+ 	<li> "doe4ejb3-test-app" : sample enterprise application project that includes the "doe" application client to manage the previous "EJB3" entities.</li>
   	</ul>
     </blockquote>
 
@@ -137,35 +137,32 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
 	<li>Assemble all modules into an EAR archive, and deploy to the application server.</li>
 	<li>Note: if you want to test "doe" with the sample EJB3 entities, you should create a database for the tests, configure the connection parameters in GlassFish administration console (the JDBC datasource should be named "jdbc/doe4ejb3"), then open the "doe4ejb3-test-app" project with NetBeans 6.0, and deploy into the application server.
 	</li>
-	<li>Launch the new deployed "doe4ejb3-app-client" application from GlassFish administrative console.</li>
         <li>See the instructions below.</li>
 	</ol>
     </blockquote>
-
-   
 
 
     <a name="usage">
     <h3>Usage Instructions</h3>
     </a>
     <blockquote>
-    You can easily launch the "doe" application client from GlassFish administration console (after installation, you can also start it from Java Web Start viewer). The application has the following features:
+    You can easily launch the "doe" application client from GlassFish administrative console (after installation, you can also start it from Java Web Start viewer). The application has the following features:
 
     <h4>Create a new entity object:</h4>
-    From "File" menu, select "New" option, and the class name of the new EJB3 entity. Then complete the entity properties and press the "Accept" button.
+    Open the "File" menu, select "New" option, the name of the persistence unit, and the class name of the EJB3 entity to be created. Then complete the entity properties and press the "Accept" button to persist the entity.
 
     <h4>Search entity beans:</h4>
-    First, you have to select the persistence unit for the EJB3 entity class, and double click with left button on the desired class to open the entity manager window on the desktop. Then select the query type (to search "All" objects, specify a "Custom" query, or the name of the desired "named query", when defined in the EJB3 entity bean). With "custom" or "named" queries, you also have to complete the required parameters. Finally, press the "Search" button, and wait for the results (note the "done" indicator in the status bar).
+    On the left panel, select the persistence unit to view its EJB3 entity classes, and double click with left button on the desired class to open the entity manager window on the desktop. Then select the query type (to search "All" objects, or use a custom/named query). With "custom" or "named" queries, you also have to complete the required parameters. Finally, press the "Search" button, and wait for the results (note the "done" indicator in the status bar).
 
 
     <h4>Browse/edit an object:</h4>
-    You have to select one of the objects found, and click the "Edit" button from the manager window to view the entity details on the right panel (desktop). You can modify it's properties, and press the "Accept" button to save the changes.
+    Select one of the objects found, and click the "Edit" button from the manager window to view the entity details on the right panel (desktop). You can navigate to related entities, and modify its properties (to persist changes, remember to press the "Save" or "Accept" button on the modified entity details).
 
     <h4>Print the objects:</h4>
     Use the "Print" button from the manager/detail window, configure the printing dialog, and click the "Print" button to confirm.
 
     <h4>Delete an object:</h4>
-    You have to select the object found, click "Delete" button from the manager window, and confirm the deletion in the next window popup.
+    Select the undesired objects, click "Delete" button from the manager/detail window, and confirm the deletion in the next window popup.
     </blockquote>
 
     <a name="screenshot">
@@ -186,6 +183,144 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
     </blockquote>
     </a>
 
+
+    <a name="development">
+    <h3>Developer's guide</h3>
+    </a>
+    <blockquote>
+    <h4>Defining custom queries for an entity:</h4>
+    The "doe" application can search entities using the "named queries" defined for an EJB3 entity bean.
+<pre>
+@Entity
+@NamedQueries({
+    @NamedQuery(name="searchPublished",
+	query="SELECT OBJECT(r) FROM Recipe r WHERE r.published = true"),
+    @NamedQuery(name="searchByCategory",
+        query="SELECT OBJECT(r) FROM Recipe r WHERE r.category = :category")
+})
+public class Recipe implements java.io.Serializable
+{
+    @Id
+    @GeneratedValue(strategy=GenerationType.AUTO)
+    public Integer id;
+
+    @Column(name="TITLE", nullable=false, unique=true, length=100)
+    public String title;
+
+    @Column(name="PUBLISHED", nullable=true)
+    public boolean published;
+
+    @ManyToOne
+    public Category category;
+    ...
+}
+</pre>
+<br>
+
+    <h4>Defining custom actions for an entity:</h4>
+    When "doe" application opens an existing entity, it will display additional buttons for each public method annotated with "@org.jdesktop.application.Action" attribute (jsr-296). The default presentation properties of actions defined this way are initialized automatically from their class's ResourceBundle. Developers can use org.doe4ejb3.util.DOEUtil and org.doe4ejb3.gui.WindowManager for user interaction. For example:
+    <pre>
+@Entity
+public class Recipe implements java.io.Serializable
+{
+    ....
+    @Action
+    public void cookIt()
+    {
+        DOEUtils.getWindowManager().showMessageDialog(
+	    "Ready to eat.", 
+	    "CookIt result", 
+	    JOptionPane.INFORMATION_MESSAGE);
+    }
+    ....
+}
+</pre>
+<br>
+
+    <h4>Customize user interface for an entity:</h4>
+    The "doe" application can auto-generate the UI at runtime, but developers can also customize entity editors in many ways:
+    <ol>
+	<li><u>Using @PropertyDescriptor annotation:</u></li>
+        The @org.doe4ejb3.annotation.PropertyDescriptor annotation allows simple customization of the UI controls for the properties (to change labels, the order of fields, ...). For example:
+<pre>
+...
+@Column(name="name", length=50)
+@PropertyDescriptor(index=1, displayName="Full name:")
+public String name;
+...
+</pre>
+<br><br>
+
+	<li><u>Using Abeille forms:</u></li>
+        You can design the complete UI of an entity editor with <a href="http://abeille.dev.java.net">Abeille Forms Designer</a>, and copy the generated xml or jfrm file in the same directory/name of the entity class. To bind entity properties with the UI, developers have to design the forms with the apropiate control types (or JPanel container), and to name them as the respective properties names. When the control belongs to an embbedded entity property, use the dot symbol to separate the embedded entity name of the associated property name.  
+<br><br>
+
+	<li><u>Using compiled Swing UI:</u></li>
+	You can also use your favourite GUI builder (like NetBeans IDE) to design the complete Swing UI layout for an entity editor. The class representing the UI should be inherited from JPanel, the class name must be specified in the entity class with @org.doe4ejb3.annotation.EntityDescriptor(layoutClassName="uiClassName") annotation, and the UI class must be packaged in the same persistence unit "jar" as the entity class. To bind entity properties with the UI, developers have to design the forms with the apropiate control types (or JPanel container), and publish them as public fields with a similar name in the form class. When the control belongs to an embbedded entity property, use the "_" symbol to separate the embedded entity name of the associated property name. For example:
+<br><br>
+<table>
+<tr>
+    <td><u>Entity class:</u></td>
+    <td width="25"></td>
+    <td><u>UI code:</u></td>
+</tr>
+<tr valign="top">
+<td>
+<pre>
+...
+@Entity
+@EntityDescriptor(layoutClassName="myNS.PersonEditor")
+public class Person implements Serializable 
+{
+    @Id
+    @Column(name="ssn", length=20)
+    public String ssn;
+
+    @Column(name="name", length=50)
+    public String name;
+
+    @Column(name="bornDay")
+    public java.sql.Date bornDay;
+    ...
+}
+</pre>
+</td>
+
+<td>&nbsp;</td>
+
+<td>
+<pre>
+package myNS; 
+...
+public class PersonEditor extends javax.swing.JPanel 
+{
+    public JTextField jTextField_ssn;
+    public JTextField jTextField_name;
+    public JPanel     jPanel_bornDay;
+
+    /** Creates new form PersonEditor */
+    public PersonEditor() {
+        initComponents();
+    }
+
+    private void initComponents() {
+        // generated UI code
+        jTextField_ssn = new JTextField();
+        jTextField_name = new JTextField();
+        jPanel_bornDay = new JPanel();
+        ...
+    }
+
+}
+</pre>
+</td>
+</tr>
+</table>
+<br><br>
+
+    </ol>
+    </blockquote>
+ 
 
     <a name="support">
     <h3>Support</h3>
