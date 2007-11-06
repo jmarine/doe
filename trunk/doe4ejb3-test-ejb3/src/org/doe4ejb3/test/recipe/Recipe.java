@@ -30,17 +30,21 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.NamedQuery;
 
 import org.doe4ejb3.annotation.PropertyDescriptor;
 import org.doe4ejb3.util.DOEUtils;
 
 
 @Entity
-@NamedQuery(name="searchByCategory",query="SELECT OBJECT(r) FROM Recipe r WHERE r.category = :category")
+@NamedQueries({
+    @NamedQuery(name="searchPublished",query="SELECT OBJECT(r) FROM Recipe r WHERE r.published = true"),
+    @NamedQuery(name="searchByCategory",query="SELECT OBJECT(r) FROM Recipe r WHERE r.category = :category")
+})
 public class Recipe implements java.io.Serializable
 {
     private Integer id;
