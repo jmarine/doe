@@ -116,7 +116,7 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
 	<li> "doe4nb6": simple integration module for NetBeans Platform 6.</li>
       </ul>
  
-      Also, there are the following example modules:
+      There are also the following example modules:
  	<ul>
 	<li> "doe4ejb3-test-ejb3": sample EJB3 entity beans (some are based on  "<a href="http://www.trailsframework.org">trails</a>" demos).</li>
  	<li> "doe4ejb3-test-app" : sample enterprise application project that includes the "doe" application client to manage the previous "EJB3" entities.</li>
@@ -218,7 +218,7 @@ public class Recipe implements java.io.Serializable
 <br>
 
     <h4>Defining custom actions for an entity:</h4>
-    When "doe" application opens an existing entity, it will display additional buttons for each public method annotated with "@org.jdesktop.application.Action" attribute (jsr-296). The default presentation properties of actions defined this way are initialized automatically from their class's ResourceBundle. Developers can use org.doe4ejb3.util.DOEUtil and org.doe4ejb3.gui.WindowManager for user interaction. For example:
+    When "doe" application opens an existing entity, it will display additional buttons for each public method annotated with "@org.jdesktop.application.Action" attribute (jsr-296). The default presentation properties of actions defined this way are initialized automatically from their class's ResourceBundle. Developers can use <a href="https://doe.dev.java.net/source/browse/*checkout*/doe/doe4ejb3/src/org/doe4ejb3/util/DOEUtils.java">org.doe4ejb3.util.DOEUtils</a> and <a href="https://doe.dev.java.net/source/browse/*checkout*/doe/doe4ejb3/src/org/doe4ejb3/gui/WindowManager.java">org.doe4ejb3.gui.WindowManager</a> for user interaction. For example:
     <pre>
 @Entity
 public class Recipe implements java.io.Serializable
@@ -238,25 +238,27 @@ public class Recipe implements java.io.Serializable
 <br>
 
     <h4>Customize user interface for an entity:</h4>
-    The "doe" application can auto-generate the UI at runtime, but developers can also customize entity editors in many ways:
+    The "doe" application can auto-generate the UI at runtime, but it's also possible to customize entity editors in many ways:
     <ol>
-	<li><u>Using @PropertyDescriptor annotation:</u></li>
-        The @org.doe4ejb3.annotation.PropertyDescriptor annotation allows simple customization of the UI controls for the properties (to change labels, the order of fields, ...). For example:
+	<li><u>Using @org.doe4ejb3.annotation.PropertyDescriptor annotation:</u></li>
+        The <a href="https://doe.dev.java.net/source/browse/*checkout*/doe/doe4ejb3/src/org/doe4ejb3/annotation/PropertyDescriptor.java">@PropertyDescriptor</a> annotation allows simple customization of the UI controls for the properties (to change labels, the order of fields, UI control size, ...). It's also possible to use custom UI control types (that must implement the "<a href="https://doe.dev.java.net/source/browse/*checkout*/doe/doe4ejb3/src/org/doe4ejb3/gui/PropertyEditorInterface.java">org.doe4ejb3.gui.PropertyEditorInterface</a>"). For example:
 <pre>
 ...
-@Column(name="name", length=50)
-@PropertyDescriptor(index=1, displayName="Full name:")
-public String name;
+@Lob
+@Column(name="PHOTO", columnDefinition="BLOB")
+@PropertyDescriptor(index=7, displayName="Photo", width=300, height=175,
+                    editorClassName="<a href="https://doe.dev.java.net/source/browse/*checkout*/doe/doe4ejb3/src/org/doe4ejb3/gui/ImagePropertyEditor.java">org.doe4ejb3.gui.ImagePropertyEditor</a>")
+public byte[] photo;
 ...
 </pre>
 <br><br>
 
 	<li><u>Using Abeille forms:</u></li>
-        You can design the complete UI of an entity editor with <a href="http://abeille.dev.java.net">Abeille Forms Designer</a>, and copy the generated xml or jfrm file in the same directory/name of the entity class. To bind entity properties with the UI, developers have to design the forms with the apropiate control types (or JPanel container), and to name them as the respective properties names. When the control belongs to an embbedded entity property, use the dot symbol to separate the embedded entity name of the associated property name.  
+        You can design the complete UI of an entity editor with <a href="http://abeille.dev.java.net">Abeille Forms Designer</a>, and copy the generated xml or jfrm file in the same directory/name of the entity class. To bind entity properties with the UI, developers have to design the forms with the apropiate control types (or JPanel container), and to name them like the respective properties names. When the control belongs to an embbedded entity property, use the dot symbol to separate the embedded entity name of the associated property name.  
 <br><br>
 
 	<li><u>Using compiled Swing UI:</u></li>
-	You can also use your favourite GUI builder (like NetBeans IDE) to design the complete Swing UI layout for an entity editor. The class representing the UI should be inherited from JPanel, the class name must be specified in the entity class with @org.doe4ejb3.annotation.EntityDescriptor(layoutClassName="uiClassName") annotation, and the UI class must be packaged in the same persistence unit "jar" as the entity class. To bind entity properties with the UI, developers have to design the forms with the apropiate control types (or JPanel container), and publish them as public fields with a similar name in the form class. When the control belongs to an embbedded entity property, use the "_" symbol to separate the embedded entity name of the associated property name. For example:
+	You can also use your favourite GUI builder (like NetBeans IDE) to design the complete Swing UI layout for an entity editor. The class representing the UI should be inherited from JPanel, the UI class name must be specified in the entity class with the <a href="https://doe.dev.java.net/source/browse/*checkout*/doe/doe4ejb3/src/org/doe4ejb3/annotation/EntityDescriptor.java">@org.doe4ejb3.annotation.EntityDescriptor</a>(layoutClassName="uiClassName") annotation, and the UI class must be packaged in the same persistence unit "jar" as the entity class. To bind entity properties with the UI, developers have to design the forms with the apropiate control types (or JPanel container), and publish them as public fields with a similar name in the form class. When the control belongs to an embbedded entity property, use the "_" symbol to separate the embedded entity name of the associated property name. For example:
 <br><br>
 <table>
 <tr>
@@ -276,7 +278,7 @@ public class Person implements Serializable
     @Column(name="ssn", length=20)
     public String ssn;
 
-    @Column(name="name", length=50)
+    @Column(name="name", length=150)
     public String name;
 
     @Column(name="bornDay")
