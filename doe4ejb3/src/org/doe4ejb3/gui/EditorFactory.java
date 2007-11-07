@@ -440,9 +440,10 @@ public class EditorFactory
                 editor = findEditor(memberClass);
 
                 // support for "java.util.Date" and "java.util.Calendar"
-                if( (editor == null) 
-                    && (  (java.util.Date.class.isAssignableFrom(memberClass)) 
-                       || (java.util.Calendar.class.isAssignableFrom(memberClass))) ) {
+                // (ignore existing java.util.Date/Calendar editors, 
+                // because NetBeans Platform doesn't distinct "javax.persistence.TemporalTypes").
+                if((memberClass.isAssignableFrom(java.util.Date.class)) 
+                       || (memberClass.isAssignableFrom(java.util.Calendar.class))) {
 
                     javax.persistence.TemporalType temporalType = javax.persistence.TemporalType.TIMESTAMP;
                     if(property instanceof EntityProperty) {
@@ -456,7 +457,6 @@ public class EditorFactory
                     } else {
                         editor = new CustomDateEditor(temporalType);
                     }
-                    
                 } 
                     
                 System.out.println("EditorFactory: property editor for " + memberClass.getName() + "=" + editor);
