@@ -59,7 +59,8 @@ public class DefaultWindowManager implements WindowManager
         });
 
         // if(icon != null) window.setFrameIcon(icon);  // avoid nimbus bug
-        
+        window.setDefaultCloseOperation(JInternalFrame.DISPOSE_ON_CLOSE);
+        window.setIconifiable(true);
         window.setLayout(new BorderLayout());            
         if(contentPane != null) {
             window.add((Component)contentPane, BorderLayout.CENTER);
@@ -97,7 +98,6 @@ public class DefaultWindowManager implements WindowManager
                 mdiDesktopPane.add(iFrame);
             }
 
-
             if(iFrame.isIcon()) iFrame.setIcon(false); 
             
             if(center) {
@@ -129,8 +129,7 @@ public class DefaultWindowManager implements WindowManager
     {
         try { 
             JInternalFrame iFrame = (JInternalFrame)window;
-            iFrame.setVisible(false);
-            iFrame.dispose();
+            iFrame.doDefaultCloseAction();
         } catch(Exception ex) {
             showMessageDialog(I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
             ex.printStackTrace();                
