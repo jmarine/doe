@@ -8,6 +8,7 @@
  * <a href="http://www.javaworld.com/javaworld/jw-05-2001/jw-0525-mdi.html">Conquer Swing deficiencies in MDI development</a>.<br>
  *
  * @author Gerald Nunn 
+ * @modified Jordi Marine Fort
  */
 
 package org.doe4ejb3.gui;
@@ -69,8 +70,10 @@ public class WindowMenu extends JMenu {
             menu.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent ae) {
                     JInternalFrame frame = ((ChildMenuItem)ae.getSource()).getFrame();
-                    frame.moveToFront();
+                    frame.setVisible(true);
                     try {
+                        frame.setIcon(false);
+                        frame.moveToFront();
                         frame.setSelected(true);
                     } catch (PropertyVetoException e) {
                         e.printStackTrace();
