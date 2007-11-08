@@ -36,7 +36,7 @@ public class CredentialsManagerPane extends javax.swing.JPanel
         jButtonAccept = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
 
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(CredentialsManagerPane.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance().getContext().getResourceMap(CredentialsManagerPane.class);
         jLabelPersistenceUnit.setText(resourceMap.getString("jLabelPersistenceUnit.text")); // NOI18N
 
         jComboBoxPersistenceUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { org.doe4ejb3.util.I18n.getLiteral(CredentialsManagerPane.class, "msg.anyPersistenceUnit"), "", "", "", "" }));
@@ -61,7 +61,7 @@ public class CredentialsManagerPane extends javax.swing.JPanel
         jLabelPassword.setLabelFor(jPasswordField);
         jLabelPassword.setText(resourceMap.getString("jLabelPassword.text")); // NOI18N
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(CredentialsManagerPane.class, this);
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance().getContext().getActionMap(CredentialsManagerPane.class, this);
         jButtonAccept.setAction(actionMap.get("accept")); // NOI18N
         jButtonAccept.setMnemonic('a');
 
