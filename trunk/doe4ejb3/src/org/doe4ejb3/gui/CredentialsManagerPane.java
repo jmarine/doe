@@ -1,5 +1,5 @@
 /**
- * ConnectionManager.java
+ * CredentialsManagerPane.java
  *
  * Created on January 27, 2007, 8:38 PM
  * @author Jordi Marine Fort
@@ -7,13 +7,15 @@
 
 package org.doe4ejb3.gui;
 
+import org.doe4ejb3.util.DOEUtils;
 import org.doe4ejb3.util.JPAUtils;
+import org.jdesktop.application.Action;
 
 
-public class ConnectionManager extends javax.swing.JInternalFrame
+public class CredentialsManagerPane extends javax.swing.JPanel
 {
-    /** Creates new form ConnectionManager */
-    public ConnectionManager() {
+    /** Creates new form CredentialsManagerPane */
+    public CredentialsManagerPane() {
         initComponents();
     }
     
@@ -34,12 +36,10 @@ public class ConnectionManager extends javax.swing.JInternalFrame
         jButtonAccept = new javax.swing.JButton();
         jButtonCancel = new javax.swing.JButton();
 
-        setClosable(true);
-        setTitle("Connection properties");
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(CredentialsManagerPane.class);
+        jLabelPersistenceUnit.setText(resourceMap.getString("jLabelPersistenceUnit.text")); // NOI18N
 
-        jLabelPersistenceUnit.setText("Persistence unit:");
-
-        jComboBoxPersistenceUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "(any)", "", "", "", "" }));
+        jComboBoxPersistenceUnit.setModel(new javax.swing.DefaultComboBoxModel(new String[] { org.doe4ejb3.util.I18n.getLiteral(CredentialsManagerPane.class, "msg.anyPersistenceUnit"), "", "", "", "" }));
         jComboBoxPersistenceUnit.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
             public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
             }
@@ -56,31 +56,20 @@ public class ConnectionManager extends javax.swing.JInternalFrame
         });
 
         jLabelUsername.setLabelFor(jTextFieldUsername);
-        jLabelUsername.setText("Username:");
+        jLabelUsername.setText(resourceMap.getString("jLabelUsername.text")); // NOI18N
 
         jLabelPassword.setLabelFor(jPasswordField);
-        jLabelPassword.setText("Password:");
+        jLabelPassword.setText(resourceMap.getString("jLabelPassword.text")); // NOI18N
 
-        jButtonAccept.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/accept.png"))); // NOI18N
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(CredentialsManagerPane.class, this);
+        jButtonAccept.setAction(actionMap.get("accept")); // NOI18N
         jButtonAccept.setMnemonic('a');
-        jButtonAccept.setText("Accept");
-        jButtonAccept.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonAcceptActionPerformed(evt);
-            }
-        });
 
-        jButtonCancel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/cancel.png"))); // NOI18N
+        jButtonCancel.setAction(actionMap.get("cancel")); // NOI18N
         jButtonCancel.setMnemonic('c');
-        jButtonCancel.setText("Close");
-        jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonCancelActionPerformed(evt);
-            }
-        });
 
-        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
@@ -126,28 +115,7 @@ public class ConnectionManager extends javax.swing.JInternalFrame
                     .add(jButtonCancel))
                 .addContainerGap())
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void jButtonCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCancelActionPerformed
-        // Restore authentication parameters
-        jComboBoxPersistenceUnitItemStateChanged(null);
-        
-        close();
-    }//GEN-LAST:event_jButtonCancelActionPerformed
-
-    private void jButtonAcceptActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAcceptActionPerformed
-        String username = jTextFieldUsername.getText();
-        String password = new String(jPasswordField.getPassword());
-
-        String puName = JPAUtils.GENERIC_PERSISTENCE_UNIT;
-        if(jComboBoxPersistenceUnit.getSelectedIndex() > 0) puName = (String)((ListItem)jComboBoxPersistenceUnit.getSelectedItem()).getValue();
-
-        JPAUtils.setConnectionParams(puName, username, password);        
-        
-        close();
-    }//GEN-LAST:event_jButtonAcceptActionPerformed
 
     private void jComboBoxPersistenceUnitPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_jComboBoxPersistenceUnitPopupMenuWillBecomeVisible
 
@@ -205,20 +173,30 @@ public class ConnectionManager extends javax.swing.JInternalFrame
     private javax.swing.JTextField jTextFieldUsername;
     // End of variables declaration//GEN-END:variables
 
-
     
-    private void close()
+    @Action
+    public void accept()
     {
-        try {
-            fireVetoableChange(IS_CLOSED_PROPERTY, Boolean.FALSE,
-                               Boolean.TRUE);
-            isClosed = true;
-            setVisible(false);
-            firePropertyChange(IS_CLOSED_PROPERTY, Boolean.FALSE,
-                               Boolean.TRUE);
-            dispose();
-        } catch (Exception pve) {}
+        String username = jTextFieldUsername.getText();
+        String password = new String(jPasswordField.getPassword());
+
+        String puName = JPAUtils.GENERIC_PERSISTENCE_UNIT;
+        if(jComboBoxPersistenceUnit.getSelectedIndex() > 0) puName = (String)((ListItem)jComboBoxPersistenceUnit.getSelectedItem()).getValue();
+
+        JPAUtils.setConnectionParams(puName, username, password);        
+        
+        Object window = DOEUtils.getWindowManager().getWindowFromComponent(this);
+        DOEUtils.getWindowManager().closeWindow(window);  
+
     }
 
+    @Action
+    public void cancel() 
+    {
+        jComboBoxPersistenceUnitItemStateChanged(null);
+        
+        Object window = DOEUtils.getWindowManager().getWindowFromComponent(this);
+        DOEUtils.getWindowManager().closeWindow(window);  
+    }
    
 }

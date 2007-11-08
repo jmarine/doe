@@ -572,11 +572,11 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     public void openConnectionManager()
     {
         try {
-            if(connectionManagerFrame == null) {
-                connectionManagerFrame = new ConnectionManager();
+            if(connectionManagerWindow == null) {
+                connectionManagerWindow = DOEUtils.getWindowManager().createWindow("connectionManager", I18n.getLiteral(CredentialsManagerPane.class, "credentialsManagerDialog.title"), null, new CredentialsManagerPane());
             }
             
-            DOEUtils.getWindowManager().showWindow(connectionManagerFrame, true);
+            DOEUtils.getWindowManager().showWindow(connectionManagerWindow, true);
             
         } catch(Exception ex) {
             System.out.println("DOE.openConnectionManager(): Error " + ex.getMessage());
@@ -708,7 +708,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private JOutlinePane   jOutlinePanePersistenceUnits = new JOutlinePane();
 
     /** Connection Manager */ 
-    private ConnectionManager connectionManagerFrame = null;
+    private Object connectionManagerWindow = null;
 
     /** Caches */ 
     private HashMap<String,JMenuItem> newMenuItemsForPUandEntityClasses = new HashMap<String,JMenuItem>();
