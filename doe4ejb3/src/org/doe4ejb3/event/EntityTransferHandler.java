@@ -77,7 +77,7 @@ public class EntityTransferHandler extends TransferHandler
                     if(c instanceof JComboBox) {
                         JComboBox combo = (JComboBox)c;
                         for(int index = 0; (items != null) && (index < items.length); index++) {
-                            combo.addItem(items[index]);
+                            combo.addItem(items[index]); 
                             if(index == 0) combo.setSelectedItem(items[index]);
                         }
                     } else if(c instanceof JTable) {
@@ -119,9 +119,11 @@ public class EntityTransferHandler extends TransferHandler
                 items = (Object[])data.getTransferData(getEntityDataFlavor());
                 if(sourceControl instanceof JComboBox) {
                     JComboBox combo = (JComboBox)sourceControl;
+                    // TODO? unselect item
                     for(int index = 0; (items != null) && (index < items.length); index++) {
                         combo.removeItem(items[index]);
                     }
+
                 } else if(sourceControl instanceof JTable) {
                     JTable table = (JTable)sourceControl;
                     EntityTableModel model = (EntityTableModel)table.getModel();
@@ -165,18 +167,31 @@ public class EntityTransferHandler extends TransferHandler
 
         EntityTransferable(JComponent component) {
             try { 
-                JTable table = (JTable)component;
-                EntityTableModel model = (EntityTableModel)table.getModel();
+                if(component != null) {
+                    if(component instanceof JComboBox) {
+                        JComboBox combo = (JComboBox)component;
+                        items = null;
+                        if(combo.getSelectedItem() != null) {
+                            items = (Object[])Array.newInstance(EntityTransferHandler.this.getEntityClass(), 1);
+                            items[0] = combo.getSelectedItem();    
+                        }
+                        
+                    } else if(component instanceof JTable) {
+                        JTable table = (JTable)component;
+                        EntityTableModel model = (EntityTableModel)table.getModel();
 
-                items = null;
-                int selection[] = table.getSelectedRows();
-                if(selection != null) {
-                    items = (Object[])Array.newInstance(EntityTransferHandler.this.getEntityClass(), selection.length);
-                    for(int index = 0; index < items.length; index++) {
-                        items[index] = model.getListModel().getElementAt(table.convertRowIndexToModel(selection[index]));
+                        items = null;
+                        int selection[] = table.getSelectedRows();
+                        if(selection != null) {
+                            items = (Object[])Array.newInstance(EntityTransferHandler.this.getEntityClass(), selection.length);
+                            for(int index = 0; index < items.length; index++) {
+                                items[index] = model.getListModel().getElementAt(table.convertRowIndexToModel(selection[index]));
+                            }
+                        }
+
                     }
                 }
-            
+                
             } 
             catch(Exception ex) { }
         }
