@@ -16,6 +16,7 @@ import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyEditorSupport;
 import java.lang.reflect.Method;
@@ -165,7 +166,7 @@ public class EditorFactory
                         combo.setModel(comboBoxModel);
 
                         // define combobox prototype dimensions
-                        EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, true);
+                        final EntityTransferHandler entityTransferHandler = new EntityTransferHandler(memberClass, true);
                         combo.setMinimumSize(new java.awt.Dimension(50,26));  // it was too wided
                         combo.setTransferHandler(entityTransferHandler);
                         combo.setPrototypeDisplayValue("sample value to calculate drop-down list dimension for combobox!");  // define width dimension
@@ -226,14 +227,101 @@ public class EditorFactory
                                 }
                             }
                         };
+                        
+                        final AbstractAction deleteItemAction = new AbstractAction(I18n.getLiteral("delete.Action.text"), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/delete.png"))) {
+                            public void actionPerformed(ActionEvent evt)  {
+                                try {
+                                    Object entityToDelete = combo.getSelectedItem();
+                                    if(entityToDelete == null) {
+                                        throw new ApplicationException("No item selected");
+                                    } else {
+                                        int confirm = DOEUtils.getWindowManager().showConfirmDialog( I18n.getLiteral("deleteDialog.message.selected"), I18n.getLiteral("deleteDialog.title"), JOptionPane.OK_CANCEL_OPTION);
+                                        if(confirm == JOptionPane.OK_OPTION) 
+                                        {
+                                            try {
+                                                //combo.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                                                //DOEUtils.getWindowManager().showStatus( DOEUtils.APPLICATION_WINDOW, I18n.getLiteral(EntityEditorView.class, "msg.deletingEntity", JPAUtils.getEntityName(entityToDelete.getClass())));  // NOI18N
+                                                //JPAUtils.removeEntity(puName, entityToDelete);                                
+                                                //DOEUtils.getWindowManager().showStatus( DOEUtils.APPLICATION_WINDOW, I18n.getLiteral(EntityEditorView.class, "msg.entityDeleted", JPAUtils.getEntityName(entityToDelete.getClass())));   // NOI18N
+                                                combo.setSelectedItem(null);
+                                                //combo.removeItem(entityToDelete);
+                                            } finally {
+                                                //combo.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+                                            }
+                                        }
+                                    }
+
+                                } catch(ApplicationException ex) { 
+                                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
+
+                                } catch(Exception ex) { 
+                                    DOEUtils.getWindowManager().showMessageDialog( I18n.getLiteral("msg.error") + ex.getMessage(), I18n.getLiteral("msg.error") , JOptionPane.ERROR_MESSAGE);
+                                }
+                            }
+                        };         
+                        
+
+                        
+                        // cut, copy & paste actions
+                        final AbstractAction cutAction = new ClipboardAction(I18n.getLiteral("cut.Action.text"), 't', TransferHandler.getCutAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/cut.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("cut"));
+                        final AbstractAction copyAction = new ClipboardAction(I18n.getLiteral("copy.Action.text"), 'c', TransferHandler.getCopyAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/copy.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("copy"));
+                        final AbstractAction pasteAction = new ClipboardAction(I18n.getLiteral("paste.Action.text"), 'p', TransferHandler.getPasteAction(), new javax.swing.ImageIcon(EditorFactory.class.getResource("/org/doe4ejb3/gui/resources/paste.png")));  // org.jdesktop.application.ApplicationContext.getInstance().getActionMap(DomainObjectExplorer.class, DomainObjectExplorer.getInstance()).get("paste"));
+
+                        ActionMap map = combo.getActionMap();
+                        map.put(TransferHandler.getCutAction().getValue(Action.NAME),
+                                TransferHandler.getCutAction());
+                        map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
+                                TransferHandler.getCopyAction());
+                        map.put(TransferHandler.getPasteAction().getValue(Action.NAME),
+                                TransferHandler.getPasteAction());
+                        
+                        
+                        // setup enable state, and enable change listeners:
+                        editItemAction.setEnabled(false);
+                        deleteItemAction.setEnabled(false);
+                        copyAction.setEnabled(false);
+                        cutAction.setEnabled(false);
+                        pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
 
                         combo.addItemListener(new ItemListener() {
                             public void itemStateChanged(ItemEvent e) {
-                                boolean newState = (combo.getSelectedIndex() > 0);
-                                editItemAction.setEnabled(newState);
+                                boolean selected = combo.getSelectedItem() != null;
+                                editItemAction.setEnabled(selected);
+                                deleteItemAction.setEnabled(selected);
+                                copyAction.setEnabled(selected);
+                                cutAction.setEnabled(selected);
+                                pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
+                                
                             }
                         });
                         
+                        
+
+                        // configure popup menu
+                        javax.swing.JPopupMenu popupMenu = new javax.swing.JPopupMenu();
+                        popupMenu.add(newItemAction).setMnemonic('n');
+                        popupMenu.add(editItemAction).setMnemonic('e');
+                        popupMenu.add(new javax.swing.JSeparator());
+                        popupMenu.add(cutAction);
+                        popupMenu.add(copyAction);
+                        popupMenu.add(pasteAction);
+                        popupMenu.add(new javax.swing.JSeparator());
+                        popupMenu.add(deleteItemAction).setMnemonic('d');
+                        popupMenu.addPopupMenuListener(new PopupMenuListener() {
+                            public void popupMenuCanceled(PopupMenuEvent e) { }
+                            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
+                            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                                boolean selected = combo.getSelectedItem() != null;
+                                editItemAction.setEnabled(selected);
+                                deleteItemAction.setEnabled(selected);
+                                copyAction.setEnabled(selected);
+                                cutAction.setEnabled(selected);
+                                pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
+                            }
+                        });
+                        combo.setComponentPopupMenu(popupMenu);
+                        
+                        // lazy load of combo items:
                         combo.addPopupMenuListener(new PopupMenuListener() {
                             public void popupMenuCanceled(PopupMenuEvent e) { }
                             public void popupMenuWillBecomeInvisible(PopupMenuEvent e) { }
@@ -881,7 +969,8 @@ public class EditorFactory
         deleteAction.setEnabled(false);
         copyAction.setEnabled(false);
         cutAction.setEnabled(false);
-        pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
+        pasteAction.setEnabled(false);
+        if(!isManagerWindow) pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 boolean enabled = !listSelectionModel.isSelectionEmpty();
@@ -889,7 +978,7 @@ public class EditorFactory
                 deleteAction.setEnabled(enabled);
                 copyAction.setEnabled(enabled);
                 cutAction.setEnabled(!isManagerWindow && enabled);
-                pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
+                if(!isManagerWindow) pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
             }
         });
         
@@ -913,8 +1002,7 @@ public class EditorFactory
                 deleteAction.setEnabled(enabled);
                 copyAction.setEnabled(enabled);
                 cutAction.setEnabled(!isManagerWindow && enabled);
-                if(isManagerWindow) pasteAction.setEnabled(false);
-                pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
+                if(!isManagerWindow) pasteAction.setEnabled(ClipboardAction.getClipboard().isDataFlavorAvailable(entityTransferHandler.getEntityDataFlavor()));
             }
         });
 
@@ -980,11 +1068,26 @@ public class EditorFactory
         panel.setLayout(new BorderLayout());
         panel.add("Center", scrollableItems);
         panel.add("South", buttonPanel);
+
+        // configure "double click":
+        jTable.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                try {
+                    if(evt.getClickCount() > 1) {
+                        editAction.actionPerformed(null);
+                    }
+                } catch(Exception ex) {
+                    DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, I18n.getLiteral("msg.error") + ex.getMessage());
+                }
+            }
+        });
         
-        // configure drag and drop"
+        // configure "drag and drop"
         jTable.setDragEnabled(true);
         jTable.setTransferHandler(entityTransferHandler);
         scrollableItems.setTransferHandler(entityTransferHandler);
+        
 
         // Configure "copy & paste"
         ActionMap map = jTable.getActionMap();
