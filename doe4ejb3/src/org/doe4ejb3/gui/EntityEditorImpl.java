@@ -350,12 +350,16 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
             else if(a instanceof javax.persistence.Column) 
             {
                 javax.persistence.Column column = (javax.persistence.Column)a;
-                if( (column.insertable()) || (column.updatable()) ) {
-                    if(!generatedValue) maxLength = column.length();
-                    String columnName = column.name();
-                    if(columnName != null) name = columnName;
-                    persistent = true;
-                }
+                String columnName = column.name();
+                if(columnName != null) name = columnName;
+                if(!generatedValue) maxLength = column.length();
+                
+                persistent = true;
+                if( (!column.insertable()) && (objIsNew) ) {
+                    generatedValue = true;
+                } else if((!column.updatable()) && (!objIsNew) ) {
+                    generatedValue = true;
+                }                
             }
             else if(a instanceof javax.persistence.JoinColumn) 
             {
