@@ -19,11 +19,11 @@ public @interface PropertyDescriptor {
     int index() default 0;
     String displayName() default "";
     String resourceBundle() default "";
-    String format() default "";
     boolean showInLists() default false;
     OptionDescriptor[] options() default {};
     String editorClassName() default "";
     boolean hidden() default false;
     int width() default 0;
     int height() default 0;
+    // String format() default "";  // not supported, yet
 }
