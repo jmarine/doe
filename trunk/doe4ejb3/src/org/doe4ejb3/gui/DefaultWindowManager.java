@@ -93,13 +93,13 @@ public class DefaultWindowManager implements WindowManager
         try { 
             JInternalFrame iFrame = (JInternalFrame)window;
 
+            if(iFrame.isIcon()) iFrame.setIcon(false); 
+            
             if(iFrame.getParent() == null) {
                 //iFrame.setSize(iFrame.getPreferredSize());
                 mdiDesktopPane.add(iFrame);
             }
 
-            if(iFrame.isIcon()) iFrame.setIcon(false); 
-            
             if(center) {
                 iFrame.setLocation( Math.max(1,(mdiDesktopPane.getParent().getWidth()  - iFrame.getWidth())/2),
                                     Math.max(1,(mdiDesktopPane.getParent().getHeight() - iFrame.getHeight())/2) );
