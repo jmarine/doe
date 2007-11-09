@@ -546,6 +546,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         info.append("\n");
         info.append(I18n.getLiteral("msg.thanksTo")); info.append("\n");
         info.append("   SUN Microsystems, Inc.\n");
+        info.append("   Java.net comunity.\n");
         info.append("   NetBeans community.\n");
         info.append("   GlassFish community.\n");
         info.append("   TopLink Essentials team.\n");
