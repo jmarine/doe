@@ -80,7 +80,7 @@ public class Recipe implements java.io.Serializable
     }
 
     @PropertyDescriptor(index=1)
-    @Column(name="TITLE", nullable=false, unique=true, length=100)
+    @Column(name="TITLE", updatable=false, nullable=false, unique=true, length=100)
     public String getTitle()
     {
         return title;
@@ -104,7 +104,8 @@ public class Recipe implements java.io.Serializable
     }
     
 
-    @PropertyDescriptor(index=3,format="MM/dd/yyyy",displayName="First Cooked On")
+    @Column(name="DATE", insertable=false)
+    @PropertyDescriptor(index=3,displayName="First Cooked On")
     @Temporal(value=TemporalType.DATE)
     public Date getDate()
     {
