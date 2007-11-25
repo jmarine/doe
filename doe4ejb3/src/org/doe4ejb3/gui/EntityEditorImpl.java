@@ -304,6 +304,7 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                                 && (entityProperty.getPropertyDescriptor().getWriteMethod() != null) && (!entityProperty.getPropertyDescriptor().getWriteMethod().isAnnotationPresent(javax.persistence.Transient.class));
         boolean generatedValue = false;
         boolean embedded = false;
+        boolean hidden = false;
         javax.persistence.Temporal temporal = null;
         Object relationType = null;
         GridBagConstraints gbc = gbcComponent;
@@ -411,10 +412,21 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                 persistent = true;
                 maxLength = Integer.MAX_VALUE;
             }
+            else if(a instanceof javax.persistence.Lob) 
+            {
+                persistent = true;
+                maxLength = Integer.MAX_VALUE;
+            }            
+            else if(a instanceof org.doe4ejb3.annotation.PropertyDescriptor) 
+            {
+                org.doe4ejb3.annotation.PropertyDescriptor pd = (org.doe4ejb3.annotation.PropertyDescriptor)a;
+                hidden = pd.hidden();
+                if(!hidden) persistent = true;
+            }
                 
         }
         
-        if( (name != null) && (persistent) && (!generatedValue || !objIsNew) ) {
+        if( (name != null) && (persistent) && (!hidden) && (!generatedValue || !objIsNew) ) {
             if(embedded) {
                 // TO TEST:
                 try {
