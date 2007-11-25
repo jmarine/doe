@@ -7,9 +7,11 @@
 
 package org.doe4ejb3.test.academy;
 
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyVetoException;
 import java.io.Serializable;
-import java.util.Date;
+import java.security.MessageDigest;
+import java.sql.Date;
 import javax.persistence.*;
 
 import org.doe4ejb3.annotation.EntityDescriptor;
@@ -18,7 +20,7 @@ import org.doe4ejb3.annotation.PropertyDescriptor;
 
 @Entity()
 @Inheritance(strategy = InheritanceType.JOINED)
-//@EntityDescriptor(layoutClassName="org.doe4ejb3.test.academy.PersonEditor")
+@EntityDescriptor(layoutClassName="org.doe4ejb3.test.academy.PersonEditor")
 public class Person implements Serializable {
 
     private String ssn;
@@ -29,9 +31,11 @@ public class Person implements Serializable {
 
     private Gender gender;
     
-    private java.util.Date bornDay;
+    private Date bornDay;
     
     private Address address;
+    
+    private String storedPassword;
 
     
     @Id
@@ -41,7 +45,8 @@ public class Person implements Serializable {
         return ssn;
     }
 
-    protected void setSsn(String ssn) throws IllegalArgumentException {
+    protected void setSsn(String ssn) throws IllegalArgumentException 
+    {
         try {
             Integer.parseInt(ssn);
         } catch(Exception ex) {
@@ -82,7 +87,6 @@ public class Person implements Serializable {
     }
 
     
-    @Temporal(TemporalType.DATE)
     @Column(name="bornDay")
     public Date getBornDay() {
         return bornDay;
@@ -103,6 +107,37 @@ public class Person implements Serializable {
         this.address = address;
     }
 
+    @Column(name="password", length=40)
+    @PropertyDescriptor(hidden=true)    
+    public String getStoredPassword() {
+        return storedPassword;
+    }
+
+    public void setStoredPassword(String password) {
+        this.storedPassword = password;
+    }
+    
+    @Transient
+    @PropertyDescriptor(hidden=false)
+    public String getPassword() {
+        return this.storedPassword;
+    }
+    
+    public void setPassword(String password) throws Exception {
+        if(password == null) {
+            this.storedPassword = null;
+        } else if( (this.storedPassword == null) || (!this.storedPassword.equals(password))) { 
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-1");
+            byte[] digest = messageDigest.digest(password.getBytes());
+            StringBuffer sha1 = new StringBuffer();
+            for (int i=0;i<digest.length;i++) {
+              sha1.append(Integer.toHexString(0xFF & digest[i]));
+            }            
+            this.storedPassword = sha1.toString();
+        }
+    }
+
+    
 
     public boolean equals(Object obj)
     {
