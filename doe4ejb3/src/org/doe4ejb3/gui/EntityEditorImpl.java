@@ -452,9 +452,8 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
                             comp = entityEditorUI;
                             isNewComponent = true;
                         } else {
-                            container.setLayout(new BorderLayout());
                             container.setPreferredSize(entityEditorUI.getPreferredSize());
-                            container.add(entityEditorUI, BorderLayout.CENTER);
+                            EditorFactory.addComponentIntoContainer(container, entityEditorUI);
                             container.putClientProperty("layout", this);
                             comp = container;
                             isNewComponent = false;

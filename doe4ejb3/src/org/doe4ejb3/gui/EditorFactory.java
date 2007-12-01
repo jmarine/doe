@@ -10,9 +10,11 @@ package org.doe4ejb3.gui;
 import org.doe4ejb3.util.I18n;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.FlowLayout;
-import java.awt.dnd.DnDConstants;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -364,12 +366,19 @@ public class EditorFactory
                         } else {
                             JPanel panel = ((container != null) && (JPanel.class.isAssignableFrom(container.getClass()))) ? (JPanel)container : new JPanel();
                             if(container != null) panel.putClientProperty("layout", layout);  // existing JComboBox or JPanel
+
+                            // addComponentIntoContainer(panel, combo);  // it isn't very appropiate for custom search parameters
                             panel.setLayout(new BorderLayout());
                             panel.add(combo, BorderLayout.CENTER);
+                            
                             panel.putClientProperty("printableContent", combo);
                             comp = panel;
 
                             if(property instanceof EntityProperty) {
+                                // new layout with navigation buttons:
+                                panel.setLayout(new BorderLayout());
+                                panel.add(combo, BorderLayout.CENTER);
+
                                 // include navigation buttons
                                 JPanel jButtonsPanel = new JPanel();
                                 jButtonsPanel.setLayout(new java.awt.FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -484,8 +493,7 @@ public class EditorFactory
                         if(container != null) {
                             if(JPanel.class.isAssignableFrom(container.getClass())) {
                                 JPanel panel = (JPanel)container;
-                                panel.setLayout(new BorderLayout());
-                                panel.add(comp, BorderLayout.CENTER);
+                                addComponentIntoContainer(panel, comp);
                                 comp = panel;
                             }
                             comp.putClientProperty("layout", layout);
@@ -567,8 +575,7 @@ public class EditorFactory
                     } else {  // convert to JComponent or integrate in customized layout holder:
                         JPanel panel = (container != null) ? (JPanel)container : new JPanel();  
                         if(container != null) panel.putClientProperty("layout", layout);
-                        panel.setLayout(new FlowLayout());
-                        panel.add(customComponent);
+                        addComponentIntoContainer(panel, customComponent);
                         comp = panel;
                     }
 
@@ -607,8 +614,7 @@ public class EditorFactory
                     if(container != null) {
                         if(JPanel.class.isAssignableFrom(container.getClass())) {
                             JPanel panel = (JPanel)container;  
-                            panel.setLayout(new FlowLayout());
-                            panel.add(checkBox);
+                            addComponentIntoContainer(panel, checkBox);
                             comp = panel;
                         }
                         comp.putClientProperty("layout", layout);
@@ -672,8 +678,7 @@ public class EditorFactory
                     if(container != null) {
                         if(JPanel.class.isAssignableFrom(container.getClass())) {
                             JPanel panel = (JPanel)container;
-                            panel.setLayout(new BorderLayout());
-                            panel.add(textField, BorderLayout.CENTER);
+                            addComponentIntoContainer(panel, textField);
                             comp = panel;
                         }
                         comp.putClientProperty("layout", layout);                        
@@ -1116,6 +1121,21 @@ public class EditorFactory
                 TransferHandler.getPasteAction());
         
         return panel;
+    }
+
+    
+    private final static GridBagConstraints gbcFromFLS = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE, new java.awt.Insets(0,0,0,0), 0,0);
+    public static void addComponentIntoContainer(Container container, Component component) 
+    {
+        // ORIGINAL CODE:
+        // container.setLayout(new BorderLayout());
+        // container.add(component, BorderLayout.CENTER);
+
+        // NEW LAYOUT DOESN'T RESIZE DUMMY CONTROLS:
+        container.setLayout(new GridBagLayout());
+        container.add(component, gbcFromFLS);
+        
+        // TODO? Adapt component into current container layout.
     }
     
 }
