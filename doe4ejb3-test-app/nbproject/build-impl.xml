@@ -301,10 +301,11 @@ is divided into following sections:
     <!--
     DEBUGGING SECTION
     -->
-    <target depends="run-debug,run-display-browser,run-debug-appclient" description="Deploy to server." name="debug"/>
+    <target depends="run-debug,run-debug-appclient" description="Deploy to server." name="debug"/>
     <target depends="dist" description="Debug project in IDE." if="netbeans.home" name="run-debug" unless="app.client">
         <nbdeploy clientModuleUri="${client.module.uri}" clientUrlPart="${client.urlPart}" debugmode="true"/>
         <antcall target="connect-debugger"/>
+        <antcall target="debug-display-browser"/>
     </target>
     <target name="connect-debugger" unless="is.debugged">
         <nbjpdaconnect address="${jpda.address}" host="${jpda.host}" name="${name}" transport="${jpda.transport}">
@@ -315,6 +316,9 @@ is divided into following sections:
                 <path path="${ear.docbase.dirs}"/>
             </sourcepath>
         </nbjpdaconnect>
+    </target>
+    <target if="do.display.browser" name="debug-display-browser">
+        <nbbrowse url="${client.url}"/>
     </target>
     <target name="-init-debug-args">
         <property name="version-output" value="java version &quot;${ant.java.version}"/>
