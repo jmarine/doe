@@ -50,9 +50,10 @@ public interface EntityEditorInterface
 
 
     /**
-     * To edit an existing object
+     * To edit an object
+     * (or create a new object when null)
      */
-    void setEntity(Object obj);
+    void setEntity(Object obj) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException;
 
     /**
      * To edit a new object 
