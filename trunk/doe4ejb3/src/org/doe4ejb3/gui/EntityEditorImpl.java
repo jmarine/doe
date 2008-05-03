@@ -232,13 +232,13 @@ public class EntityEditorImpl extends JPanel implements EntityEditorInterface, E
         setEntity(entity, true);
     }
     
-    public void setEntity(Object entity)
+    public void setEntity(Object entity) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException
     {
         setEntity(entity, false);
     }
     
 
-    protected void setEntity(Object entity, boolean objIsNew)
+    protected void setEntity(Object entity, boolean objIsNew) throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException
     {
         System.out.println("Entity: " + entity + ", isNew=" + objIsNew);
         
