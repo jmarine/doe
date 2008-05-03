@@ -91,7 +91,7 @@ public class EntityEditorView extends javax.swing.JPanel
     private void updateActions()
     {
         clearCustomActions();
-        if(entity == null) {
+        if(editor.isNew()) {
             jButtonDelete.setVisible(false);
             jButtonPrint.setVisible(false);
         } else {
@@ -263,16 +263,16 @@ public class EntityEditorView extends javax.swing.JPanel
             EntityEditorView.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
             
             setMessage(I18n.getLiteral(EntityEditorView.class, "msg.savingEntity", JPAUtils.getEntityName(entityClass)));  // NOI18N
-            Object oldEntity = getEntity();
-            Object newEntity = oldEntity;
+            Object editedEntity = getEntity();
+            Object savedEntity = editedEntity;
             if(editor.isNew()) {
-                newEntity = JPAUtils.createEntity(puName, oldEntity);  // safer than "saveEntity" method.
+                savedEntity = JPAUtils.createEntity(puName, editedEntity);  // safer than "saveEntity" method.
             } else {
-                newEntity = JPAUtils.saveEntity(puName, oldEntity);  
+                savedEntity = JPAUtils.saveEntity(puName, editedEntity);  
             }
                 
             try {
-                EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, oldEntity, newEntity);
+                EntityEvent entityEvent = new EntityEvent(this, editor.isNew()? EntityEvent.ENTITY_INSERT : EntityEvent.ENTITY_UPDATE, editedEntity, savedEntity);
                 WindowManager wm = DOEUtils.getWindowManager();
                 Object window = wm.getWindowFromComponent(EntityEditorView.this);
                 EventListenerList listenerList = DOEUtils.getWindowManager().getEventListenerList(window);
@@ -288,7 +288,7 @@ public class EntityEditorView extends javax.swing.JPanel
                 ex.printStackTrace();
             } 
             
-            return newEntity;
+            return savedEntity;
         }
         
 
