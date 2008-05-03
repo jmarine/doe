@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence">
+
+  <persistence-unit name="Recipes" transaction-type="JTA">
+    <provider>oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider</provider>
+    <jta-data-source>jdbc/doe4ejb3</jta-data-source>
+    <class>org.doe4ejb3.test.recipe.Category</class>
+    <class>org.doe4ejb3.test.recipe.Ingredient</class>
+    <class>org.doe4ejb3.test.recipe.Recipe</class>
+    <properties>
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="no.weaving" value="true"/>
+      <property name="toplink.cache.type.default" value="NONE"/>
+    </properties>
+  </persistence-unit>
+
+  <persistence-unit name="Academy" transaction-type="JTA">
+    <provider>oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider</provider>
+    <jta-data-source>jdbc/doe4ejb3</jta-data-source>
+    <class>org.doe4ejb3.test.academy.Address</class>
+    <class>org.doe4ejb3.test.academy.Person</class>
+    <class>org.doe4ejb3.test.academy.Teacher</class>
+    <class>org.doe4ejb3.test.academy.Course</class>
+    <properties>
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="no.weaving" value="true"/>
+      <property name="toplink.cache.type.default" value="NONE"/>
+    </properties>
+  </persistence-unit>
+
+  
+  <!-- NetBeans Platform tests: use non-jta-data-source (RESOURCE_LOCAL) 
+  <persistence-unit name="Recipes" transaction-type="RESOURCE_LOCAL">
+    <provider>oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider</provider>
+    <class>org.doe4ejb3.test.recipe.Category</class>
+    <class>org.doe4ejb3.test.recipe.Ingredient</class>
+    <class>org.doe4ejb3.test.recipe.Recipe</class>
+    <properties>
+      <property name="toplink.jdbc.url" value="jdbc:derby://localhost:1527/doe4ejb3" />
+      <property name="toplink.jdbc.user" value="admin" />
+      <property name="toplink.jdbc.password" value="adminadmin" />
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="no.weaving" value="true"/>
+      <property name="toplink.cache.type.default" value="NONE"/>
+    </properties>
+  </persistence-unit>
+
+  <persistence-unit name="Academy" transaction-type="RESOURCE_LOCAL">
+    <provider>oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider</provider>
+    <class>org.doe4ejb3.test.academy.Address</class>
+    <class>org.doe4ejb3.test.academy.Person</class>
+    <class>org.doe4ejb3.test.academy.Teacher</class>
+    <class>org.doe4ejb3.test.academy.Course</class>
+    <properties>
+      <property name="toplink.jdbc.url" value="jdbc:derby://localhost:1527/doe4ejb3" />
+      <property name="toplink.jdbc.user" value="admin" />
+      <property name="toplink.jdbc.password" value="adminadmin" />        
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="no.weaving" value="true"/>
+      <property name="toplink.cache.type.default" value="NONE"/>
+    </properties>
+  </persistence-unit>
+  -->
+
+  
+  <!-- HIBERNATE3 TESTS: problems with embedded entities and lazy relationships
+  <persistence-unit name="Recipes" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <non-jta-data-source>jdbc/doe4ejb3</non-jta-data-source>
+    <class>org.doe4ejb3.test.recipe.Category</class>
+    <class>org.doe4ejb3.test.recipe.Ingredient</class>
+    <class>org.doe4ejb3.test.recipe.Recipe</class>
+    <properties>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
+    </properties>
+  </persistence-unit>
+  
+  <persistence-unit name="Academy" transaction-type="RESOURCE_LOCAL">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <non-jta-data-source>jdbc/doe4ejb3</non-jta-data-source>
+    <class>org.doe4ejb3.test.academy.Address</class>
+    <class>org.doe4ejb3.test.academy.Person</class>
+    <class>org.doe4ejb3.test.academy.Teacher</class>
+    <class>org.doe4ejb3.test.academy.Course</class>
+    <properties>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.hbm2ddl.auto" value="update"/>
+      <property name="hibernate.dialect" value="org.hibernate.dialect.DerbyDialect"/>
+    </properties>
+  </persistence-unit>  
+  -->  
+  
+  
+  <!-- OTHER TESTS
+  <persistence-unit name="Invoice" transaction-type="JTA">
+    <jta-data-source>jdbc/doe4ejb3</jta-data-source>
+    <class>org.doe4ejb3.test.invoice.Order</class>
+    <class>org.doe4ejb3.test.invoice.LineItem</class>
+    <properties>
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="toplink.create-ddl-jdbc-file-name" value="invoice_create_javadb.jdbc"/>
+      <property name="toplink.drop-ddl-jdbc-file-name" value="invoice_drop_javadb.jdbc"/>
+    </properties>
+  </persistence-unit>
+  -->
+
+  <!-- OTHER TESTS
+  <persistence-unit name="ProjectManagement" transaction-type="JTA">
+    <jta-data-source>jdbc/doe4ejb3</jta-data-source>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Department</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Projectchanges</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Navigation</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.UserGroup</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Employee</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Project</class>
+    <class>com.sap.nwce.ra.edm.ejb.entity.Skill</class>
+    <properties>
+      <property name="toplink.logging.level" value="FINE"/>
+      <property name="toplink.ddl-generation" value="create-tables"/>
+      <property name="toplink.create-ddl-jdbc-file-name" value="sap_test_create_javadb.jdbc"/>
+      <property name="toplink.drop-ddl-jdbc-file-name" value="sap_test_drop_javadb.jdbc"/>
+    </properties>
+  </persistence-unit>
+-->
+  
+</persistence>
