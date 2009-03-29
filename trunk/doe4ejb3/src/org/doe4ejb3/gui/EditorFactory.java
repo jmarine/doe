@@ -1127,15 +1127,16 @@ public class EditorFactory
     private final static GridBagConstraints gbcFromFLS = new GridBagConstraints(GridBagConstraints.RELATIVE,GridBagConstraints.RELATIVE, 0, 1, 1.0, 1.0, GridBagConstraints.FIRST_LINE_START, GridBagConstraints.NONE, new java.awt.Insets(0,0,0,0), 0,0);
     public static void addComponentIntoContainer(Container container, Component component) 
     {
-        // ORIGINAL CODE:
-        // container.setLayout(new BorderLayout());
-        // container.add(component, BorderLayout.CENTER);
+        // Clear previous contained components:
+        container.removeAll();
 
-        // NEW LAYOUT DOESN'T RESIZE DUMMY CONTROLS:
+        // Original code (with ugly middle vertical alignment)
+        // container.setLayout(new BorderLayout());
+        // container.add(component, BorderLayout.CENTER);  
+
+        // New layout (but doesn't resize dummy controls):
         container.setLayout(new GridBagLayout());
         container.add(component, gbcFromFLS);
-        
-        // TODO? Adapt component into current container layout.
     }
     
 }
