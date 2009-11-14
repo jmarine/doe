@@ -50,7 +50,7 @@ public class JPAUtils
     public static final String TOPLINK_PROVIDER    = "oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider";
     public static final String HIBERNATE_PROVIDER  = "org.hibernate.ejb.HibernatePersistence";
     public static final String OPENJPA_PROVIDER    = "org.apache.openjpa.persistence.PersistenceProviderImpl";
-    public static final String KODO_PROVIDER       = "kodo.persistence. PersistenceProviderImpl";
+    public static final String KODO_PROVIDER       = "kodo.persistence.PersistenceProviderImpl";
 
     private static JAXBContext jc = null;
     private static String defaultPersistenceProvider = TOPLINK_PROVIDER;
