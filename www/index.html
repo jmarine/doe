@@ -32,7 +32,7 @@
             <td><a href="http://enterprise-incubator.dev.java.net/" style="color: white; text-decoration:none; font-family:Arial,sans-serif; font-size:11px; font-weight:bold;white-space:nowrap">incubator</a></td>
             <!-- download j2ee 1.4 sdk -->
             <td><img src="images/bullet.gif" alt="*" border="0" hspace="4" /></td>
-            <td><a href="https://glassfish.dev.java.net/downloads/v2-b58g.html" style="color: white; text-decoration:none; font-family:Arial,sans-serif; font-size:11px; font-weight:bold;white-space:nowrap">download GlassFish v2</a></td>
+            <td><a href="http://download.java.net/glassfish/v3/promoted/glassfish-v3-b72.zip" style="color: white; text-decoration:none; font-family:Arial,sans-serif; font-size:11px; font-weight:bold;white-space:nowrap">download GlassFish v3-b72</a></td>
           </tr>
         </table>
       </td>
@@ -55,12 +55,12 @@
         <!-- Latest Release: e.g. 1.0 -->
         <li><b>Latest Release:</b> None</li>
         <!-- Status of best release: Planning, Pre-Alpha, Alpha, Beta, Production -->
-        <li><b>Latest Release Status:</b> Pre-Alpha</li>
+        <li><b>Latest Release Status:</b> Alpha</li>
         <!-- Project Type: Web Service, Tool, Component, or add your own -->
         <li><b>Project Type:</b> Java Web Start application client</li>
-        <li><b>License:</b> Common Development and Distribution License (CDDL) Version 1.0</li>
+        <li><b>License:</b> Common Development and Distribution License (CDDL) - Version 1.0</li>
       </ul>
-The "Domain Object Explorer" is a desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without needing of UI programming (like <a href="http://www.nakedobjects.org">Naked Objects</a>, <a href="http://www.jmatter.org">JMatter</a>, ...). It can also be deployed as a JavaEE 5 application client into <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">GlassFish v2</a> application server to centrally manage datasource configuration, update persistence units, and deliver application to users via Java Web Start technology.
+The <b>"Domain Object Explorer"</b> is a desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without needing of UI programming (like <a href="http://www.nakedobjects.org">Naked Objects</a>, <a href="http://www.jmatter.org">JMatter</a>, ...). It can also be deployed as a JavaEE 5 application client into <b>Glassfish</b> <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">v2</a>/<a href="http://download.java.net/glassfish/v3/promoted/glassfish-v3-b72.zip">v3-b72</a> application server to centrally manage datasource configuration, update persistence units, and deliver application to users via Java Web Start technology.
       <!-- project info end -->
     </blockquote>
 
@@ -97,7 +97,7 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
       </ul>
       <li>Cons:</li>
       <ul>
-	<li>Deployed aplications are really big (about 45Mb).</li>
+	<li>Deployed aplications are really big (about 45Mb from Glassfish v2, or 65Mb from Glassfish v3-b72).</li>
 	<li>Rude printing support.</li>
 	<li>...</li>
       </ul>
@@ -130,12 +130,12 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
     <blockquote>
 
 	<ol>
-        <li>Download, install and start <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">GlassFish v2</a> application server.
+        <li>Download, install and start Glassfish <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">v2</a>/<a href="http://download.java.net/glassfish/v3/promoted/glassfish-v3-b72.zip">v3-b72</a> application server.
         </li>
         <li>Include the "doe4ejb3-app-client" into your Java EE 5 application.</li>
 	<li>Specify EJB3 entity class names in your "META-INF/persistence.xml" descriptors.</li>
 	<li>Assemble all modules into an EAR archive, and deploy to the application server.</li>
-	<li>Note: if you want to test "doe" with the sample EJB3 entities, you should create a database for the tests, configure the connection parameters in GlassFish administration console (the JDBC datasource should be named "jdbc/doe4ejb3"), then open the "doe4ejb3-test-app" project with NetBeans 6.0, and deploy into the application server.
+	<li>Note: if you want to test "doe" with the sample EJB3 entities, you should create a database for the tests, configure the connection parameters in GlassFish administration console (the JDBC datasource should be named "jdbc/doe4ejb3"), then open the "doe4ejb3-test-app" project with NetBeans 6, and deploy into the application server.
 	</li>
         <li>See the instructions below.</li>
 	</ol>
@@ -146,13 +146,16 @@ The "Domain Object Explorer" is a desktop application that auto-generates the us
     <h3>Usage Instructions</h3>
     </a>
     <blockquote>
-    You can easily launch the "doe" application client from GlassFish administrative console (after installation, you can also start it from Java Web Start viewer). The application has the following features:
+    You can easily launch the "doe" application client from GlassFish v2 administrative console. But this feature is not supported in GlassFish v3-b72, so you need to manually execute the command "javaws http://localhost:8080/doe4ejb3-test-app/doe4ejb3-app-client" (supposing "doe4ejb3-test-app" is the EAR application name, and "doe4ejb3-app-client" is "doe" application name, as it is in the sample application).<br>
+After installation, you can also launch it from Java Web Start viewer.
+<br><br>
+The application has the following features:
 
     <h4>Create a new entity object:</h4>
-    Open the "File" menu, select "New" option, the name of the persistence unit, and the class name of the EJB3 entity to be created. Then complete the entity properties and press the "Accept" button to persist the entity.
+    Open the "File" menu, select "New" option, the name of the persistence unit, and the class name of the EJB3 entity to be created. Then complete the entity properties and press the "Accept" or "Save" button to persist the entity.
 
     <h4>Search entity beans:</h4>
-    On the left panel, select the persistence unit to view its EJB3 entity classes, and double click with left button on the desired class to open the entity manager window on the desktop. Then select the query type (to search "All" objects, or use a custom/named query). With "custom" or "named" queries, you also have to complete the required parameters. Finally, press the "Search" button, and wait for the results (note the "done" indicator in the status bar).
+    On the left panel, select the persistence unit to view its EJB3 entity classes, and double click with left button on the desired class to open the entity manager window on the desktop. Then select the query type (to search "All" objects, or use a custom/named query). With "custom" or "named" queries, you also have to complete the required parameters. Finally, press the "Search" button, and wait for the results (also note the "done" indicator in the status bar).
 
 
     <h4>Browse/edit an object:</h4>
@@ -336,7 +339,6 @@ public class PersonEditor extends javax.swing.JPanel
     </a>
     <blockquote>
       Everybody is welcome to participate with "doe" project.<br>
-      The application can sure be improved in many ways.<br>
       Any volunteers and suggestions?<br>
       <br>
     </blockquote>
@@ -366,7 +368,15 @@ public class PersonEditor extends javax.swing.JPanel
     </a>
     <blockquote>
       <ul>
-	<li>Version 0.2 - [Alpha version - CVS head]
+	<li>Version 0.3 - [Development version - CVS head]
+	  <ul>
+	    <li>Integration with Glassfish v3-b72</li> 
+	    <li>Updates for NetBeans 6.8 beta.</li>
+	    <li>EclipseLink JPA support</li>
+	    <li>Some bug fixes.</li>
+	  </ul>
+	</li>
+	<li>Version 0.2 - [2009/03/29 - Alpha version - CVS tag: DOE-0_2_PREVIEW4NB65]
 	  <ul>
 	    <li>Improved UI.</li>
 	    <li>Cut, copy & paste operations.</li>
@@ -377,13 +387,16 @@ public class PersonEditor extends javax.swing.JPanel
 	    <li>Custom layout in entity editor (compiled Swing UI, or Abeille forms).</li>
  	    <li>Allows client authentication with databases.</li>
 	    <li>API migration to jsr-295 (beans binding) and jsr-296 (swing application framework).</li>
+	    <li>Updates for NetBeans 6.x and Glassfish v2.</li>
+	    <li>Suport for other JPA providers (like Hibernate and OpenJPA). 
 	    <li>Many bug fixes.</li>
 	  </ul>
         </li>
-	<li>Version 0.1 - [Pre-Alpha version imported in CVS - 2006/09/27]
+	<li>Version 0.1 - [2006/09/27 - Pre-Alpha version - CVS tag: start]
 	  <ul>
 	    <li>Open source release to java.net.</li>
 	    <li>Simple search/view/edition of EJB3 entity objects.</li>
+	    <li>Integration with NetBeans 5, Glassfish v2 previews, and TopLink Essentials.</li>
 	  </ul>
         </li>
       </ul>
