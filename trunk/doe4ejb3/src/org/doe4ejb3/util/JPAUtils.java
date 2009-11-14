@@ -45,7 +45,8 @@ public class JPAUtils
     public static final String GENERIC_PERSISTENCE_UNIT         = null;
     public static final String GENERIC_USER_PROPERTY_NAME       = "username";
     public static final String GENERIC_PASSWORD_PROPERTY_NAME   = "password";
-    
+
+    public static final String ECLIPSE_LINK_PROVIDER = "org.eclipse.persistence.jpa.PersistenceProvider";
     public static final String TOPLINK_PROVIDER    = "oracle.toplink.essentials.ejb.cmp3.EntityManagerFactoryProvider";
     public static final String HIBERNATE_PROVIDER  = "org.hibernate.ejb.HibernatePersistence";
     public static final String OPENJPA_PROVIDER    = "org.apache.openjpa.persistence.PersistenceProviderImpl";
@@ -120,8 +121,10 @@ public class JPAUtils
     private static String getUserPropertyName(String providerClass) 
     {
         if(providerClass != null) {
-            if(providerClass.equalsIgnoreCase(TOPLINK_PROVIDER)) {
-                return oracle.toplink.essentials.config.TopLinkProperties.JDBC_USER;
+            if(providerClass.equalsIgnoreCase(ECLIPSE_LINK_PROVIDER)) {
+                return "eclipselink.jdbc.user";
+            } else if(providerClass.equalsIgnoreCase(TOPLINK_PROVIDER)) {
+                return "toplink.jdbc.user";
             } else if(providerClass.equalsIgnoreCase(HIBERNATE_PROVIDER)) {
                 return "hibernate.connection.username";
             } else if(providerClass.equalsIgnoreCase(OPENJPA_PROVIDER)) {
@@ -130,14 +133,16 @@ public class JPAUtils
                 return "kodo.ConnectionUserName";  // FIXME? "kodo.Connection2UserName";
             }
         }
-        return oracle.toplink.essentials.config.TopLinkProperties.JDBC_USER;
+        return "javax.persistence.jdbc.user";
     }
 
     private static String getPasswordPropertyName(String providerClass) 
     {
         if(providerClass != null) {
-            if(providerClass.equalsIgnoreCase(TOPLINK_PROVIDER)) {
-                return oracle.toplink.essentials.config.TopLinkProperties.JDBC_PASSWORD;
+            if(providerClass.equalsIgnoreCase(ECLIPSE_LINK_PROVIDER)) {
+                return "eclipselink.jdbc.password";
+            } else if(providerClass.equalsIgnoreCase(TOPLINK_PROVIDER)) {
+                return "toplink.jdbc.password";
             } else if(providerClass.equalsIgnoreCase(HIBERNATE_PROVIDER)) {
                 return "hibernate.connection.password";
             } else if(providerClass.equalsIgnoreCase(OPENJPA_PROVIDER)) {
@@ -146,7 +151,7 @@ public class JPAUtils
                 return "kodo.ConnectionPassword"; // FIXME? "kodo.Connection2Password";
             }
         }
-        return oracle.toplink.essentials.config.TopLinkProperties.JDBC_PASSWORD;
+        return "javax.persistence.jdbc.password";
     }    
 
     public static String getPersistenceUnitTitle(String puName)

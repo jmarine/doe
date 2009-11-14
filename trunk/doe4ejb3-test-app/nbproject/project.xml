@@ -8,11 +8,11 @@
             <minimum-ant-version>1.6</minimum-ant-version>
             <web-module-libraries/>
             <web-module-additional-libraries>
-                <library files="1">
+                <library>
                     <file>${reference.doe4ejb3-app-client.j2ee-module-car}</file>
                     <path-in-war>/</path-in-war>
                 </library>
-                <library files="1">
+                <library>
                     <file>${reference.doe4ejb3-test-ejb3.jar}</file>
                     <path-in-war>/</path-in-war>
                 </library>
