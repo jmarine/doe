@@ -14,19 +14,61 @@ import javax.persistence.*;
 @Embeddable
 public class Address implements Serializable {
 
+    private String location;
+
+    private String city;
+
+    private String state;
+
+    private String country;
+
+    private String zip;
+
+
     @Column(name = "location", length=30)
-    public String location;
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
     
     @Column(name = "city", length=30)
-    public String city;
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
     
     @Column(name = "state", length=30)
-    public String state;
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
+    }
     
     @Column(name = "country", length=2)
-    public String country;
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
 
     @Column(name = "zip", length=6)
-    public String zip;
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
     
 }
