@@ -853,7 +853,8 @@ public class EditorFactory
                             if(listSelectionModel.isSelectedIndex(index)) {
                                 int modelIndex = jTable.convertRowIndexToModel(index);
                                 WindowManager wm = DOEUtils.getWindowManager();
-                                Object window = DOEUtils.openEntityEditor(puName, memberClass, listModel.getElementAt(modelIndex)); 
+                                Object entity = listModel.getElementAt(modelIndex);
+                                Object window = DOEUtils.openEntityEditor(puName, entity.getClass(), entity);
                                 EventListenerList listenerList = wm.getEventListenerList(window);
                                 listenerList.add(EntityListener.class, new EntityListener() {
                                     public void entityChanged(EntityEvent event) {
