@@ -184,7 +184,7 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init,deps-jar,pre-pre-compile,pre-compile" name="-do-compile-deps">
         <copyfiles files="${reference.doe4ejb3-app-client.j2ee-module-car}" todir="${build.dir}//"/>
-        <copyfiles files="${reference.doe4ejb3-test-ejb3.jar}" todir="${build.dir}//"/>
+        <copyfiles files="${reference.doe4ejb3-test-ejb3.jar}" todir="${build.dir}//lib"/>
     </target>
     <target name="post-compile">
         <!-- Empty placeholder for easier customization. -->
@@ -403,9 +403,15 @@ exists or setup the property manually. For example like this:
     <target if="j2ee.appclient.mainclass.args" name="-as-retrieve-option-workaround" unless="j2ee.clientName">
         <property name="client.jar" value="${dist.dir}/doe4ejb3-test-appClient.jar"/>
         <sleep seconds="3"/>
-        <copy file="${wa.copy.client.jar.from}/doe4ejb3-test-app/doe4ejb3-test-appClient.jar" todir="${dist.dir}"/>
+        <copy failonerror="false" file="${wa.copy.client.jar.from}/doe4ejb3-test-app/doe4ejb3-test-appClient.jar" todir="${dist.dir}"/>
+        <copy failonerror="false" flatten="true" todir="${dist.dir}/">
+            <fileset dir="${wa.copy.client.jar.from}/doe4ejb3-test-app" includes="**/doe4ejb3-test-appClient.jar"/>
+        </copy>
         <copy flatten="true" todir="${dist.dir}/doe4ejb3-test-appClient">
             <fileset dir="${wa.copy.client.jar.from}/doe4ejb3-test-app" includes="**/*.*ar"/>
+        </copy>
+        <copy flatten="false" todir="${dist.dir}/doe4ejb3-test-appClient">
+            <fileset dir="${dist.dir}/gfdeploy/doe4ejb3-test-app" includes="**/*.jar"/>
         </copy>
     </target>
     <!--
@@ -421,6 +427,7 @@ exists or setup the property manually. For example like this:
         <nbjpdaconnect address="${jpda.address}" host="${jpda.host}" name="${name}" transport="${jpda.transport}">
             <classpath>
                 <path path="${debug.classpath}"/>
+                <fileset dir="${build.dir}/lib" includes="*.jar"/>
             </classpath>
             <sourcepath>
                 <path path="${ear.docbase.dirs}"/>
