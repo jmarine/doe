@@ -14,7 +14,7 @@
                 </library>
                 <library>
                     <file>${reference.doe4ejb3-test-ejb3.jar}</file>
-                    <path-in-war>/</path-in-war>
+                    <path-in-war>/lib</path-in-war>
                 </library>
             </web-module-additional-libraries>
         </data>

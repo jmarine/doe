@@ -129,12 +129,6 @@
         <property name="javadoc.encoding.used" value="${source.encoding}"/>
         <property name="includes" value="**"/>
         <property name="excludes" value=""/>
-        <condition else="" property="javac.compilerargs.jaxws" value="-Djava.endorsed.dirs='${jaxws.endorsed.dir}'">
-            <and>
-                <isset property="jaxws.endorsed.dir"/>
-                <available file="nbproject/jaxws-build.xml"/>
-            </and>
-        </condition>
         <path id="endorsed.classpath.path" path="${endorsed.classpath}"/>
         <condition else="" property="endorsed.classpath.cmd.line.arg" value="-Xbootclasspath/p:'${toString:endorsed.classpath.path}'">
             <length length="0" string="${endorsed.classpath}" when="greater"/>
@@ -196,7 +190,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
                         <path path="@{classpath}"/>
                     </classpath>
                     <compilerarg line="${endorsed.classpath.cmd.line.arg}"/>
-                    <compilerarg line="${javac.compilerargs} ${javac.compilerargs.jaxws}"/>
+                    <compilerarg line="${javac.compilerargs}"/>
                     <customize/>
                 </javac>
             </sequential>
@@ -208,7 +202,7 @@ or ant -Dj2ee.platform.classpath=&lt;server_classpath&gt; (where no properties f
             <attribute default="${excludes}" name="excludes"/>
             <attribute default="**" name="testincludes"/>
             <sequential>
-                <junit dir="${basedir}" errorproperty="tests.failed" failureproperty="tests.failed" fork="true" showoutput="true">
+                <junit dir="${basedir}" errorproperty="tests.failed" failureproperty="tests.failed" fork="true" showoutput="true" tempdir="${java.io.tmpdir}">
                     <batchtest todir="${build.test.results.dir}">
                         <fileset dir="${test.src.dir}" excludes="@{excludes},${excludes}" includes="@{includes}">
                             <filename name="@{testincludes}"/>
@@ -397,11 +391,9 @@ exists or setup the property manually. For example like this:
     </target>
     <target depends="init" if="no.dist.ear.dir" name="-deps-module-jar" unless="no.deps">
         <ant antfile="${project.doe4ejb3}/build.xml" inheritall="false" target="jar"/>
-        <ant antfile="${project.doe4ejb3-test-ejb3}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init" if="dist.ear.dir" name="-deps-ear-jar" unless="no.deps">
         <ant antfile="${project.doe4ejb3}/build.xml" inheritall="false" target="jar"/>
-        <ant antfile="${project.doe4ejb3-test-ejb3}/build.xml" inheritall="false" target="jar"/>
     </target>
     <target depends="init, -check-main-class, -deps-module-jar, -deps-ear-jar" name="deps-jar"/>
     <target depends="init,deps-jar" name="-pre-pre-compile">
@@ -416,27 +408,25 @@ exists or setup the property manually. For example like this:
         <copyfiles files="${reference.doe4ejb3.jar}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.ANTLR-2.7.6.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.absolutelayout.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${libs.EclipseLink-GlassFish-v3.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.swing-layout.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
+        <copyfiles files="${libs.eclipselink.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.ABEILLE-2.1.0.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.jaxb.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.beans-binding.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
         <copyfiles files="${libs.swing-app-framework.classpath}" todir="${build.classes.dir}/META-INF/lib"/>
-        <copyfiles files="${reference.doe4ejb3-test-ejb3.jar}" todir="${build.classes.dir}/META-INF/lib"/>
     </target>
     <target depends="compile" if="dist.ear.dir" name="library-inclusion-in-manifest">
-        <copyfiles files="${reference.doe4ejb3.jar}" manifestproperty="manifest.reference.doe4ejb3.jar" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.ANTLR-2.7.6.classpath}" manifestproperty="manifest.libs.ANTLR-2.7.6.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.absolutelayout.classpath}" manifestproperty="manifest.libs.absolutelayout.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.EclipseLink-GlassFish-v3.classpath}" manifestproperty="manifest.libs.EclipseLink-GlassFish-v3.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.swing-layout.classpath}" manifestproperty="manifest.libs.swing-layout.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.ABEILLE-2.1.0.classpath}" manifestproperty="manifest.libs.ABEILLE-2.1.0.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.jaxb.classpath}" manifestproperty="manifest.libs.jaxb.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.beans-binding.classpath}" manifestproperty="manifest.libs.beans-binding.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${libs.swing-app-framework.classpath}" manifestproperty="manifest.libs.swing-app-framework.classpath" todir="${dist.ear.dir}"/>
-        <copyfiles files="${reference.doe4ejb3-test-ejb3.jar}" manifestproperty="manifest.reference.doe4ejb3-test-ejb3.jar" todir="${dist.ear.dir}"/>
+        <copyfiles files="${reference.doe4ejb3.jar}" manifestproperty="manifest.reference.doe4ejb3.jar" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.ANTLR-2.7.6.classpath}" manifestproperty="manifest.libs.ANTLR-2.7.6.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.absolutelayout.classpath}" manifestproperty="manifest.libs.absolutelayout.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.swing-layout.classpath}" manifestproperty="manifest.libs.swing-layout.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.eclipselink.classpath}" manifestproperty="manifest.libs.eclipselink.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.ABEILLE-2.1.0.classpath}" manifestproperty="manifest.libs.ABEILLE-2.1.0.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.jaxb.classpath}" manifestproperty="manifest.libs.jaxb.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.beans-binding.classpath}" manifestproperty="manifest.libs.beans-binding.classpath" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${libs.swing-app-framework.classpath}" manifestproperty="manifest.libs.swing-app-framework.classpath" todir="${dist.ear.dir}/lib"/>
         <manifest file="${build.ear.classes.dir}/META-INF/MANIFEST.MF" mode="update">
-            <attribute name="Class-Path" value="${manifest.reference.doe4ejb3.jar} ${manifest.libs.ANTLR-2.7.6.classpath} ${manifest.libs.absolutelayout.classpath} ${manifest.libs.EclipseLink-GlassFish-v3.classpath} ${manifest.libs.swing-layout.classpath} ${manifest.libs.ABEILLE-2.1.0.classpath} ${manifest.libs.jaxb.classpath} ${manifest.libs.beans-binding.classpath} ${manifest.libs.swing-app-framework.classpath} ${manifest.reference.doe4ejb3-test-ejb3.jar} "/>
+            <attribute name="Class-Path" value="${manifest.reference.doe4ejb3.jar} lib/${manifest.reference.doe4ejb3.jar} ${manifest.libs.ANTLR-2.7.6.classpath} lib/${manifest.libs.ANTLR-2.7.6.classpath} ${manifest.libs.absolutelayout.classpath} lib/${manifest.libs.absolutelayout.classpath} ${manifest.libs.swing-layout.classpath} lib/${manifest.libs.swing-layout.classpath} ${manifest.libs.eclipselink.classpath} lib/${manifest.libs.eclipselink.classpath} ${manifest.libs.ABEILLE-2.1.0.classpath} lib/${manifest.libs.ABEILLE-2.1.0.classpath} ${manifest.libs.jaxb.classpath} lib/${manifest.libs.jaxb.classpath} ${manifest.libs.beans-binding.classpath} lib/${manifest.libs.beans-binding.classpath} ${manifest.libs.swing-app-framework.classpath} lib/${manifest.libs.swing-app-framework.classpath} "/>
         </manifest>
     </target>
     <target name="-copy-meta-inf">
@@ -878,7 +868,6 @@ exists or setup the property manually. For example like this:
             -->
     <target depends="init" if="no.dist.ear.dir" name="deps-clean" unless="no.deps">
         <ant antfile="${project.doe4ejb3}/build.xml" inheritall="false" target="clean"/>
-        <ant antfile="${project.doe4ejb3-test-ejb3}/build.xml" inheritall="false" target="clean"/>
     </target>
     <target depends="init" name="-do-clean">
         <delete dir="${build.dir}"/>
