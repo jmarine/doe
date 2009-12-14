@@ -32,7 +32,7 @@
             <td><a href="http://enterprise-incubator.dev.java.net/" style="color: white; text-decoration:none; font-family:Arial,sans-serif; font-size:11px; font-weight:bold;white-space:nowrap">incubator</a></td>
             <!-- download j2ee 1.4 sdk -->
             <td><img src="images/bullet.gif" alt="*" border="0" hspace="4" /></td>
-            <td><a href="http://download.java.net/glassfish/v3/promoted/glassfish-v3-b72.zip" style="color: white; text-decoration:none; font-family:Arial,sans-serif; font-size:11px; font-weight:bold;white-space:nowrap">download GlassFish v3-b72</a></td>
+            <td><a href="https://glassfish.dev.java.net/downloads/v3-final.html" style="color: white; text-decoration:none; font-family:Arial,sans-serif; font-size:11px; font-weight:bold;white-space:nowrap">download GlassFish v3</a></td>
           </tr>
         </table>
       </td>
@@ -60,7 +60,7 @@
         <li><b>Project Type:</b> Java Web Start application client</li>
         <li><b>License:</b> Common Development and Distribution License (CDDL) - Version 1.0</li>
       </ul>
-The <b>"Domain Object Explorer"</b> is a desktop application that auto-generates the user interface for your EJB3 entity beans at runtime, without needing of UI programming (like <a href="http://www.nakedobjects.org">Naked Objects</a>, <a href="http://www.jmatter.org">JMatter</a>, ...). It can also be deployed as a JavaEE 5 application client into <b>Glassfish</b> <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">v2</a>/<a href="http://download.java.net/glassfish/v3/promoted/glassfish-v3-b72.zip">v3-b72</a> application server to centrally manage datasource configuration, update persistence units, and deliver application to users via Java Web Start technology.
+The <b>"Domain Object Explorer"</b> is a desktop application that auto-generates the user interface for your JPA/EJB3 entity beans at runtime, without needing of UI programming (like <a href="http://www.nakedobjects.org">Naked Objects</a>, <a href="http://www.jmatter.org">JMatter</a>, ...). It can also be deployed as a JavaEE 5/6 application client into <b>Glassfish</b> <a href="https://glassfish.dev.java.net/downloads/v2.1.1-final.html">v2</a>/<a href="https://glassfish.dev.java.net/downloads/v3-final.html">v3</a> application server to centrally manage datasource configuration, update persistence units, and deliver application to users via Java Web Start technology.
       <!-- project info end -->
     </blockquote>
 
@@ -97,7 +97,7 @@ The <b>"Domain Object Explorer"</b> is a desktop application that auto-generates
       </ul>
       <li>Cons:</li>
       <ul>
-	<li>Deployed aplications are really big (about 45Mb from Glassfish v2, or 65Mb from Glassfish v3-b72).</li>
+	<li>Deployed aplications are really big (about 45Mb from Glassfish v2, or 53Mb from Glassfish v3).</li>
 	<li>Rude printing support.</li>
 	<li>...</li>
       </ul>
@@ -109,10 +109,10 @@ The <b>"Domain Object Explorer"</b> is a desktop application that auto-generates
     <h3>Download</h3>
     </a>
     <blockquote>
-      There is no stable version, yet. But you can download preview releases from <a href="https://doe.dev.java.net/servlets/ProjectDocumentList?folderID=7649&expandFolder=7649&folderID=0">Document & files</a> or <a href="https://doe.dev.java.net/source/browse/doe/">CVS</a>, where you will find the following projects for NetBeans IDE 6:<br>
+      There is no stable version, yet. But you can download preview releases from <a href="https://doe.dev.java.net/servlets/ProjectDocumentList?folderID=7649&expandFolder=7649&folderID=0">Document & files</a> or <a href="https://doe.dev.java.net/source/browse/doe/">CVS</a>, where you will find the following projects for NetBeans 6.x:<br>
       <ul>
 	<li> "doe4ejb3": it's the core library.</li>
- 	<li> "doe4ejb3-app-client": it's a Java EE 5 application client (that can be included in the users's enterprise application).</li>
+ 	<li> "doe4ejb3-app-client": it's a Java EE application client (that can be included in the users's enterprise application).</li>
 	<li> "doe4nb6": simple integration module for NetBeans Platform 6.</li>
       </ul>
  
@@ -130,15 +130,16 @@ The <b>"Domain Object Explorer"</b> is a desktop application that auto-generates
     <blockquote>
 
 	<ol>
-        <li>Download, install and start Glassfish <a href="https://glassfish.dev.java.net/downloads/v2-b58g.html">v2</a>/<a href="http://download.java.net/glassfish/v3/promoted/glassfish-v3-b72.zip">v3-b72</a> application server.
+        <li>Download, install and start Glassfish <a href="https://glassfish.dev.java.net/downloads/v2.1.1-final.html">v2</a>/<a href="https://glassfish.dev.java.net/downloads/v3-final.html">v3</a> application server.
         </li>
-        <li>Include the "doe4ejb3-app-client" into your Java EE 5 application.</li>
-	<li>Specify EJB3 entity class names in your "META-INF/persistence.xml" descriptors.</li>
-	<li>Assemble all modules into an EAR archive, and deploy to the application server.</li>
-	<li>Note: if you want to test "doe" with the sample EJB3 entities, you should create a database for the tests, configure the connection parameters in GlassFish administration console (the JDBC datasource should be named "jdbc/doe4ejb3"), then open the "doe4ejb3-test-app" project with NetBeans 6, and deploy into the application server.
-	</li>
-        <li>See the instructions below.</li>
+        <li>If your application is not assembled in EAR format, you should create a new "Enterprise Application" module to deploy the "doe" application client with your JPA/EJB3 entity beans.</li> 
+	<li>Define the "doe4ejb3-app-client.jar" application as a java module in "application.xml" deployment descriptor, and include this library at the root level of the EAR archive, and the required libraries in the "/lib" folder (appframework-1.0.3.jar, swing-worker-1.1.jar,  swing-layout-1.0.4.jar, AbsoluteLayout.jar, beansbinding-1.2.1.jar, activation.jar, eclipselink-javax.persistence-2.0.jar, eclipselink-2.0.0.jar, jaxb-api.jar, jaxb-impl.jar, jaxb-xjc.jar,jaxb1-impl.jar, jsr173_api.jar, <a target="_blank" href="http://www.antlr2.org/download.html">antlr-2.7.6.jar</a>, <a target="_blank" href="https://abeille.dev.java.net/servlets/ProjectDocumentList?folderID=7802&expandFolder=7802&folderID=7803">Abeille</a>'s formsrt-2.1.0.jar)</li>
+	<li>Define the entity class names in the "META-INF/persistence.xml" descriptor, and assemble the library into the "/lib" folder of the EAR archive.</li>
+	<li>Define desired database connection pools and JDBC resources in Glassfih application server</li> 
+	<li>Deploy the EAR archive to Glassfish application server (with the "Enterprise Application" type, and the "Java Web Start" option enabled). <br>
+            Important note: it seems that Glassfish v3 doesn't support directory deployment of application clients, so don't deploy the applications from NetBeans 6.x (issue 11071).</li>
 	</ol>
+If you want to test "doe4ejb3-test-app" sample application, you only have to open the project with NetBeans 6.x to build EAR archive, and use the Glassfish administrative console to configure database connection parameters (with the JDBC resource's JNDI name as "jdbc/doe4ejb3"), and deploy the EAR application with "Java Web Start" option enabled.
     </blockquote>
 
 
@@ -146,8 +147,8 @@ The <b>"Domain Object Explorer"</b> is a desktop application that auto-generates
     <h3>Usage Instructions</h3>
     </a>
     <blockquote>
-    You can easily launch the "doe" application client from GlassFish v2 administrative console. But this feature is not supported in GlassFish v3-b72, so you need to manually execute the command "javaws http://localhost:8080/doe4ejb3-test-app/doe4ejb3-app-client" (supposing "doe4ejb3-test-app" is the EAR application name, and "doe4ejb3-app-client" is "doe" application name, as it is in the sample application).<br>
-After installation, you can also launch it from Java Web Start viewer.
+    The application can be launched with the command "javaws http://localhost:8080/doe4ejb3-test-app/doe4ejb3-app-client" (supposing "doe4ejb3-test-app" is the EAR application name, and "doe4ejb3-app-client" is "doe" application client name, as it is in the sample application).<br>
+After installation, you can also launch it from Java Web Start viewer (command: "javaws -viewer").
 <br><br>
 The application has the following features:
 
@@ -370,8 +371,8 @@ public class PersonEditor extends javax.swing.JPanel
       <ul>
 	<li>Version 0.3 - [Development version - CVS head]
 	  <ul>
-	    <li>Integration with Glassfish v3-b72</li> 
-	    <li>Updates for NetBeans 6.8 beta.</li>
+	    <li>Integration with Glassfish v3</li> 
+	    <li>Updates for NetBeans 6.8</li>
 	    <li>EclipseLink JPA support</li>
 	    <li>Some bug fixes.</li>
 	  </ul>
