@@ -21,6 +21,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.ButtonGroup;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 
 
@@ -32,6 +34,7 @@ public class JOutlinePane extends JComponent implements ActionListener {
     
     private ButtonGroup buttonGroup;
     private JPanel outlineInternalPane;
+    private int    selectedTabComponent;
     
     /** Creates a new instance of JOutlinePane */
     public JOutlinePane()
@@ -40,7 +43,45 @@ public class JOutlinePane extends JComponent implements ActionListener {
         outlineInternalPane = new JPanel();
         outlineInternalPane.setAlignmentY(0.0f);
         outlineInternalPane.setLayout(new GridBagLayout());
+        selectedTabComponent = -1;
+    }
 
+    public void addListSelectionListener(ListSelectionListener listener)
+    {
+        listenerList.add(ListSelectionListener.class, listener);
+    }
+
+    public void removeListSelectionListener(ListSelectionListener listener) {
+        listenerList.remove(ListSelectionListener.class, listener);
+    }
+
+    public ListSelectionListener[] getListSelectionListeners() {
+        return (ListSelectionListener[])listenerList.getListeners(ListSelectionListener.class);
+    }
+
+    protected void fireSelectionValueChanged()
+    {
+        Object[] listeners = listenerList.getListenerList();
+        ListSelectionEvent e = null;
+
+        for (int i = listeners.length - 2; i >= 0; i -= 2) {
+            if (listeners[i] == ListSelectionListener.class) {
+                if (e == null) {
+                    e = new ListSelectionEvent(this, selectedTabComponent, selectedTabComponent, false);
+                }
+                ((ListSelectionListener)listeners[i+1]).valueChanged(e);
+            }
+        }
+    }
+
+
+    public Component getSelectedTabComponent()
+    {
+        if(selectedTabComponent != -1) {
+            return outlineInternalPane.getComponent(selectedTabComponent);
+        } else {
+            return null;
+        }
     }
     
     public void addTabPagesFromJTabbedPane(JTabbedPane tabs)
@@ -72,6 +113,10 @@ public class JOutlinePane extends JComponent implements ActionListener {
         gbc.weighty = 1.0;
         outlineInternalPane.add(panel, gbc);
         panel.setVisible(outlineInternalPane.getComponentCount() <= 2);  // Expands 1st panel, and collapse other ones
+        if(selectedTabComponent == -1) {
+            selectedTabComponent = 1;
+            fireSelectionValueChanged();
+        }
 
         setLayout(new java.awt.BorderLayout());         // OVERRIDE IDE LAYOUT
         add(outlineInternalPane, BorderLayout.CENTER);
@@ -91,9 +136,15 @@ public class JOutlinePane extends JComponent implements ActionListener {
                 outlineInternalPane.remove(i-1);
                 
                 // if selected tab is removed, then select first tab:
-                if( (selectedTabRemoved) && (outlineInternalPane.getComponentCount() > 1) ) {
-                    ((AbstractButton)outlineInternalPane.getComponent(0)).setSelected(true);
-                    outlineInternalPane.getComponent(1).setVisible(true);
+                if(selectedTabRemoved) {
+                    if(outlineInternalPane.getComponentCount() > 1) {
+                        ((AbstractButton)outlineInternalPane.getComponent(0)).setSelected(true);
+                        outlineInternalPane.getComponent(1).setVisible(true);
+                        selectedTabComponent = 1;
+                    } else {
+                        selectedTabComponent = -1;
+                    }
+                    fireSelectionValueChanged();
                 }
                 
                 // recalculate layout:
@@ -113,6 +164,8 @@ public class JOutlinePane extends JComponent implements ActionListener {
                 Component component2 = outlineInternalPane.getComponent(i+1);
                 if(component1 == button) {
                     component2.setVisible(true);
+                    selectedTabComponent = i+1;
+                    fireSelectionValueChanged();
                 } else {
                     component2.setVisible(false);
                 }

@@ -1113,7 +1113,7 @@ public class EditorFactory
                 TransferHandler.getPasteAction());
 
         map = panel.getActionMap();
-        map.put("printAction", printAction);
+        map.put("print", printAction);
         map.put(TransferHandler.getCutAction().getValue(Action.NAME),
                 TransferHandler.getCutAction());
         map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
