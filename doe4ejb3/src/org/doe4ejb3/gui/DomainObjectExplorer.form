@@ -11,9 +11,8 @@
         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemNew">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="createNewEntity" methodName=""/>
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="createNewEntity" methodName="createNewEntity"/>
             </Property>
-            <Property name="mnemonic" type="int" value="110"/>
           </Properties>
         </MenuItem>
         <MenuItem class="javax.swing.JMenuItem" name="jMenuItemManager">
@@ -21,7 +20,6 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="manageEntityClass" methodName=""/>
             </Property>
-            <Property name="mnemonic" type="int" value="109"/>
             <Property name="text" type="java.lang.String" resourceKey="managerMenu.text"/>
           </Properties>
         </MenuItem>
@@ -55,12 +53,29 @@
             </Menu>
             <MenuItem class="javax.swing.JSeparator" name="jSeparator1">
             </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemSave">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="save" methodName="save"/>
+                </Property>
+                <Property name="text" type="java.lang.String" resourceKey="save.Action.text"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuItemPrint">
+              <Properties>
+                <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+                  <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="print" methodName="print"/>
+                </Property>
+                <Property name="text" type="java.lang.String" resourceKey="print.Action.text"/>
+              </Properties>
+            </MenuItem>
+            <MenuItem class="javax.swing.JPopupMenu$Separator" name="jSeparator5">
+            </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItemExit">
               <Properties>
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="exit" methodName=""/>
                 </Property>
-                <Property name="mnemonic" type="int" value="120"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -126,7 +141,6 @@
                 <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
                   <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="about" methodName=""/>
                 </Property>
-                <Property name="mnemonic" type="int" value="97"/>
               </Properties>
             </MenuItem>
           </SubComponents>
@@ -148,6 +162,7 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
@@ -168,17 +183,57 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignBoxLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JButton" name="jButtonConnectionProperties">
+        <Component class="javax.swing.JButton" name="jButtonManage">
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
-              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="openConnectionManager" methodName=""/>
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="manageSelectedEntity" methodName="manageSelectedEntity"/>
             </Property>
+            <Property name="mnemonic" type="int" value="109"/>
+            <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConnectionPropertiesActionPerformed"/>
-          </Events>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonNew">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="createSelectedEntity" methodName="createSelectedEntity"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/org/doe4ejb3/gui/resources/new.png"/>
+            </Property>
+            <Property name="mnemonic" type="int" value="110"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonSave">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="save" methodName="save"/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/org/doe4ejb3/gui/resources/save.png"/>
+            </Property>
+            <Property name="mnemonic" type="int" value="115"/>
+            <Property name="text" type="java.lang.String" resourceKey="save.Action.text"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonPrint">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="print" methodName="print"/>
+            </Property>
+            <Property name="mnemonic" type="int" value="112"/>
+            <Property name="text" type="java.lang.String" resourceKey="print.Action.text"/>
+            <Property name="focusable" type="boolean" value="false"/>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
         </Component>
         <Component class="javax.swing.JSeparator" name="jSeparator3">
           <Properties>
@@ -192,6 +247,9 @@
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="cut" methodName=""/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/org/doe4ejb3/gui/resources/cut.png"/>
             </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -207,6 +265,9 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="copy" methodName=""/>
             </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/org/doe4ejb3/gui/resources/copy.png"/>
+            </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -219,6 +280,9 @@
           <Properties>
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="paste" methodName=""/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/org/doe4ejb3/gui/resources/paste.png"/>
             </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
@@ -235,6 +299,21 @@
               <Dimension value="[4, 0]"/>
             </Property>
           </Properties>
+        </Component>
+        <Component class="javax.swing.JButton" name="jButtonConnectionProperties">
+          <Properties>
+            <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
+              <action class="org.doe4ejb3.gui.DomainObjectExplorer" id="openConnectionManager" methodName=""/>
+            </Property>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/org/doe4ejb3/gui/resources/credentials.png"/>
+            </Property>
+            <Property name="horizontalTextPosition" type="int" value="0"/>
+            <Property name="verticalTextPosition" type="int" value="3"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonConnectionPropertiesActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

@@ -6,7 +6,6 @@
  */
 package org.doe4ejb3.gui;
 
-import org.doe4ejb3.util.I18n;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.datatransfer.*;
@@ -18,8 +17,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 import javax.swing.*;
-
-
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.jdesktop.application.ResourceMap;
 
@@ -27,10 +26,10 @@ import org.doe4ejb3.annotation.EntityDescriptor;
 import org.doe4ejb3.exception.ApplicationException;
 import org.doe4ejb3.util.JPAUtils;
 import org.doe4ejb3.util.DOEUtils;
+import org.doe4ejb3.util.I18n;
 
 
-
-public class DomainObjectExplorer extends javax.swing.JFrame 
+public class DomainObjectExplorer extends javax.swing.JFrame implements ListSelectionListener
 {
     
     /**
@@ -44,6 +43,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         initComponents();
         
         DOEUtils.setWindowManager(new DefaultWindowManager(this, mdiDesktopPane, jLabelStatus));
+        mdiDesktopPane.addPropertyChangeListener(new PropertyChangeListener() {
+            public void propertyChange(PropertyChangeEvent evt) {
+                if("mdiFrameActive".equals(evt.getPropertyName())) {
+                    enableActionsFromInternalWindows();
+                }
+            }
+        });
 
         try {
             initPersistenceEntities();
@@ -54,6 +60,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         }
 
         // Replace left component with jOutlinePane
+        jOutlinePanePersistenceUnits.addListSelectionListener(this);
         jSplitPaneCentral.setLeftComponent(jOutlinePanePersistenceUnits);
         
         // replace JDesktopPane with a better  MDI container
@@ -115,12 +122,16 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuItemNew = new javax.swing.JMenuItem();
         jMenuItemManager = new javax.swing.JMenuItem();
         jToolBar = new javax.swing.JToolBar();
-        jButtonConnectionProperties = new javax.swing.JButton();
+        jButtonManage = new javax.swing.JButton();
+        jButtonNew = new javax.swing.JButton();
+        jButtonSave = new javax.swing.JButton();
+        jButtonPrint = new javax.swing.JButton();
         jSeparator3 = new javax.swing.JSeparator();
         jButtonCut = new javax.swing.JButton();
         jButtonCopy = new javax.swing.JButton();
         jButtonPaste = new javax.swing.JButton();
         jSeparator4 = new javax.swing.JSeparator();
+        jButtonConnectionProperties = new javax.swing.JButton();
         jStatusPanel = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
         jProgressPanel = new javax.swing.JPanel();
@@ -133,6 +144,9 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuNew = new javax.swing.JMenu();
         jMenuManage = new javax.swing.JMenu();
         jSeparator1 = new javax.swing.JSeparator();
+        jMenuItemSave = new javax.swing.JMenuItem();
+        jMenuItemPrint = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
         jMenuItemExit = new javax.swing.JMenuItem();
         jMenuEdit = new javax.swing.JMenu();
         jMenuItemCut = new javax.swing.JMenuItem();
@@ -143,14 +157,12 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuHelp = new javax.swing.JMenu();
         jMenuItemAbout = new javax.swing.JMenuItem();
 
-        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance().getContext().getActionMap(DomainObjectExplorer.class, this);
+        javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getActionMap(DomainObjectExplorer.class, this);
         jMenuItemNew.setAction(actionMap.get("createNewEntity")); // NOI18N
-        jMenuItemNew.setMnemonic('n');
         jPopupMenuContextual.add(jMenuItemNew);
 
         jMenuItemManager.setAction(actionMap.get("manageEntityClass")); // NOI18N
-        jMenuItemManager.setMnemonic('m');
-        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance().getContext().getResourceMap(DomainObjectExplorer.class);
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(org.doe4ejb3.gui.Application.class).getContext().getResourceMap(DomainObjectExplorer.class);
         jMenuItemManager.setText(resourceMap.getString("managerMenu.text")); // NOI18N
         jPopupMenuContextual.add(jMenuItemManager);
 
@@ -162,21 +174,44 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             }
         });
 
-        jButtonConnectionProperties.setAction(actionMap.get("openConnectionManager")); // NOI18N
-        jButtonConnectionProperties.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButtonConnectionProperties.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButtonConnectionProperties.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButtonConnectionPropertiesActionPerformed(evt);
-            }
-        });
-        jToolBar.add(jButtonConnectionProperties);
+        jButtonManage.setAction(actionMap.get("manageSelectedEntity")); // NOI18N
+        jButtonManage.setMnemonic('m');
+        jButtonManage.setFocusable(false);
+        jButtonManage.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonManage.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar.add(jButtonManage);
+
+        jButtonNew.setAction(actionMap.get("createSelectedEntity")); // NOI18N
+        jButtonNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/new.png"))); // NOI18N
+        jButtonNew.setMnemonic('n');
+        jButtonNew.setFocusable(false);
+        jButtonNew.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonNew.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar.add(jButtonNew);
+
+        jButtonSave.setAction(actionMap.get("save")); // NOI18N
+        jButtonSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/save.png"))); // NOI18N
+        jButtonSave.setMnemonic('s');
+        jButtonSave.setText(resourceMap.getString("save.Action.text")); // NOI18N
+        jButtonSave.setFocusable(false);
+        jButtonSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonSave.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar.add(jButtonSave);
+
+        jButtonPrint.setAction(actionMap.get("print")); // NOI18N
+        jButtonPrint.setMnemonic('p');
+        jButtonPrint.setText(resourceMap.getString("print.Action.text")); // NOI18N
+        jButtonPrint.setFocusable(false);
+        jButtonPrint.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonPrint.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar.add(jButtonPrint);
 
         jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator3.setMaximumSize(new java.awt.Dimension(4, 0));
         jToolBar.add(jSeparator3);
 
         jButtonCut.setAction(actionMap.get("cut")); // NOI18N
+        jButtonCut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/cut.png"))); // NOI18N
         jButtonCut.setFocusable(false);
         jButtonCut.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonCut.setName("cutToolBarButton"); // NOI18N
@@ -189,6 +224,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jToolBar.add(jButtonCut);
 
         jButtonCopy.setAction(actionMap.get("copy")); // NOI18N
+        jButtonCopy.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/copy.png"))); // NOI18N
         jButtonCopy.setFocusable(false);
         jButtonCopy.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonCopy.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -200,6 +236,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jToolBar.add(jButtonCopy);
 
         jButtonPaste.setAction(actionMap.get("paste")); // NOI18N
+        jButtonPaste.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/paste.png"))); // NOI18N
         jButtonPaste.setFocusable(false);
         jButtonPaste.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonPaste.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -213,6 +250,17 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
         jSeparator4.setMaximumSize(new java.awt.Dimension(4, 0));
         jToolBar.add(jSeparator4);
+
+        jButtonConnectionProperties.setAction(actionMap.get("openConnectionManager")); // NOI18N
+        jButtonConnectionProperties.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/credentials.png"))); // NOI18N
+        jButtonConnectionProperties.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonConnectionProperties.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonConnectionProperties.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonConnectionPropertiesActionPerformed(evt);
+            }
+        });
+        jToolBar.add(jButtonConnectionProperties);
 
         getContentPane().add(jToolBar, java.awt.BorderLayout.NORTH);
 
@@ -247,8 +295,16 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuFile.add(jMenuManage);
         jMenuFile.add(jSeparator1);
 
+        jMenuItemSave.setAction(actionMap.get("save")); // NOI18N
+        jMenuItemSave.setText(resourceMap.getString("save.Action.text")); // NOI18N
+        jMenuFile.add(jMenuItemSave);
+
+        jMenuItemPrint.setAction(actionMap.get("print")); // NOI18N
+        jMenuItemPrint.setText(resourceMap.getString("print.Action.text")); // NOI18N
+        jMenuFile.add(jMenuItemPrint);
+        jMenuFile.add(jSeparator5);
+
         jMenuItemExit.setAction(actionMap.get("exit")); // NOI18N
-        jMenuItemExit.setMnemonic('x');
         jMenuFile.add(jMenuItemExit);
 
         jMainMenuBar.add(jMenuFile);
@@ -295,7 +351,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         jMenuHelp.setText(resourceMap.getString("helpMenu.text")); // NOI18N
 
         jMenuItemAbout.setAction(actionMap.get("about")); // NOI18N
-        jMenuItemAbout.setMnemonic('a');
         jMenuHelp.add(jMenuItemAbout);
 
         jMainMenuBar.add(jMenuHelp);
@@ -507,6 +562,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             entityList.putClientProperty("org.doe4ejb3.persistenceUnit", persistenceUnit);
             entityList.setCellRenderer(EntityClassListCellRenderer.getInstance());
             entityList.setComponentPopupMenu(jPopupMenuContextual);
+            entityList.addListSelectionListener(this);
             entityList.addMouseListener(new MouseAdapter() {
                 public void mouseClicked(MouseEvent evt) {
                     try {
@@ -521,9 +577,9 @@ public class DomainObjectExplorer extends javax.swing.JFrame
                     }
                 }
             });
-            
+
             String title = JPAUtils.getPersistenceUnitTitle(persistenceUnit);
-            jOutlinePanePersistenceUnits.addTab(title, new JScrollPane(entityList));
+            jOutlinePanePersistenceUnits.addTab(title, entityList);
             
             for(Class entityClass : persistenceEntities) addEntityClassActions(persistenceUnit, entityClass);
         }
@@ -584,27 +640,51 @@ public class DomainObjectExplorer extends javax.swing.JFrame
             ex.printStackTrace();
         }
     }
-    
+
+    @org.jdesktop.application.Action(enabledProperty="entitySelected")
+    public void manageSelectedEntity(ActionEvent evt) {
+        manageEntityClass(evt);
+    }
     
     @org.jdesktop.application.Action
     public void manageEntityClass(ActionEvent evt) {
         try {
+            String puName = null;
+            Class  entityClass = null;
+            
             DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
-            
-            // Check "File-->Manage-->Entity" class:
-            javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
-            String puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
-            Class  entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
-            
-            if(entityClass == null) {
-                JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
-                if( (sourceControl != null) && (sourceControl instanceof JList) ) {
-                    // Manage entidad:
-                    JList  list = (JList)sourceControl; 
-                    puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
-                    entityClass = (Class)list.getSelectedValue();
-                    if(entityClass == null) {
-                        throw new ApplicationException("A class must be selected");
+
+            Object source = evt.getSource();
+            if(source instanceof JMenuItem) {
+                // Check "File-->Manage-->Entity" class:
+                javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
+                puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
+                entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
+
+                if(entityClass == null) {
+                    JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)((javax.swing.JMenuItem)evt.getSource()).getParent()).getInvoker();
+                    if( (sourceControl != null) && (sourceControl instanceof JList) ) {
+                        // Manage entidad:
+                        JList  list = (JList)sourceControl;
+                        puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
+                        entityClass = (Class)list.getSelectedValue();
+                        if(entityClass == null) {
+                            throw new ApplicationException("A class must be selected");
+                        }
+                    }
+                }
+                
+            } else if(source instanceof JButton) {
+                // Toolbar button
+                JScrollPane scrollPane = (JScrollPane)jOutlinePanePersistenceUnits.getSelectedTabComponent();
+                if(scrollPane != null) {
+                    JList list = (JList)scrollPane.getViewport().getView();
+                    if(list != null) {
+                        puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
+                        entityClass = (Class)list.getSelectedValue();
+                        if(entityClass == null) {
+                            throw new ApplicationException("A class must be selected");
+                        }
                     }
                 }
             }
@@ -624,25 +704,50 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     }
     
 
+    @org.jdesktop.application.Action(enabledProperty="entitySelected")
+    public void createSelectedEntity(ActionEvent evt) {
+        createNewEntity(evt);
+    }
+
     @org.jdesktop.application.Action
     public void createNewEntity(ActionEvent evt) {
         try {
+            String puName = null;
+            Class  entityClass = null;
+            
             DOEUtils.getWindowManager().showStatus(DOEUtils.APPLICATION_WINDOW, "");
 
-            // Check "File-->New-->Entity" class:
-            javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
-            String puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
-            Class  entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
-            
-            // Check contextual popup menu in left panel entity lists:
-            if(entityClass == null) {
-                JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)menuItem.getParent()).getInvoker();
-                if(sourceControl instanceof JList) {
-                    JList list = (JList)sourceControl; 
-                    puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
-                    entityClass = (Class)list.getSelectedValue();
-                    if(entityClass == null) {
-                        throw new ApplicationException("A class must be selected");
+            Object source = evt.getSource();
+            if(source instanceof JMenuItem) {
+                // Context menu or "File-->New-->Entity" class:
+                javax.swing.JMenuItem menuItem = (javax.swing.JMenuItem)evt.getSource();
+                puName = (String)menuItem.getClientProperty("org.doe4ejb3.persistenceUnit");
+                entityClass = (Class)menuItem.getClientProperty("org.doe4ejb3.entityClass");
+
+                // Check contextual popup menu in left panel entity lists:
+                if(entityClass == null) {
+                    JComponent sourceControl = (JComponent)((javax.swing.JPopupMenu)menuItem.getParent()).getInvoker();
+                    if(sourceControl instanceof JList) {
+                        JList list = (JList)sourceControl;
+                        puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
+                        entityClass = (Class)list.getSelectedValue();
+                        if(entityClass == null) {
+                            throw new ApplicationException("A class must be selected");
+                        }
+                    }
+                }
+                
+            } else if(source instanceof JButton) {
+                // Toolbar button
+                JScrollPane scrollPane = (JScrollPane)jOutlinePanePersistenceUnits.getSelectedTabComponent();
+                if(scrollPane != null) {
+                    JList list = (JList)scrollPane.getViewport().getView();
+                    if(list != null) {
+                        puName = (String)list.getClientProperty("org.doe4ejb3.persistenceUnit");
+                        entityClass = (Class)list.getSelectedValue();
+                        if(entityClass == null) {
+                            throw new ApplicationException("A class must be selected");
+                        }
                     }
                 }
             }
@@ -661,7 +766,79 @@ public class DomainObjectExplorer extends javax.swing.JFrame
         }
     }
 
-    
+    @org.jdesktop.application.Action(enabledProperty="printEnabled")
+    public void print() {
+        JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
+        if(iFrame != null) {
+            Action printAction = iFrame.getActionMap().get("print");
+            if(printAction != null) {
+                printAction.actionPerformed(new ActionEvent(iFrame, ActionEvent.ACTION_PERFORMED, "print"));
+            }
+        }
+    }
+
+    public boolean isPrintEnabled() {
+        JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
+        if(iFrame != null) {
+            Action printAction = iFrame.getActionMap().get("print");
+            if(printAction != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @org.jdesktop.application.Action(enabledProperty="saveEnabled")
+    public void save() {
+        JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
+        if(iFrame != null) {
+            Action printAction = iFrame.getActionMap().get("save");
+            if(printAction != null) {
+                printAction.actionPerformed(new ActionEvent(iFrame, ActionEvent.ACTION_PERFORMED, "save"));
+            }
+        }
+    }
+
+    public boolean isSaveEnabled() {
+        JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
+        if(iFrame != null) {
+            Action printAction = iFrame.getActionMap().get("save");
+            if(printAction != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isEntitySelected() {
+        JScrollPane scrollPane = (JScrollPane)jOutlinePanePersistenceUnits.getSelectedTabComponent();
+        if(scrollPane != null) {
+            JList selectedList = (JList)scrollPane.getViewport().getView();
+            if(selectedList != null) {
+                return (selectedList.getSelectedValue() != null);
+            }
+        }
+        return false;
+    }
+
+    public void enableActionsFromInternalWindows()
+    {
+        boolean saveEnabled = isSaveEnabled();
+        boolean printEnabled = isPrintEnabled();
+        firePropertyChange("printEnabled", !printEnabled, printEnabled);
+        firePropertyChange("saveEnabled", !saveEnabled, saveEnabled);
+    }
+
+    public void enableActionsFromSelectedEntity()
+    {
+        boolean selected = isEntitySelected();
+        firePropertyChange("entitySelected", !selected, selected);
+    }
+
+    public void valueChanged(ListSelectionEvent e) {
+        enableActionsFromSelectedEntity();
+    }
+
 
 
     // </editor-fold>
@@ -672,7 +849,11 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private javax.swing.JButton jButtonConnectionProperties;
     private javax.swing.JButton jButtonCopy;
     private javax.swing.JButton jButtonCut;
+    private javax.swing.JButton jButtonManage;
+    private javax.swing.JButton jButtonNew;
     private javax.swing.JButton jButtonPaste;
+    private javax.swing.JButton jButtonPrint;
+    private javax.swing.JButton jButtonSave;
     private javax.swing.JLabel jLabelStatus;
     private javax.swing.JMenuBar jMainMenuBar;
     private javax.swing.JMenu jMenuEdit;
@@ -686,6 +867,8 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private javax.swing.JMenuItem jMenuItemManager;
     private javax.swing.JMenuItem jMenuItemNew;
     private javax.swing.JMenuItem jMenuItemPaste;
+    private javax.swing.JMenuItem jMenuItemPrint;
+    private javax.swing.JMenuItem jMenuItemSave;
     private javax.swing.JMenu jMenuManage;
     private javax.swing.JMenu jMenuNew;
     private javax.swing.JPopupMenu jPopupMenuContextual;
@@ -696,6 +879,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JSplitPane jSplitPaneCentral;
     private javax.swing.JLabel jStatusAnimationLabel;
     private javax.swing.JPanel jStatusPanel;

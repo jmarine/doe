@@ -14,6 +14,7 @@ import java.awt.Frame;
 import java.util.HashMap;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -64,6 +65,12 @@ public class DefaultWindowManager implements WindowManager
         window.setLayout(new BorderLayout());            
         if(contentPane != null) {
             window.add((Component)contentPane, BorderLayout.CENTER);
+        }
+
+        if((contentPane != null) && (contentPane instanceof JComponent)) {
+            JComponent swingComponent = (JComponent)contentPane;
+            window.getActionMap().put("print", swingComponent.getActionMap().get("print"));
+            window.getActionMap().put("save", swingComponent.getActionMap().get("save"));
         }
         
         return window;

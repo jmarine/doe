@@ -16,7 +16,9 @@ import org.jdesktop.application.SingleFrameApplication;
 import org.doe4ejb3.util.DOEUtils;
 
 
-
+// Note: ProxyActions only works when values are defined in actionmaps of the focused component
+// (but doesn't execute actions defined hierarchically in actionmaps of parents containers)
+// @org.jdesktop.application.ProxyActions(value={"save", "print"})
 public class Application extends SingleFrameApplication {
 
     /**

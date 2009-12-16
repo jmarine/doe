@@ -182,6 +182,18 @@ class MDIDesktopManager extends DefaultDesktopManager {
         this.desktop = desktop;
     }
 
+    public void activateFrame(javax.swing.JInternalFrame iFrame)
+    {
+        super.activateFrame(iFrame);
+        desktop.firePropertyChange("mdiFrameActive", false, true);
+    }
+
+    public void deactivateFrame(javax.swing.JInternalFrame iFrame)
+    {
+        super.deactivateFrame(iFrame);
+        desktop.firePropertyChange("mdiFrameActive", true, false);
+    }
+
     public void endResizingFrame(JComponent f) {
         super.endResizingFrame(f);
         resizeDesktop();
