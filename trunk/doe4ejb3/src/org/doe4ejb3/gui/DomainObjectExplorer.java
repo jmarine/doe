@@ -123,15 +123,17 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         jMenuItemManager = new javax.swing.JMenuItem();
         jToolBar = new javax.swing.JToolBar();
         jButtonManage = new javax.swing.JButton();
+        jSeparator6 = new javax.swing.JToolBar.Separator();
         jButtonNew = new javax.swing.JButton();
         jButtonSave = new javax.swing.JButton();
         jButtonPrint = new javax.swing.JButton();
-        jSeparator3 = new javax.swing.JSeparator();
+        jSeparator8 = new javax.swing.JToolBar.Separator();
         jButtonCut = new javax.swing.JButton();
         jButtonCopy = new javax.swing.JButton();
         jButtonPaste = new javax.swing.JButton();
-        jSeparator4 = new javax.swing.JSeparator();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
         jButtonConnectionProperties = new javax.swing.JButton();
+        jSeparator7 = new javax.swing.JToolBar.Separator();
         jStatusPanel = new javax.swing.JPanel();
         jLabelStatus = new javax.swing.JLabel();
         jProgressPanel = new javax.swing.JPanel();
@@ -175,15 +177,15 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         });
 
         jButtonManage.setAction(actionMap.get("manageSelectedEntity")); // NOI18N
-        jButtonManage.setMnemonic('m');
+        jButtonManage.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/manager.png"))); // NOI18N
         jButtonManage.setFocusable(false);
         jButtonManage.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonManage.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar.add(jButtonManage);
+        jToolBar.add(jSeparator6);
 
         jButtonNew.setAction(actionMap.get("createSelectedEntity")); // NOI18N
         jButtonNew.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/new.png"))); // NOI18N
-        jButtonNew.setMnemonic('n');
         jButtonNew.setFocusable(false);
         jButtonNew.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonNew.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -191,7 +193,6 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
 
         jButtonSave.setAction(actionMap.get("save")); // NOI18N
         jButtonSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/save.png"))); // NOI18N
-        jButtonSave.setMnemonic('s');
         jButtonSave.setText(resourceMap.getString("save.Action.text")); // NOI18N
         jButtonSave.setFocusable(false);
         jButtonSave.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
@@ -199,16 +200,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         jToolBar.add(jButtonSave);
 
         jButtonPrint.setAction(actionMap.get("print")); // NOI18N
-        jButtonPrint.setMnemonic('p');
+        jButtonPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/print.png"))); // NOI18N
         jButtonPrint.setText(resourceMap.getString("print.Action.text")); // NOI18N
         jButtonPrint.setFocusable(false);
         jButtonPrint.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonPrint.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar.add(jButtonPrint);
-
-        jSeparator3.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator3.setMaximumSize(new java.awt.Dimension(4, 0));
-        jToolBar.add(jSeparator3);
+        jToolBar.add(jSeparator8);
 
         jButtonCut.setAction(actionMap.get("cut")); // NOI18N
         jButtonCut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/cut.png"))); // NOI18N
@@ -246,10 +244,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
             }
         });
         jToolBar.add(jButtonPaste);
-
-        jSeparator4.setOrientation(javax.swing.SwingConstants.VERTICAL);
-        jSeparator4.setMaximumSize(new java.awt.Dimension(4, 0));
-        jToolBar.add(jSeparator4);
+        jToolBar.add(jSeparator3);
 
         jButtonConnectionProperties.setAction(actionMap.get("openConnectionManager")); // NOI18N
         jButtonConnectionProperties.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/credentials.png"))); // NOI18N
@@ -261,6 +256,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
             }
         });
         jToolBar.add(jButtonConnectionProperties);
+        jToolBar.add(jSeparator7);
 
         getContentPane().add(jToolBar, java.awt.BorderLayout.NORTH);
 
@@ -877,9 +873,11 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
     private javax.swing.JScrollPane jScrollDesktopPane;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JPopupMenu.Separator jSeparator5;
+    private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JToolBar.Separator jSeparator8;
     private javax.swing.JSplitPane jSplitPaneCentral;
     private javax.swing.JLabel jStatusAnimationLabel;
     private javax.swing.JPanel jStatusPanel;
