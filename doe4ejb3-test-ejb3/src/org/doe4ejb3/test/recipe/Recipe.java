@@ -80,7 +80,7 @@ public class Recipe implements java.io.Serializable
     }
 
     @PropertyDescriptor(index=1)
-    @Column(name="TITLE", updatable=false, nullable=false, unique=true, length=100)
+    @Column(name="TITLE", updatable=true, nullable=false, unique=true, length=100)
     public String getTitle()
     {
         return title;
