@@ -71,6 +71,7 @@ public class DefaultWindowManager implements WindowManager
             JComponent swingComponent = (JComponent)contentPane;
             window.getActionMap().put("print", swingComponent.getActionMap().get("print"));
             window.getActionMap().put("save", swingComponent.getActionMap().get("save"));
+            window.getActionMap().put("edit", swingComponent.getActionMap().get("edit"));
         }
         
         return window;

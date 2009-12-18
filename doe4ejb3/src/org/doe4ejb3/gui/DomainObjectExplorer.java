@@ -125,6 +125,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         jButtonManage = new javax.swing.JButton();
         jSeparator6 = new javax.swing.JToolBar.Separator();
         jButtonNew = new javax.swing.JButton();
+        jButtonEdit = new javax.swing.JButton();
         jButtonSave = new javax.swing.JButton();
         jButtonPrint = new javax.swing.JButton();
         jSeparator8 = new javax.swing.JToolBar.Separator();
@@ -146,6 +147,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         jMenuNew = new javax.swing.JMenu();
         jMenuManage = new javax.swing.JMenu();
         jSeparator1 = new javax.swing.JSeparator();
+        jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItemSave = new javax.swing.JMenuItem();
         jMenuItemPrint = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
@@ -190,6 +192,13 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         jButtonNew.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         jButtonNew.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar.add(jButtonNew);
+
+        jButtonEdit.setAction(actionMap.get("editSelectedObject")); // NOI18N
+        jButtonEdit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/edit.png"))); // NOI18N
+        jButtonEdit.setFocusable(false);
+        jButtonEdit.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonEdit.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar.add(jButtonEdit);
 
         jButtonSave.setAction(actionMap.get("save")); // NOI18N
         jButtonSave.setIcon(new javax.swing.ImageIcon(getClass().getResource("/org/doe4ejb3/gui/resources/save.png"))); // NOI18N
@@ -291,11 +300,17 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         jMenuFile.add(jMenuManage);
         jMenuFile.add(jSeparator1);
 
+        jMenuItem1.setAction(actionMap.get("editSelectedObject")); // NOI18N
+        jMenuItem1.setMnemonic('e');
+        jMenuFile.add(jMenuItem1);
+
         jMenuItemSave.setAction(actionMap.get("save")); // NOI18N
+        jMenuItemSave.setMnemonic('S');
         jMenuItemSave.setText(resourceMap.getString("save.Action.text")); // NOI18N
         jMenuFile.add(jMenuItemSave);
 
         jMenuItemPrint.setAction(actionMap.get("print")); // NOI18N
+        jMenuItemPrint.setMnemonic('p');
         jMenuItemPrint.setText(resourceMap.getString("print.Action.text")); // NOI18N
         jMenuFile.add(jMenuItemPrint);
         jMenuFile.add(jSeparator5);
@@ -762,6 +777,18 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         }
     }
 
+    
+    public boolean isEntitySelected() {
+        JScrollPane scrollPane = (JScrollPane)jOutlinePanePersistenceUnits.getSelectedTabComponent();
+        if(scrollPane != null) {
+            JList selectedList = (JList)scrollPane.getViewport().getView();
+            if(selectedList != null) {
+                return (selectedList.getSelectedValue() != null);
+            }
+        }
+        return false;
+    }
+
     @org.jdesktop.application.Action(enabledProperty="printEnabled")
     public void print() {
         JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
@@ -778,7 +805,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         if(iFrame != null) {
             Action printAction = iFrame.getActionMap().get("print");
             if(printAction != null) {
-                return true;
+                return printAction.isEnabled();
             }
         }
         return false;
@@ -788,9 +815,9 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
     public void save() {
         JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
         if(iFrame != null) {
-            Action printAction = iFrame.getActionMap().get("save");
-            if(printAction != null) {
-                printAction.actionPerformed(new ActionEvent(iFrame, ActionEvent.ACTION_PERFORMED, "save"));
+            Action saveAction = iFrame.getActionMap().get("save");
+            if(saveAction != null) {
+                saveAction.actionPerformed(new ActionEvent(iFrame, ActionEvent.ACTION_PERFORMED, "save"));
             }
         }
     }
@@ -798,31 +825,46 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
     public boolean isSaveEnabled() {
         JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
         if(iFrame != null) {
-            Action printAction = iFrame.getActionMap().get("save");
-            if(printAction != null) {
-                return true;
+            Action saveAction = iFrame.getActionMap().get("save");
+            if(saveAction != null) {
+                return saveAction.isEnabled();
             }
         }
         return false;
     }
 
-    public boolean isEntitySelected() {
-        JScrollPane scrollPane = (JScrollPane)jOutlinePanePersistenceUnits.getSelectedTabComponent();
-        if(scrollPane != null) {
-            JList selectedList = (JList)scrollPane.getViewport().getView();
-            if(selectedList != null) {
-                return (selectedList.getSelectedValue() != null);
+                                                                @org.jdesktop.application.Action(enabledProperty="editEnabled")
+    public void editSelectedObject() {
+        JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
+        if(iFrame != null) {
+            Action editAction = iFrame.getActionMap().get("edit");
+            if(editAction != null) {
+                editAction.actionPerformed(new ActionEvent(iFrame, ActionEvent.ACTION_PERFORMED, "edit"));
+            }
+        }
+    }
+
+    public boolean isEditEnabled() {
+        JInternalFrame iFrame = mdiDesktopPane.getSelectedFrame();
+        if(iFrame != null) {
+            Action editAction = iFrame.getActionMap().get("edit");
+            if(editAction != null) {
+                return true;   // editAction.isEnabled();
             }
         }
         return false;
     }
+
+    
 
     public void enableActionsFromInternalWindows()
     {
         boolean saveEnabled = isSaveEnabled();
         boolean printEnabled = isPrintEnabled();
+        boolean editEnabled = isEditEnabled();
         firePropertyChange("printEnabled", !printEnabled, printEnabled);
         firePropertyChange("saveEnabled", !saveEnabled, saveEnabled);
+        firePropertyChange("editEnabled", !editEnabled, editEnabled);
     }
 
     public void enableActionsFromSelectedEntity()
@@ -845,6 +887,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
     private javax.swing.JButton jButtonConnectionProperties;
     private javax.swing.JButton jButtonCopy;
     private javax.swing.JButton jButtonCut;
+    private javax.swing.JButton jButtonEdit;
     private javax.swing.JButton jButtonManage;
     private javax.swing.JButton jButtonNew;
     private javax.swing.JButton jButtonPaste;
@@ -855,6 +898,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
     private javax.swing.JMenu jMenuEdit;
     private javax.swing.JMenu jMenuFile;
     private javax.swing.JMenu jMenuHelp;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItemAbout;
     private javax.swing.JMenuItem jMenuItemConnectionProperties;
     private javax.swing.JMenuItem jMenuItemCopy;

@@ -95,6 +95,7 @@ public class EntityManagerPane extends javax.swing.JPanel implements EditorLayou
         
         // Define public actions (for Netbeans integration)
         this.getActionMap().put("print", entityListEditor.getActionMap().get("print"));
+        this.getActionMap().put("edit", entityListEditor.getActionMap().get("edit"));
 
         
     }

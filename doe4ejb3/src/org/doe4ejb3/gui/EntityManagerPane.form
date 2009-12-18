@@ -4,6 +4,7 @@
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="0"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
     <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
     <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="2"/>
@@ -41,7 +42,7 @@
                       <Group type="102" alignment="0" attributes="0">
                           <Component id="jLabelQuery" min="-2" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jComboBoxNamedQuery" pref="437" max="32767" attributes="1"/>
+                          <Component id="jComboBoxNamedQuery" pref="429" max="32767" attributes="1"/>
                           <EmptySpace max="-2" attributes="0"/>
                           <Component id="jButtonSearch" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -104,7 +105,6 @@
             <Property name="action" type="javax.swing.Action" editor="org.netbeans.modules.swingapp.ActionEditor">
               <action class="org.doe4ejb3.gui.EntityManagerPane" id="searchInstances" methodName=""/>
             </Property>
-            <Property name="mnemonic" type="int" value="115"/>
           </Properties>
         </Component>
         <Container class="javax.swing.JPanel" name="jPanelResults">
@@ -117,7 +117,7 @@
             </DimensionLayout>
             <DimensionLayout dim="1">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <EmptySpace min="0" pref="316" max="32767" attributes="0"/>
+                  <EmptySpace min="0" pref="315" max="32767" attributes="0"/>
               </Group>
             </DimensionLayout>
           </Layout>
