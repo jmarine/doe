@@ -1114,6 +1114,7 @@ public class EditorFactory
 
         map = panel.getActionMap();
         map.put("print", printAction);
+        map.put("edit", editAction);
         map.put(TransferHandler.getCutAction().getValue(Action.NAME),
                 TransferHandler.getCutAction());
         map.put(TransferHandler.getCopyAction().getValue(Action.NAME),
