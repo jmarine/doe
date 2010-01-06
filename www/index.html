@@ -139,7 +139,7 @@ The <b>"Domain Object Explorer"</b> is a desktop application that auto-generates
 	<li>Deploy the EAR archive to Glassfish application server (with the "Enterprise Application" type, and the "Java Web Start" option enabled). <br>
             Important note: it seems that Glassfish v3 doesn't support directory deployment of application clients, so don't deploy the applications from NetBeans 6.x (issue 11071).</li>
 	</ol>
-If you want to test "doe4ejb3-test-app" sample application, you only have to open the project with NetBeans 6.x to build EAR archive, and use the Glassfish administrative console to configure database connection parameters (with the JDBC resource's JNDI name as "jdbc/doe4ejb3"), and deploy the EAR application with "Java Web Start" option enabled.
+Note: If you want to test "doe4ejb3-test-app" sample application, you only have to open the project with NetBeans 6.x to build EAR archive, and use the Glassfish administrative console to configure database connection parameters (with the JDBC resource's JNDI name as "jdbc/doe4ejb3"), and deploy the EAR application with "Java Web Start" option enabled.
     </blockquote>
 
 
@@ -147,7 +147,7 @@ If you want to test "doe4ejb3-test-app" sample application, you only have to ope
     <h3>Usage Instructions</h3>
     </a>
     <blockquote>
-    The application can be launched with the command "javaws http://localhost:8080/doe4ejb3-test-app/doe4ejb3-app-client" (supposing "doe4ejb3-test-app" is the EAR application name, and "doe4ejb3-app-client" is "doe" application client name, as it is in the sample application).<br>
+    The application can be launched from Glassfish administrative console (selecting the deployed EAR application, and following the "launch" link action of the "doe4ejb3-app-client.jar" module), or with the command "javaws http://localhost:8080/doe4ejb3-test-app/doe4ejb3-app-client" (supposing "doe4ejb3-test-app" is the EAR application name, and "doe4ejb3-app-client" is "doe" application client name, as it is in the sample application).<br>
 After installation, you can also launch it from Java Web Start viewer (command: "javaws -viewer").
 <br><br>
 The application has the following features:
