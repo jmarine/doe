@@ -625,6 +625,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         info.append("   Java tutorial and demo writers.\n");
         info.append("   Gerald Nunn (MDIDesktopPane/WindowMenu article)\n");
         info.append("   Michael Urban (AbstractValidator article)\n");
+        info.append("   Charlie Hubbard (DateTimePicker bean)\n");
         info.append("\n");
         DOEUtils.getWindowManager().showMessageDialog(info.toString(), I18n.getLiteral("about.Action.text"), JOptionPane.INFORMATION_MESSAGE);
     }
