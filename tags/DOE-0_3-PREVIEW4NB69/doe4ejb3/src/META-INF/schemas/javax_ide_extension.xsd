@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+      Copyright 2005 by Oracle USA
+      500 Oracle Parkway, Redwood Shores, California, 94065, U.S.A.
+      All rights reserved. 
+-->
+<xs:schema targetNamespace="http://jcp.org/jsr/198/extension-manifest"
+           xmlns="http://jcp.org/jsr/198/extension-manifest"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <!-- Root element declaration============================================ -->
+  <xs:element name="extension">
+    <xs:annotation>
+      <xs:documentation>Unit of dependency</xs:documentation>
+    </xs:annotation>  
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="identifiableType">
+          <xs:all>
+            <xs:element name="name" type="i18n_string" minOccurs="1"/>
+
+            <xs:element name="owner" type="i18n_string" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>Extension writer name</xs:documentation>
+              </xs:annotation>
+            </xs:element>
+
+            <xs:element name="platform-info" type="platformInfoType" minOccurs="0"/>
+            <xs:element name="classpaths" type="classpathsType" minOccurs="0"/>
+            <xs:element name="hooks" type="hooksType" minOccurs="0" />
+            <xs:element name="dependencies" minOccurs="0" type="dependenciesType"/>
+
+          </xs:all>
+          <xs:attribute name="version" use="required" type="versionNumber" />
+          <xs:attribute name="esdk-version" use="required" type="versionNumber" />
+          <xs:attribute name="rsbundle-class" type="className"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="custom-hook" type="customHookType" abstract="true"/>
+
+  <!-- Type declarations ============================================= -->
+  <!-- complexType declaration for identifiables -->
+  <xs:complexType name="identifiableType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>  
+
+  <xs:complexType name="customHookType">
+  </xs:complexType>  
+
+  <!-- Platform info declaration -->
+  <xs:complexType name="platformInfoType">
+    <xs:sequence>
+      <xs:element name="toolkit" type="toolkitType" maxOccurs="2"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Extension hooks declaration -->
+  <xs:complexType name="hooksType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded" >
+        <xs:element name="menu-hook" type="menuHookType" minOccurs="0"/>
+        <xs:element name="document-hook" type="documentHookType" minOccurs="0"/>
+        <xs:element name="ide-listener-hook" type="ideListenerHookType" minOccurs="0"/>
+        <xs:element name="editor-hook" type="editorHookType" minOccurs="0"/>
+        <xs:element name="property-hook" type="propertyHookType" minOccurs="0"/>
+        <xs:element name="log-hook" type="logHookType" minOccurs="0"/>
+        <xs:element name="wizard-hook" type="wizardHookType" minOccurs="0"/>
+        <xs:element name="build-system-hook" type="buildSystemHookType" minOccurs="0"/>
+        <xs:element name="feature-hook" type="featureHookType" minOccurs="0"/>
+        <xs:element name="hook-handler-hook" type="hookHandlerHookType" minOccurs="0"/>
+      <xs:element name="vfs-hook" minOccurs="0" type="vfsHookType"/>
+      <xs:element ref="custom-hook" minOccurs="0"/>
+    </xs:choice>
+  </xs:complexType>
+  <!-- Abstract hook type -->
+  <xs:complexType name="hookType" abstract="true" />
+
+  <!-- Command hook declaration -->
+  <xs:complexType name="menuHookType" >
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:all>
+          <xs:element name="actions" type="actionsType" minOccurs="0"/>
+          <xs:element name="menus" type="menusType" minOccurs="0"/>
+          <xs:element name="toolbars" type="toolbarsType" minOccurs="0"/>
+          <xs:element name="item-factories" minOccurs="0">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="item-factory-class" minOccurs="1"
+                            maxOccurs="unbounded"/>
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:all>    
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Document hook declaration -->
+  <xs:complexType name="documentHookType">
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:all>
+          <xs:element name="documents" type="recognizersType" minOccurs="0"/>
+          <xs:element name="listeners" type="modelListenersType"
+            minOccurs="0"/>
+        </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- IDE listener hook declaration -->
+  <xs:complexType name="ideListenerHookType">
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:all>
+          <xs:element name="ide-listeners" type="ideListenersType" 
+            minOccurs="0"/>
+        </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- IDE properties hook declaration -->
+  <xs:complexType name="propertyHookType">
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:sequence>
+          <xs:element name="property-pages" type="propertyPagesType" />
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Editor hook declaration -->
+  <xs:complexType name="editorHookType">
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:all>
+          <xs:element name="editors" type="editorsType" minOccurs="0"/>
+          <xs:element name="mappings" type="mappingsType" minOccurs="0"/>
+          <xs:element name="editor-listeners" type="editorListenersType" 
+            minOccurs="0"/>
+        </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Log window hook declaration -->
+  <xs:complexType name="logHookType">
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:all>
+          <xs:element name="log-pages" type="logPagesType" minOccurs="0"/>
+        </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Wizard hook declaration -->
+  <xs:complexType name="wizardHookType">
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:all>
+          <xs:element name="wizards" type="wizardsType" minOccurs="0"/>
+        </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Build System hook declaration -->
+  <xs:complexType name="buildSystemHookType">
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:all>
+          <xs:element name="build-listeners" type="ideListenersType" 
+            minOccurs="0"/>
+        </xs:all>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Hook handler declaration -->
+  <xs:complexType name="hookHandlerHookType">
+    <xs:complexContent>
+      <xs:extension base="hookType">
+        <xs:sequence>
+          <xs:element name="hook-handler" maxOccurs="unbounded" minOccurs="0">
+            <xs:annotation>
+              <xs:documentation>Fully qualified class name of the class used to process a custom extension</xs:documentation>
+            </xs:annotation>                  
+            <xs:complexType>
+              <xs:attribute name="tag-name" type="xs:string" use="required"/>
+              <xs:attribute name="handler-class" type="className" use="required"/>
+              <xs:attribute name="namespace" type="xs:anyURI" use="required"/>
+              <xs:attribute name="schema-location" type="xs:string"/>
+            </xs:complexType> 
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <!-- Feature hook -->
+  <xs:complexType name="featureHookType">
+    <xs:all>
+      <xs:element name="license" type="i18n_string" minOccurs="0"/>
+      <xs:element name="copyright" type="i18n_string" minOccurs="0"/>
+      <xs:element name="iconpath" type="i18n_string" minOccurs="0"/>
+      <xs:element name="description" type="i18n_string" minOccurs="0"/>
+      <xs:element name="optional" type="xs:boolean" default="true"/>
+      <xs:element name="part-of" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <!-- actions declaration -->
+  <xs:complexType name="actionsType">
+    <xs:sequence>
+      <xs:element name="action" type="actionType" 
+        minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="action-override" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="invoke-class" type="className"/>
+            <xs:element name="update-class" type="className" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="action-ref" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Menus declaration -->
+  <xs:complexType name="menusType">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element name="menubar" type="menuBarType" />
+        <xs:element name="popup" type="popupType" />
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Action declaration -->
+  <xs:complexType name="typeType">
+    <xs:all>
+      <xs:element name="toggle" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="context-sensitive" type="xs:boolean" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="actionType">
+    <xs:complexContent>
+      <xs:extension base="identifiableType">
+        <xs:all>
+          <xs:element name="label" type="i18n_string" minOccurs="1"/>
+          <xs:element name="mnemonic" type="i18n_char" minOccurs="0"/>
+          <xs:element name="tooltip" type="i18n_string" minOccurs="0"/>
+          <xs:element name="iconpath" type="i18n_string" minOccurs="0"/>
+          <xs:element name="enabled" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="checked" type="xs:boolean" minOccurs="0"/>
+          <xs:element name="invoke-class" type="className" minOccurs="0"/>
+          <xs:element name="update-class" type="className" minOccurs="0"/>
+        </xs:all>
+        <xs:attribute name="toggle" type="xs:boolean"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="popupType">
+    <xs:complexContent>
+      <xs:extension base="sectionContainerType"/>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Pulldown menu declaration -->
+  <xs:complexType name="menuBarType">
+    <xs:complexContent>
+      <xs:extension base="identifiableType">
+        <xs:sequence>
+          <xs:element name="menu" type="menuType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Pulldown menu declaration -->
+  <xs:complexType name="sectionContainerType">
+    <xs:complexContent>
+      <xs:extension base="identifiableType">
+        <xs:sequence maxOccurs="unbounded" minOccurs="0">
+          <xs:element name="section" type="sectionType"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Menu declaration -->
+  <xs:complexType name="menuType">
+    <xs:complexContent>
+      <xs:extension base="identifiableType">
+        <xs:sequence minOccurs="0">
+          <xs:element name="label" type="i18n_string" minOccurs="0"
+                      maxOccurs="1"/>
+          <xs:element name="mnemonic" type="i18n_char" minOccurs="0"
+                      maxOccurs="1"/>
+          <xs:element name="tooltip" type="i18n_string" minOccurs="0"
+                      maxOccurs="1"/>
+          <xs:element name="iconpath" type="i18n_string" minOccurs="0"
+                      maxOccurs="1"/>
+    
+          <xs:element name="section" maxOccurs="unbounded" minOccurs="0"
+                      type="sectionType"/>
+        </xs:sequence>
+        <xs:attributeGroup ref="menuPositionAttributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Menu item declaration -->
+  <xs:attributeGroup name="menuPositionAttributes">
+    <xs:attribute name="before" type="xs:string"/>
+    <xs:attribute name="after" type="xs:string"/>
+  </xs:attributeGroup>
+  <xs:complexType name="itemType">
+    <xs:attribute name="action-ref" type="xs:string" use="required"/>
+    <xs:attribute name="radiogroup-id"/>
+    <xs:attributeGroup ref="menuPositionAttributes"/>
+  </xs:complexType>
+  <!-- Menu section declaration -->
+  <xs:complexType name="sectionType">
+    <xs:complexContent>
+      <xs:extension base="identifiableType">
+        <xs:sequence>
+          <xs:choice maxOccurs="unbounded">
+            <xs:element name="item" type="itemType" />
+            <xs:element name="menu" type="menuType" />
+          </xs:choice>
+        </xs:sequence>
+        <xs:attributeGroup ref="menuPositionAttributes"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="toolbarsType">
+    <xs:sequence>
+      <xs:element name="toolbar" type="sectionContainerType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Tool declaration -->
+  <!-- Toolbar section declaration -->
+  <xs:complexType name="toolSectionType">
+    <xs:complexContent>
+      <xs:extension base="identifiableType">
+        <xs:sequence>
+          <xs:element name="item" type="itemType" maxOccurs="unbounded"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <!-- Radio group declaration -->
+  <xs:complexType name="radioGroupType">
+    <xs:complexContent>
+      <xs:extension base="identifiableType">
+        <xs:sequence>
+          <xs:element name="radio-item" type="itemType" 
+            minOccurs="2" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="weight" type="xs:float"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  
+  <!-- VFS hook declaration -->
+  <xs:complexType name="vfsHookType">
+    <xs:sequence>
+      <xs:element name="helper" type="vfsHelperType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="vfsHelperType">
+    <xs:attribute name="helper-class" type="className" use="required"/>
+    <xs:attribute name="scheme" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <!-- Libraries declaration -->
+  <!-- If the extension is not packaged in one jar, libraries lists -->
+  <!-- additional jars required for the extension to run -->
+  <xs:complexType name="classpathsType">
+    <xs:sequence>
+      <xs:element name="classpath" 
+                  type="xs:string" 
+                  minOccurs="0" 
+                  maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Dependencies declaration -->
+  <!-- Lists other extensions an extension dependes on -->
+  <xs:complexType name="dependenciesType">
+    <xs:sequence>
+      <xs:element name="import" 
+                  maxOccurs="unbounded" 
+                  minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>Import extensions used</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="minVersion" type="versionNumber"
+                            use="optional"/>
+              <xs:attribute name="maxVersion" type="versionNumber"/>
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType> 
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- IDE listener hook declarations ===================================== -->
+  <!-- IDE listeners -->
+  <xs:complexType name="ideListenersType">
+    <xs:sequence>
+      <xs:element name="listener-class" type="className" minOccurs="0"
+                  maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Document hook declarations ========================================= -->
+  <!-- Documents -->
+  <xs:complexType name="recognizersType">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element name="by-suffix" type="suffixRecognizerType"
+                  minOccurs="1"
+                  maxOccurs="unbounded"/>
+      <xs:element name="by-xml-root" type="xmlRootDocumentType" minOccurs="1"
+                  maxOccurs="unbounded"/>
+      <xs:element name="by-xml-doctype" type="xmlDocType" minOccurs="1"
+                  maxOccurs="unbounded"/>
+      <xs:element name="by-recognizer" type="customRecognizerType" 
+        minOccurs="1" maxOccurs="unbounded"/>
+    </xs:choice>
+  </xs:complexType>
+  <!-- Text documents -->
+  <xs:complexType name="suffixRecognizerType">
+    <xs:sequence>
+      <xs:element name="suffix" type="xs:string" 
+        minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="document-class" use="required"/>
+  </xs:complexType>
+  <!-- XML documents -->
+  <xs:complexType name="xmlRootDocumentType">
+    <xs:sequence>
+      <xs:element name="suffix" minOccurs="0" maxOccurs="unbounded"
+                  type="xs:string"/>
+      <xs:element name="root-element" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="namespace" use="required"/>
+          <xs:attribute name="localName" use="required"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="document-class"/>
+  </xs:complexType>
+  <xs:complexType name="xmlDocType">
+    <xs:sequence>
+      <xs:element name="suffix" maxOccurs="unbounded" minOccurs="0"/>
+      <xs:element name="doc-type" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="public-id"/>
+          <xs:attribute name="system-id"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="document-class"/>
+  </xs:complexType>
+  <!-- Custom documents -->
+  <xs:complexType name="customRecognizerType">
+    <xs:attribute name="recognizer-class" use="required"/>
+  </xs:complexType>
+  <!-- Model listeners -->
+  <xs:complexType name="modelListenersType">
+    <xs:sequence>
+      <xs:element name="document-listener" type="listenerType" minOccurs="0"
+                  maxOccurs="unbounded"/>
+      <xs:element name="property-listener" type="listenerType" minOccurs="0"
+                  maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- Editor hook declarations ========================================= -->
+  <!-- Editors -->
+  <xs:complexType name="editorsType">
+    <xs:sequence>
+      <xs:element name="editor" 
+        minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="editorType">
+              <xs:all>
+                <xs:element name="name" type="i18n_string" minOccurs="1"/>
+              </xs:all>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="editorType">
+    <xs:attribute name="editor-class" type="className" use="required"/>
+  </xs:complexType>
+  <!-- Mappings -->
+  <xs:complexType name="mappingsType">
+    <xs:sequence>
+      <xs:element name="mapping" type="mappingType"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="mappingType">
+    <xs:sequence>
+      <xs:element name="open-with" type="openWithType"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="document-class" type="className" use="required"/>
+  </xs:complexType>
+  <xs:complexType name="openWithType">
+    <xs:attribute name="editor-class" type="className" use="required"/>
+    <xs:attribute name="preferred" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+  <!-- Editor listeners -->
+  <xs:complexType name="editorListenersType">
+    <xs:sequence>
+      <xs:element name="editor-listener" minOccurs="0"
+                  maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="listenerType"/>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <!-- property pages hook declarations ============================== -->
+  <!-- property pages -->
+  <xs:complexType name="propertyPagesType">
+    <xs:sequence>
+      <xs:element name="property-page" type="propertyPageType" 
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="propertyPageType">
+    <xs:all>
+      <xs:element name="label" type="i18n_string"/>
+      <xs:element name="object-class" type="className"/>
+    </xs:all>
+    <xs:attribute name="property-page-class" type="className" use="required"/>
+    <xs:attribute name="parent-page" type="className"/>
+  </xs:complexType>
+  <!-- Log hook declarations ========================================= -->
+  <!-- Pages -->
+  <xs:complexType name="logPagesType">
+    <xs:sequence>
+      <xs:element name="log-page" type="logPageType"
+        minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="logPageType">
+    <xs:attribute name="log-page-class" type="className" use="required"/>
+  </xs:complexType>
+  <!-- Wizard hook declarations ========================================= -->
+  <!-- Wizards -->
+  <xs:complexType name="wizardsType">
+    <xs:sequence>
+      <xs:element name="wizard-category" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="identifiableType">
+              <xs:sequence>
+                <xs:element name="label" type="i18n_string"/>
+              </xs:sequence>
+              <xs:attribute name="parent-category" type="xs:string"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="wizard" 
+        minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:complexContent>
+            <xs:extension base="wizardType">
+              <xs:attribute name="category-ref" type="className"/>
+            </xs:extension>
+          </xs:complexContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="wizardType">
+    <xs:all>
+      <xs:element name="label" type="i18n_string"/>
+      <xs:element name="iconpath" type="i18n_string"/>
+      <xs:element name="tooltip" type="i18n_string"/>
+    </xs:all>
+    <xs:attribute name="wizard-class" type="className" use="required"/>
+  </xs:complexType>
+  <!-- Type declarations ================================================== -->
+  <!-- Localizable string type -->
+  <xs:complexType name="i18n_string">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="rskey" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:simpleType name="char">
+    <xs:restriction base="xs:string">
+      <xs:length value="1" fixed="true"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="i18n_char">
+    <xs:simpleContent>
+      <xs:extension base="char">
+        <xs:attribute name="rskey" type="xs:string"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="docTypeType">
+    <xs:attribute name="public-id" type="xs:string"/>
+    <xs:attribute name="system-id" type="xs:string"/>
+  </xs:complexType>
+
+  <xs:complexType name="listenerType">
+    <xs:attribute name="listener-class" type="className" use="required"/>
+    <xs:attribute name="source-class" type="className" use="optional"/>
+  </xs:complexType>
+  
+  <!-- Custom type for xml elements or attributes which are class names. -->
+  <xs:simpleType name="className">
+    <xs:restriction base="xs:normalizedString" />
+  </xs:simpleType>
+  
+  <!-- Custom type for allowed toolkit types. -->
+  <xs:simpleType name="toolkitType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="swing" />
+      <xs:enumeration value="swt" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:simpleType name="versionNumber">
+    <xs:restriction base="xs:token">
+      <xs:pattern value="[\.0-9]+" />
+    </xs:restriction>
+  </xs:simpleType>
+  
+</xs:schema>
