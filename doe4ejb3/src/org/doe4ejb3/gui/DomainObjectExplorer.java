@@ -609,7 +609,7 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         info.append(I18n.getLiteral(Application.class, "Application.name") + " - v" + I18n.getLiteral(Application.class, "Application.version")); info.append("\n");
         info.append("\n");
         info.append(I18n.getLiteral("msg.developers")); info.append("\n");
-        info.append("   Jordi Marine Fort <jmarine@dev.java.net>\n");
+        info.append("   Jordi Marine Fort <jmarine@java.net>\n");
         info.append("\n");
         info.append(I18n.getLiteral("msg.thanksTo")); info.append("\n");
         info.append("   SUN Microsystems, Inc.\n");
