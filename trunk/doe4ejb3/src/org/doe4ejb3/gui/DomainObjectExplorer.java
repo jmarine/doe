@@ -612,13 +612,14 @@ public class DomainObjectExplorer extends javax.swing.JFrame implements ListSele
         info.append("   Jordi Marine Fort <jmarine@java.net>\n");
         info.append("\n");
         info.append(I18n.getLiteral("msg.thanksTo")); info.append("\n");
-        info.append("   SUN Microsystems, Inc.\n");
+        info.append("   Oracle & SUN Microsystems, Inc.\n");
         info.append("   Java.net comunity.\n");
         info.append("   NetBeans community.\n");
         info.append("   GlassFish community.\n");
-        info.append("   TopLink Essentials team.\n");
+        info.append("   EclipseLink team.\n");
         info.append("   Trails framework team.\n");
         info.append("   ANTLR project team.\n");
+        info.append("   SwingLabs team.\n");        
         info.append("   Beans binding project team.\n");
         info.append("   Swing application framework team.\n");
         info.append("   JAXB framework team.\n");
