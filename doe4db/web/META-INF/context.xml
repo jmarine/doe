@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context antiJARLocking="true" path="/doe">
+  <!--
+  <Resource name="jdbc/doe4db" auth="Container" type="javax.sql.DataSource"
+               maxTotal="100" maxIdle="30" maxWaitMillis="10000"
+               username="app" password="app" driverClassName="org.apache.derby.jdbc.ClientDataSource"
+               url="jdbc:derby://localhost:1527/sample"/>
+               -->
+               
+<Resource name="jdbc/doe4db" auth="Container"
+              type="javax.sql.DataSource" driverClassName="oracle.jdbc.OracleDriver"
+              url="jdbc:oracle:thin:@127.0.0.1:49161:XE"
+              username="HR" password="hr" maxTotal="20" maxIdle="10"
+              maxWaitMillis="-1"/>
+               
+</Context>
