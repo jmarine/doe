@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence">
+    
+  <persistence-unit name="Recipes" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>org.doe4ejb3.test.recipe.Category</class>
+    <class>org.doe4ejb3.test.recipe.Ingredient</class>
+    <class>org.doe4ejb3.test.recipe.Recipe</class>
+    <properties>
+      <property name="eclipselink.jdbc.url" value="jdbc:derby://localhost:1527/doe4ejb3" />
+      <property name="eclipselink.jdbc.user" value="admin" />
+      <property name="eclipselink.jdbc.password" value="adminadmin" />
+      <property name="eclipselink.logging.level" value="FINE"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="no.weaving" value="true"/>
+      <property name="eclipselink.cache.type.default" value="NONE"/>
+      <!--
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="doe4ejb3_recipe_create_javadb.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="doe4ejb3_recipe_drop_javadb.jdbc"/>
+      -->
+    </properties>
+  </persistence-unit>
+
+  
+  <persistence-unit name="Academy" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>org.doe4ejb3.test.academy.Address</class>
+    <class>org.doe4ejb3.test.academy.Person</class>
+    <class>org.doe4ejb3.test.academy.Teacher</class>
+    <class>org.doe4ejb3.test.academy.Course</class>
+    <properties>
+      <property name="eclipselink.jdbc.url" value="jdbc:derby://localhost:1527/doe4ejb3" />
+      <property name="eclipselink.jdbc.user" value="admin" />
+      <property name="eclipselink.jdbc.password" value="adminadmin" />        
+      <property name="eclipselink.logging.level" value="FINE"/>
+      <property name="eclipselink.ddl-generation" value="create-tables"/>
+      <property name="no.weaving" value="true"/>
+      <property name="eclipselink.cache.type.default" value="NONE"/>
+      <!--
+      <property name="eclipselink.create-ddl-jdbc-file-name" value="doe4ejb3_academy_create_javadb.jdbc"/>
+      <property name="eclipselink.drop-ddl-jdbc-file-name" value="doe4ejb3_academy_drop_javadb.jdbc"/>
+      -->
+    </properties>
+  </persistence-unit>
+  
+</persistence>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.apisupport.project</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
+            <code-name-base>org.doe4ejb3.netbeans.core</code-name-base>
+            <suite-component/>
+            <module-dependencies>
+                <dependency>
+                    <code-name-base>org.doe4ejb3.netbeans.libs</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+            </module-dependencies>
+            <public-packages>
+                <package>org.doe4ejb3.annotation</package>
+                <package>org.doe4ejb3.beans</package>
+                <package>org.doe4ejb3.binding</package>
+                <package>org.doe4ejb3.ejbql</package>
+                <package>org.doe4ejb3.event</package>
+                <package>org.doe4ejb3.exception</package>
+                <package>org.doe4ejb3.gui</package>
+                <package>org.doe4ejb3.jaxb.persistence</package>
+                <package>org.doe4ejb3.util</package>
+            </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/doe4ejb3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/doe4ejb3.jar</binary-origin>
+            </class-path-extension>
+        </data>
+    </configuration>
+</project>

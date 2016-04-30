@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.doe4ejb3.netbeans.libs
+OpenIDE-Module-Localizing-Bundle: org/doe4ejb3/netbeans/libs/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

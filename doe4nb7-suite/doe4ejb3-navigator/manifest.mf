@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+OpenIDE-Module: org.doe4ejb3.netbeans.navigator
+OpenIDE-Module-Layer: org/doe4ejb3/netbeans/navigator/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/doe4ejb3/netbeans/navigator/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

@@ -1,0 +1,120 @@
+/*
+ * Person.java
+ * 
+ * Created on Sep 2, 2007, 11:47:23 AM
+ * @author Jordi Mariné Fort
+ */
+
+package org.doe4ejb3.test.academy;
+
+import java.io.Serializable;
+import java.util.Date;
+import javax.persistence.*;
+import org.doe4ejb3.annotation.EntityDescriptor;
+
+
+@Entity()
+@Inheritance(strategy = InheritanceType.JOINED)
+//@EntityDescriptor(layoutClassName="org.doe4ejb3.test.academy.PersonEditor")
+public class Person implements Serializable {
+
+    
+    private String ssn;
+    
+    private String firstName;
+    
+    private String lastName;
+
+    private String gender;
+    
+    private java.util.Date bornDay;
+    
+    private Address address;
+
+    
+    @Id
+    @Column(name="ssn", length=10)
+    public String getSsn() {
+        return ssn;
+    }
+
+    protected void setSsn(String ssn) {
+        this.ssn = ssn;
+    }
+
+        
+    @Column(name="firstName", length=50)
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    @Column(name="lastName", length=50)
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+
+    @Column(name="gender", length=10)
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    
+    @Temporal(TemporalType.DATE)
+    @Column(name="bornDay")
+    public Date getBornDay() {
+        return bornDay;
+    }
+
+    public void setBornDay(Date bornDay) {
+        this.bornDay = bornDay;
+    }
+
+    
+
+    @Embedded
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+
+    public boolean equals(Object obj)
+    {
+        if( (obj != null) && (obj instanceof Person) ) {
+            Person other = (Person)obj;
+            return ssn.equals(other.getSsn());
+        }
+        return false;
+    }
+
+    public int hashCode()
+    {
+        return ssn.hashCode();
+    }
+    
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        if(firstName != null) sb.append(firstName);
+        sb.append(' ');
+        if(lastName != null) sb.append(lastName);
+        return sb.toString().trim();
+    }
+
+}
