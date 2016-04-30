@@ -1,4 +1,4 @@
-# Domain Object Explorer 
+# Data Object Explorer 
 
 Documentation
 -------------
